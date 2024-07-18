@@ -5,7 +5,7 @@ import SoftBox from "components/SoftBox";
 import Card from "@mui/material/Card";
 import SoftTypography from "components/SoftTypography";
 import Table from "examples/Tables/Table";
-
+import AddCollaborator from './addCollaborator';
 //Data
 import collaboratorTableData from "layouts/tables/data/collaboratorTableData";
 
@@ -19,6 +19,7 @@ function index() {
           <Card>
             <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
               <SoftTypography variant="h6">Collaborator table</SoftTypography>
+              <AddCollaborator />
             </SoftBox>
             <SoftBox
               sx={{
