@@ -19,7 +19,7 @@ import PropTypes from "prop-types";
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 
-function Office({ color, size }) {
+function Office({color ="dark", size="16px" }) {
   return (
     <svg
       width={size}
@@ -53,11 +53,6 @@ function Office({ color, size }) {
   );
 }
 
-// Setting default values for the props of Office
-Office.defaultProps = {
-  color: "dark",
-  size: "16px",
-};
 
 // Typechecking props for the Office
 Office.propTypes = {

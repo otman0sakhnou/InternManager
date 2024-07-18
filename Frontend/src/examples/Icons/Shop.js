@@ -19,7 +19,7 @@ import PropTypes from "prop-types";
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 
-function Shop({ color, size }) {
+function Shop({ color ="dark", size="16px" }) {
   return (
     <svg
       width={size}
@@ -56,11 +56,6 @@ function Shop({ color, size }) {
   );
 }
 
-// Setting default values for the props of Shop
-Shop.defaultProps = {
-  color: "dark",
-  size: "16px",
-};
 
 // Typechecking props for the Shop
 Shop.propTypes = {

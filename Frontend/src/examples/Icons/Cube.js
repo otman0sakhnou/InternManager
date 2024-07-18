@@ -19,7 +19,7 @@ import PropTypes from "prop-types";
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 
-function Cube({ color, size }) {
+function Cube({ color ="dark", size="16px" }) {
   return (
     <svg
       width={size}
@@ -60,11 +60,6 @@ function Cube({ color, size }) {
   );
 }
 
-// Setting default values for the props of Cube
-Cube.defaultProps = {
-  color: "dark",
-  size: "16px",
-};
 
 // Typechecking props for the Cube
 Cube.propTypes = {

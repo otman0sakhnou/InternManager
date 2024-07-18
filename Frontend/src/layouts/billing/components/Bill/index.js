@@ -24,7 +24,7 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
 
-function Bill({ name, company, email, vat, noGutter }) {
+function Bill({ name, company, email, vat, noGutter=false }) {
   return (
     <SoftBox
       component="li"
@@ -92,10 +92,7 @@ function Bill({ name, company, email, vat, noGutter }) {
   );
 }
 
-// Setting default values for the props of Bill
-Bill.defaultProps = {
-  noGutter: false,
-};
+
 
 // Typechecking props for the Bill
 Bill.propTypes = {
