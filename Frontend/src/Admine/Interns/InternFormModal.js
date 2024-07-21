@@ -41,7 +41,7 @@ function InternFormModal({ open, onClose, onAddIntern, intern }) {
   const [internshipInfo, setInternshipInfo] = useState({
     title: "",
     department: "",
-    startDate: dayjs(), // ou une valeur appropriée pour startDate
+    startDate: dayjs(),
     endDate: dayjs(),
   });
   const [accountInfo, setAccountInfo] = useState({
