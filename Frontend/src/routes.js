@@ -6,6 +6,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Collaborator from "./Admine/collaborator";
+import Interns from "./Admine/Interns";
 
 // Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
@@ -16,7 +17,8 @@ import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
+import GroupIcon from "@mui/icons-material/Group";
 
 const routes = [
   {
@@ -30,11 +32,20 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "collaborator",
+    name: "Collaborator",
     key: "collaborator",
     route: "/collaborator",
     icon: <PersonIcon size="12px" />,
     component: <Collaborator />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Interns",
+    key: "interns",
+    route: "/interns",
+    icon: <GroupIcon size="12px" />,
+    component: <Interns />,
     noCollapse: true,
   },
   {
@@ -93,12 +104,12 @@ const routes = [
     noCollapse: true,
   },
   {
-    type:"collapse",
-    name :"Account",
+    type: "collapse",
+    name: "Account",
     key: "account",
-    icon:<CreditCard size="12px"/>,
-    noCollapse:false,
-  }
+    icon: <CreditCard size="12px" />,
+    noCollapse: false,
+  },
 ];
 
 export default routes;
