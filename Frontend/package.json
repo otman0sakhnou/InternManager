@@ -28,6 +28,7 @@
     "chroma-js": "2.4.2",
     "dayjs": "^1.11.12",
     "dropzone": "^6.0.0-beta.2",
+    "node-sass": "^9.0.0",
     "prop-types": "15.8.1",
     "react": ">=16.8.0",
     "react-chartjs-2": "3.0.5",

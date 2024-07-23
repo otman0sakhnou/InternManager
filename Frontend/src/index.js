@@ -18,7 +18,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "App";
 import ToastProvider from "Providers/ToastProvider";
-
+import "./assets/scss/_globals.scss"
 // Soft UI Dashboard React Context Provider
 import { SoftUIControllerProvider } from "context";
 

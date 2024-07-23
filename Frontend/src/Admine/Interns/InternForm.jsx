@@ -556,7 +556,7 @@ export default function CreateProfile() {
                               Start:
                             </Typography>
                             <FormControl fullWidth error={!!errors.startDate}>
-                              <DatePicker
+                              <DatePicker orientation="landscape" ma
                                 value={
                                   internshipInfo.startDate ? dayjs(internshipInfo.startDate) : null
                                 }

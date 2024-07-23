@@ -56,16 +56,6 @@ const routes = [
     component: <Interns />,
     noCollapse: true,
   },
-
-  {
-    type: "collapse",
-    name: "Interns",
-    key: "interns",
-    route: "/interns",
-    icon: <GroupIcon size="12px" />,
-    component: <Interns />,
-    noCollapse: true,
-  },
   {
     type: "collapse",
     name: "Tables",
