@@ -17,6 +17,7 @@ import Configurator from "examples/Configurator";
 
 // Soft UI Dashboard React themes
 import theme from "assets/theme";
+import InternForm from "./Admine/intern/InternForm"
 
 
 
@@ -147,6 +148,7 @@ export default function App() {
       <Routes>
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="/createInternProfile" element={<InternForm />}/> 
       </Routes>
     </ThemeProvider>
   );
