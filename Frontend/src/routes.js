@@ -12,13 +12,14 @@ import GroupIcon from "@mui/icons-material/Group";
 // Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
 import Office from "examples/Icons/Office";
-import Settings from "examples/Icons/Settings";
+import Interns from "./Admine/Interns";
 import Document from "examples/Icons/Document";
 import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
+import GroupIcon from "@mui/icons-material/Group";
 
 const routes = [
   {
@@ -32,7 +33,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "collaborator",
+    name: "Collaborator",
     key: "collaborator",
     route: "/collaborator",
     icon: <PersonIcon size="12px" />,
