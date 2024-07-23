@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useStagiaireStore from "Admine/Interns/InternStore";
+import useStagiaireStore from "store/InternStore";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import PropTypes from "prop-types";

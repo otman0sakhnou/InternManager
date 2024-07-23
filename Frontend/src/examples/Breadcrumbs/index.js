@@ -72,7 +72,7 @@ function Breadcrumbs({ icon, title, route, light =false }) {
           color={light ? "white" : "dark"}
           sx={{ lineHeight: 0 }}
         >
-          {title.replace("-", " ")}
+          {title.replace(/-/g, " ")}
         </SoftTypography>
       </MuiBreadcrumbs>
       <SoftTypography
@@ -82,7 +82,7 @@ function Breadcrumbs({ icon, title, route, light =false }) {
         color={light ? "white" : "dark"}
         noWrap
       >
-        {title.replace("-", " ")}
+        {title.replace(/-/g, " ")}
       </SoftTypography>
     </SoftBox>
   );

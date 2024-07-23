@@ -19,7 +19,6 @@ import Configurator from "examples/Configurator";
 import theme from "assets/theme";
 
 
-
 // Soft UI Dashboard React routes
 import routes from "routes";
 

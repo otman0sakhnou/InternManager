@@ -5,12 +5,15 @@ import VirtualReality from "layouts/virtual-reality";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import CollabProfile from "Admine/collaborator/CollabProfile";
+import CreateProfile from './Admine/collaborator/CreateProfile';
 import Collaborator from "./Admine/collaborator";
+import Interns from "./Admine/Interns";
+import InternForm from "Admine/Interns/InternForm";
 
 // Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
 import Office from "examples/Icons/Office";
-import Interns from "./Admine/Interns";
 import Document from "examples/Icons/Document";
 import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
@@ -18,7 +21,6 @@ import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
 import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
-import InternForm from "Admine/Interns/InternForm";
 
 const routes = [
   {
@@ -55,6 +57,15 @@ const routes = [
     noCollapse: true,
   },
 
+  {
+    type: "collapse",
+    name: "Interns",
+    key: "interns",
+    route: "/interns",
+    icon: <GroupIcon size="12px" />,
+    component: <Interns />,
+    noCollapse: true,
+  },
   {
     type: "collapse",
     name: "Tables",
@@ -111,11 +122,27 @@ const routes = [
     noCollapse: true,
   },
   {
+    name: "CreateIntern",
+    key: "c",
+    route: "/createintern",
+    component: <InternForm />,
+  },
+  {
     type: "collapse",
     name: "Account",
     key: "account",
     icon: <CreditCard size="12px" />,
     noCollapse: false,
+  },
+  { name: 'CreateCollaboratorProfile', 
+    key: 'CreateCollaboratorProfile', 
+    route: "/Collaborator/Create-Collaborator-Profile", 
+    component: <CreateProfile/> 
+  },
+  { name: 'CollaboratorProfile', 
+    key: 'CollaboratorProfile', 
+    route: "/Collaborator/Profile/:id", 
+    component: <CollabProfile/> 
   },
 ];
 
