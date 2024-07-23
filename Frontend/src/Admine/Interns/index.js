@@ -11,17 +11,24 @@ import SoftButton from "components/SoftButton";
 import Icon from "@mui/material/Icon";
 import useStagiaireStore from "Admine/Interns/InternStore";
 import SoftPagination from "components/SoftPagination";
-
+import { useNavigate } from "react-router-dom";
+import ConfirmationModal from "components/ConfirmationModals";
 import CustomDropzone from "components/Dropzone"; // Importer le composant Dropzone
 
 function Interns() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedIntern, setSelectedIntern] = useState(null);
 
-  const { addStagiaire, updateStagiaire, deleteAllStagiaires, stagiaires } = useStagiaireStore();
+  const { addStagiaire, updateStagiaire, deleteAllStagiaires, deleteStagiaire, stagiaires } =
+    useStagiaireStore();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
+  const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
+  const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const navigate = useNavigate();
   const getPaginatedInterns = () => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
@@ -29,12 +36,20 @@ function Interns() {
     console.log("Paginated Interns:", paginated); // Ajoutez ce log pour déboguer
     return paginated;
   };
-  const { columns, rows } = InternsTableData(getPaginatedInterns());
+
   const handleAddIntern = (newIntern) => {
     if (selectedIntern) {
-      updateStagiaire(newIntern);
+      setActionType("edit");
+      setConfirmationModalTitle("Edit Intern");
+      setConfirmationModalDescription("Are you sure you want to edit this intern's information?");
+      setOnConfirmAction(() => () => updateStagiaire(newIntern));
+      setIsConfirmationModalOpen(true);
     } else {
-      addStagiaire(newIntern);
+      setActionType("Add");
+      setConfirmationModalTitle("Add Intern");
+      setConfirmationModalDescription("Are you sure you want to add this intern?");
+      setOnConfirmAction(() => () => addStagiaire(newIntern));
+      setIsConfirmationModalOpen(true);
     }
     setIsFormModalOpen(false);
   };
@@ -43,20 +58,35 @@ function Interns() {
     setSelectedIntern(intern);
     setIsFormModalOpen(true);
   };
+
+  const handleDeleteClick = (intern) => {
+    setActionType("delete");
+    setConfirmationModalTitle("Delete Intern");
+    setConfirmationModalDescription(
+      "Are you sure you want to delete this intern? This action cannot be undone."
+    );
+    setOnConfirmAction(() => () => deleteStagiaire(intern.id));
+    setIsConfirmationModalOpen(true);
+  };
+
   const handleDeleteAllClick = () => {
-    if (window.confirm("Are you sure you want to delete all interns?")) {
-      deleteAllStagiaires();
-    }
+    setActionType("delete");
+    setConfirmationModalTitle("Delete All Interns");
+    setConfirmationModalDescription(
+      "Are you sure you want to delete all interns? This action cannot be undone."
+    );
+    setOnConfirmAction(() => deleteAllStagiaires);
+    setIsConfirmationModalOpen(true);
   };
-  const generateAvatar = (name) => {
-    // Extraire les premières lettres du nom complet
-    if (!name) return "";
-    const initiales = name
-      .split(" ")
-      .map((name) => name[0])
-      .join("");
-    return initiales;
-  };
+  // const generateAvatar = (name) => {
+  //   // Extraire les premières lettres du nom complet
+  //   if (!name) return "";
+  //   const initiales = name
+  //     .split(" ")
+  //     .map((name) => name[0])
+  //     .join("");
+  //   return initiales;
+  // };
 
   const handleFileAdded = (file) => {
     const reader = new FileReader();
@@ -74,11 +104,11 @@ function Interns() {
         // Traiter les données comme vous le souhaitez
         data.forEach((intern) => {
           // Générer l'avatar basé sur le nom complet
-          if (intern.name) {
-            intern.avatar = generateAvatar(intern.name);
-          } else {
-            intern.avatar = "DEFAULT";
-          }
+          // if (intern.name) {
+          //   intern.avatar = generateAvatar(intern.name);
+          // } else {
+          //   intern.avatar = "DEFAULT";
+          // }
 
           // Ajouter le stagiaire avec l'avatar généré
           addStagiaire(intern);
@@ -92,6 +122,15 @@ function Interns() {
   const handlePageChange = (value) => {
     setCurrentPage(value);
   };
+  const handleViewDetailsClick = (intern) => {
+    navigate(`/collaborator`); // Naviguer vers la page de détails de l'intern
+  };
+  const { columns, rows } = InternsTableData(
+    getPaginatedInterns(),
+    handleDeleteClick,
+    handleViewDetailsClick
+  );
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -182,6 +221,17 @@ function Interns() {
         }}
         onAddIntern={handleAddIntern}
         intern={selectedIntern}
+      />
+      <ConfirmationModal
+        open={isConfirmationModalOpen}
+        handleClose={() => setIsConfirmationModalOpen(false)}
+        title={confirmationModalTitle}
+        description={confirmationModalDescription}
+        onConfirm={() => {
+          onConfirmAction();
+          setIsConfirmationModalOpen(false);
+        }}
+        actionType={actionType}
       />
     </DashboardLayout>
   );

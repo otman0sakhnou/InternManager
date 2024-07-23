@@ -8,120 +8,66 @@ import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import dayjs from "dayjs";
+import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp";
+import duration from "dayjs/plugin/duration";
+import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg";
+import SoftAvatar from "components/SoftAvatar";
+// import neutralAvatar from "public/avatars/neutral.png";
+
+dayjs.extend(duration);
 
 // Fonction pour générer une couleur aléatoire
-const getRandomColor = () => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
+const getAvatarImage = (gender) => {
+  switch (gender.toLowerCase()) {
+    case "male":
+      return maleAvatar;
+    case "female":
+      return femaleAvatar;
+    default:
+      return null;
   }
-  return color;
 };
-
-// Styles pour l'avatar
-const avatarStyles = (backgroundColor) => ({
+const avatarStyles = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   width: 40,
   height: 40,
   borderRadius: "50%",
-  backgroundColor,
+  backgroundColor: "#fff",
   color: "#fff",
   fontSize: 16,
   fontWeight: "bold",
-});
-
-function PersonalInfos({ avatar, name, email, phone, gender, birthdate }) {
-  // console.log("birthdate", birthdate);
-  const backgroundColor = getRandomColor();
+};
+// Composants pour chaque section
+function PersonalInfos({ name, gender }) {
+  const avatarImage = getAvatarImage(gender);
   return (
     <SoftBox display="flex" alignItems="center" px={1} py={0.5}>
-      <SoftBox mr={2} style={avatarStyles(backgroundColor)}>
-        {avatar.toUpperCase()}
+      <SoftBox mr={2} style={avatarStyles}>
+        <SoftAvatar src={avatarImage} alt={name} size="sm" variant="rounded" />
       </SoftBox>
-      <SoftBox display="flex" flexDirection="column">
-        <SoftTypography variant="caption" color="secondary">
-          <span style={{ fontWeight: "bold" }}>Full Name: </span>
-          {name}
-        </SoftTypography>
-        <SoftTypography variant="caption" color="secondary">
-          <span style={{ fontWeight: "bold" }}>Email: </span>
-          {email}
-        </SoftTypography>
-        <SoftTypography variant="caption" color="secondary">
-          <span style={{ fontWeight: "bold" }}>Phone:</span> {phone}
-        </SoftTypography>
-        <SoftTypography variant="caption" color="secondary">
-          <span style={{ fontWeight: "bold" }}>Gender:</span> {gender}
-        </SoftTypography>
-        <SoftTypography variant="caption" color="secondary">
-          <span style={{ fontWeight: "bold" }}>Birthdate:</span>{" "}
-          {dayjs(birthdate).format("YYYY-MM-DD")}
-        </SoftTypography>
-      </SoftBox>
+      <SoftTypography variant="button" fontWeight="medium">
+        {name}
+      </SoftTypography>
     </SoftBox>
   );
 }
 
-function EducationInfos({ institution, level, specialization, yearOfStudy }) {
+function ContactInfos({ email, phone }) {
   return (
     <SoftBox display="flex" flexDirection="column" px={1} py={0.5}>
       <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Institution:</span> {institution}
+        {email}
       </SoftTypography>
       <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Level:</span> {level}
-      </SoftTypography>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Specialization: </span>
-        {specialization}
-      </SoftTypography>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Year of Study:</span> {yearOfStudy}
+        {phone}
       </SoftTypography>
     </SoftBox>
   );
 }
 
-function InternshipInfos({ title, department, startDate, endDate }) {
-  // console.log("startDate", startDate);
-  // console.log("endDate", endDate);
-  return (
-    <SoftBox display="flex" flexDirection="column" px={1} py={0.5}>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Title: </span>
-        {title}
-      </SoftTypography>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Department:</span> {department}
-      </SoftTypography>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Start Date:</span>{" "}
-        {dayjs(startDate).format("YYYY-MM-DD")}
-      </SoftTypography>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>End Date:</span> {dayjs(endDate).format("YYYY-MM-DD")}
-      </SoftTypography>
-    </SoftBox>
-  );
-}
-
-function AccountInfos({ username, password }) {
-  return (
-    <SoftBox display="flex" flexDirection="column" px={1} py={0.5}>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Username:</span> {username}
-      </SoftTypography>
-      <SoftTypography variant="caption" color="secondary">
-        <span style={{ fontWeight: "bold" }}>Password:</span> {password}
-      </SoftTypography>
-    </SoftBox>
-  );
-}
-
-function ActionIcons({ onEdit, onDelete }) {
+function ActionIcons({ onEdit, onDelete, onViewDetails }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -152,6 +98,19 @@ function ActionIcons({ onEdit, onDelete }) {
       >
         <MenuItem
           onClick={() => {
+            onViewDetails();
+            handleClose();
+          }}
+        >
+          <Tooltip title="View Details">
+            <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
+              visibility
+            </Icon>
+          </Tooltip>
+          View Details
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
             onEdit();
             handleClose();
           }}
@@ -165,9 +124,7 @@ function ActionIcons({ onEdit, onDelete }) {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (window.confirm("Are you sure you want to delete this intern?")) {
-              onDelete();
-            }
+            onDelete();
             handleClose();
           }}
         >
@@ -186,89 +143,60 @@ function ActionIcons({ onEdit, onDelete }) {
 ActionIcons.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onViewDetails: PropTypes.func.isRequired,
 };
 
 PersonalInfos.propTypes = {
   avatar: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
+  gender: PropTypes.string.isRequired,
+};
+
+ContactInfos.propTypes = {
   email: PropTypes.string.isRequired,
   phone: PropTypes.string.isRequired,
-  gender: PropTypes.string.isRequired,
-  birthdate: PropTypes.string,
 };
 
-EducationInfos.propTypes = {
-  institution: PropTypes.string.isRequired,
-  level: PropTypes.string.isRequired,
-  specialization: PropTypes.string.isRequired,
-  yearOfStudy: PropTypes.string.isRequired,
-};
-
-InternshipInfos.propTypes = {
-  title: PropTypes.string.isRequired,
-  department: PropTypes.string.isRequired,
-  startDate: PropTypes.string,
-  endDate: PropTypes.string,
-};
-
-AccountInfos.propTypes = {
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-};
-
-const InternsTableData = (paginatedInterns) => {
-  const { deleteStagiaire } = useStagiaireStore();
-
-  const handleDelete = (index) => {
-    deleteStagiaire(index);
-  };
-
+const InternsTableData = (paginatedInterns, handleDeleteClick, handleViewDetailsClick) => {
   const columns = [
-    { name: "PersonalInfos", align: "left" },
-    { name: "EducationInfos", align: "left" },
-    { name: "InternshipInfos", align: "left" },
-    { name: "AccountInfos", align: "left" },
+    { name: "Interns", align: "left" },
+    { name: "Department", align: "left" },
+    { name: "End Date", align: "left" },
+    { name: "Duration", align: "left" },
+    { name: "Contact", align: "left" },
     { name: "Actions", align: "left" },
   ];
 
   const rows = (handleEditClick) =>
     paginatedInterns.map((stagiaire) => ({
-      PersonalInfos: (
-        <PersonalInfos
-          avatar={stagiaire.avatar}
-          name={stagiaire.name}
-          email={stagiaire.email}
-          phone={stagiaire.phone}
-          gender={stagiaire.gender}
-          birthdate={stagiaire.birthdate}
-        />
+      Interns: (
+        <PersonalInfos avatar={stagiaire.avatar} name={stagiaire.name} gender={stagiaire.gender} />
       ),
-      EducationInfos: (
-        <EducationInfos
-          institution={stagiaire.educationInfo.institution}
-          level={stagiaire.educationInfo.level}
-          specialization={stagiaire.educationInfo.specialization}
-          yearOfStudy={stagiaire.educationInfo.yearOfStudy}
-        />
+      Department: (
+        <SoftTypography variant="caption" color="secondary">
+          {stagiaire.internshipInfo.department}
+        </SoftTypography>
       ),
-      InternshipInfos: (
-        <InternshipInfos
-          title={stagiaire.internshipInfo.title}
-          department={stagiaire.internshipInfo.department}
-          startDate={stagiaire.internshipInfo.startDate}
-          endDate={stagiaire.internshipInfo.endDate}
-        />
+      "End Date": (
+        <SoftTypography variant="caption" color="secondary">
+          {dayjs(stagiaire.internshipInfo.endDate).format("YYYY-MM-DD")}
+        </SoftTypography>
       ),
-      AccountInfos: (
-        <AccountInfos
-          username={stagiaire.accountInfo.username}
-          password={stagiaire.accountInfo.password}
-        />
+      Duration: (
+        <SoftTypography variant="caption" color="secondary">
+          {dayjs(stagiaire.internshipInfo.endDate).diff(
+            dayjs(stagiaire.internshipInfo.startDate),
+            "day"
+          )}{" "}
+          days
+        </SoftTypography>
       ),
+      Contact: <ContactInfos email={stagiaire.email} phone={stagiaire.phone} />,
       Actions: (
         <ActionIcons
           onEdit={() => handleEditClick(stagiaire)}
-          onDelete={() => handleDelete(stagiaire.id)}
+          onDelete={() => handleDeleteClick(stagiaire)}
+          onViewDetails={() => handleViewDetailsClick(stagiaire)}
         />
       ),
     }));
