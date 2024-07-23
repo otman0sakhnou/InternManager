@@ -147,7 +147,6 @@ ActionIcons.propTypes = {
 };
 
 PersonalInfos.propTypes = {
-  avatar: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   gender: PropTypes.string.isRequired,
 };
@@ -158,6 +157,7 @@ ContactInfos.propTypes = {
 };
 
 const InternsTableData = (paginatedInterns, handleDeleteClick, handleViewDetailsClick) => {
+  console.log(paginatedInterns);
   const columns = [
     { name: "Interns", align: "left" },
     { name: "Department", align: "left" },

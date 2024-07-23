@@ -18,6 +18,7 @@ import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
 import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
+import InternForm from "Admine/Interns/InternForm";
 
 const routes = [
   {
@@ -37,6 +38,12 @@ const routes = [
     icon: <PersonIcon size="12px" />,
     component: <Collaborator />,
     noCollapse: true,
+  },
+  {
+    name: "CreateIntern",
+    key: "c",
+    route: "/createintern",
+    component: <InternForm />,
   },
   {
     type: "collapse",

@@ -5,7 +5,7 @@ import SoftBox from "../../components/SoftBox";
 import Card from "@mui/material/Card";
 import SoftTypography from "../../components/SoftTypography";
 import Table from "../../examples/Tables/Table";
-import InternFormModal from "./InternFormModal";
+
 import InternsTableData from "layouts/tables/data/InternsTableData";
 import SoftButton from "components/SoftButton";
 import Icon from "@mui/material/Icon";
@@ -13,10 +13,10 @@ import useStagiaireStore from "Admine/Interns/InternStore";
 import SoftPagination from "components/SoftPagination";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "components/ConfirmationModals";
-import CustomDropzone from "components/Dropzone"; // Importer le composant Dropzone
+import CustomDropzone from "components/Dropzone";
+import toast from "react-hot-toast";
 
 function Interns() {
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedIntern, setSelectedIntern] = useState(null);
 
   const { addStagiaire, updateStagiaire, deleteAllStagiaires, deleteStagiaire, stagiaires } =
@@ -39,24 +39,17 @@ function Interns() {
 
   const handleAddIntern = (newIntern) => {
     if (selectedIntern) {
-      setActionType("edit");
-      setConfirmationModalTitle("Edit Intern");
       setConfirmationModalDescription("Are you sure you want to edit this intern's information?");
-      setOnConfirmAction(() => () => updateStagiaire(newIntern));
-      setIsConfirmationModalOpen(true);
+
+      updateStagiaire(newIntern);
+      toast.success("Intern updated successfully!");
     } else {
-      setActionType("Add");
-      setConfirmationModalTitle("Add Intern");
-      setConfirmationModalDescription("Are you sure you want to add this intern?");
-      setOnConfirmAction(() => () => addStagiaire(newIntern));
-      setIsConfirmationModalOpen(true);
+      navigate("/createintern");
     }
-    setIsFormModalOpen(false);
   };
 
   const handleEditClick = (intern) => {
     setSelectedIntern(intern);
-    setIsFormModalOpen(true);
   };
 
   const handleDeleteClick = (intern) => {
@@ -65,17 +58,23 @@ function Interns() {
     setConfirmationModalDescription(
       "Are you sure you want to delete this intern? This action cannot be undone."
     );
-    setOnConfirmAction(() => () => deleteStagiaire(intern.id));
+    setOnConfirmAction(() => () => {
+      deleteStagiaire(intern.id);
+      toast.success("Intern deleted successfully!");
+    });
     setIsConfirmationModalOpen(true);
   };
 
   const handleDeleteAllClick = () => {
     setActionType("delete");
-    setConfirmationModalTitle("Delete All Interns");
+    setConfirmationModalTitle("Delete Intern");
     setConfirmationModalDescription(
       "Are you sure you want to delete all interns? This action cannot be undone."
     );
-    setOnConfirmAction(() => deleteAllStagiaires);
+    setOnConfirmAction(() => () => {
+      deleteAllStagiaires();
+      toast.success("All interns deleted successfully!");
+    });
     setIsConfirmationModalOpen(true);
   };
   // const generateAvatar = (name) => {
@@ -92,16 +91,12 @@ function Interns() {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        // Lire le contenu du fichier comme texte
         const text = e.target.result;
 
-        // Analyser le texte comme JSON
         const data = JSON.parse(text);
 
-        // Vérifier le contenu des données
         console.log("Parsed data:", data);
 
-        // Traiter les données comme vous le souhaitez
         data.forEach((intern) => {
           // Générer l'avatar basé sur le nom complet
           // if (intern.name) {
@@ -142,11 +137,7 @@ function Interns() {
 
               <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                 <SoftBox>
-                  <SoftButton
-                    variant="gradient"
-                    color="info"
-                    onClick={() => setIsFormModalOpen(true)}
-                  >
+                  <SoftButton variant="gradient" color="info" onClick={handleAddIntern}>
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     Add Intern
                   </SoftButton>
@@ -154,7 +145,7 @@ function Interns() {
                     variant="gradient"
                     color="error"
                     onClick={handleDeleteAllClick}
-                    sx={{ ml: 2 }} // Ajoute un espace à gauche du bouton
+                    sx={{ ml: 2 }}
                   >
                     <Icon sx={{ fontWeight: "bold" }}>delete_sweep</Icon>
                     Delete All
@@ -213,15 +204,7 @@ function Interns() {
           </SoftBox>
         </SoftBox>
       </SoftBox>
-      <InternFormModal
-        open={isFormModalOpen}
-        onClose={() => {
-          setSelectedIntern(null);
-          setIsFormModalOpen(false);
-        }}
-        onAddIntern={handleAddIntern}
-        intern={selectedIntern}
-      />
+
       <ConfirmationModal
         open={isConfirmationModalOpen}
         handleClose={() => setIsConfirmationModalOpen(false)}
