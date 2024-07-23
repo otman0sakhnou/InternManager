@@ -118,7 +118,7 @@ function Interns() {
     setCurrentPage(value);
   };
   const handleViewDetailsClick = (intern) => {
-    navigate(`/collaborator`); // Naviguer vers la page de détails de l'intern
+    navigate(`/collaborator`); 
   };
   const { columns, rows } = InternsTableData(
     getPaginatedInterns(),

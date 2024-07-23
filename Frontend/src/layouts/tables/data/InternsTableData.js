@@ -103,8 +103,8 @@ function ActionIcons({ onEdit, onDelete, onViewDetails }) {
           }}
         >
           <Tooltip title="View Details">
-            <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
-              visibility
+            <Icon sx={{ cursor: "pointer", color: "#77E4C8", mr: 1 }} fontSize="small">
+              info
             </Icon>
           </Tooltip>
           View Details
