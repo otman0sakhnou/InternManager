@@ -1,25 +1,25 @@
-import AddCollaborator from "Admine/collaborator/addCollaborator";
 import { create } from "zustand";
 
-const useCollaboratorStore = create((set) => ({
+const useCollaboratorStore = create((set, get) => ({
+  idCounter: 4, // Start the counter from 1 or another appropriate value
   collaborators: [
     {
-      id: Date.now() + 1,
+      id: 1,
       name: "Alice Johnson",
       email: "alice.johnson@example.com",
       phone: "123-456-7890",
+      gender: "female",
       job: "manager",
       department: "Java",
       organization: "Acme Corp",
       employementDate: "2024-01-15",
-      password: "password123",
-      confirmPassword: "password123",
     },
     {
-      id: Date.now() + 2,
+      id: 2,
       name: "Bob Smith",
       email: "bob.smith@example.com",
       phone: "987-654-3210",
+      gender: "male",
       job: "collaborator",
       department: "PHP",
       organization: "Beta LLC",
@@ -28,26 +28,24 @@ const useCollaboratorStore = create((set) => ({
       confirmPassword: "securepassword",
     },
     {
-      id: Date.now() + 3,
+      id: 3,
       name: "Carol Davis",
       email: "carol.davis@example.com",
       phone: "555-555-5555",
+      gender: "female",
       job: "manager",
       department: "Java",
       organization: "Gamma Inc",
       employementDate: "2022-11-22",
-      password: "mypassword",
-      confirmPassword: "mypassword",
     },
   ],
   addCollaborator: (collaborator) =>
     set((state) => {
-      const newCollaborator = {
-        ...collaborator,
-        id: Date.now(),
-      };
+      const newId = state.idCounter;
+      const newCollaborator = { ...collaborator, id: newId };
       return {
         collaborators: [...state.collaborators, newCollaborator],
+        idCounter: newId + 1, // Increment the counter
       };
     }),
   deleteCollaborator: (id) =>
@@ -60,6 +58,7 @@ const useCollaboratorStore = create((set) => ({
         collaborator.id === updatedCollaborator.id ? updatedCollaborator : collaborator
       ),
     })),
+  getCollaboratorById: (id) => get().collaborators.find((collaborator) => collaborator.id === id),
 }));
 
 export default useCollaboratorStore;

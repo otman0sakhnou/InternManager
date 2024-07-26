@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "../../examples/Navbars/DashboardNavbar";
 import SoftBox from "../../components/SoftBox";
@@ -9,18 +9,18 @@ import Table from "../../examples/Tables/Table";
 import InternsTableData from "layouts/tables/data/InternsTableData";
 import SoftButton from "components/SoftButton";
 import Icon from "@mui/material/Icon";
-import useStagiaireStore from "store/InternStore";
 import SoftPagination from "components/SoftPagination";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "components/ConfirmationModals";
 import CustomDropzone from "components/Dropzone";
 import toast from "react-hot-toast";
+import useStagiaireStore from "store/InternStore";
 
 function Interns() {
   const [selectedIntern, setSelectedIntern] = useState(null);
-
-  const { addStagiaire, updateStagiaire, deleteAllStagiaires, deleteStagiaire, stagiaires } =
+  const { addStagiaire, updateStagiaire, deleteAllStagiaires, deleteStagiaire } =
     useStagiaireStore();
+  const stagiaires = useStagiaireStore((state) => state.stagiaires);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -29,18 +29,21 @@ function Interns() {
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
   const navigate = useNavigate();
+
+  useEffect(() => {
+
+  }, [stagiaires])
+
   const getPaginatedInterns = () => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const paginated = stagiaires.slice(start, end);
-    console.log("Paginated Interns:", paginated); // Ajoutez ce log pour déboguer
     return paginated;
   };
 
   const handleAddIntern = (newIntern) => {
     if (selectedIntern) {
       setConfirmationModalDescription("Are you sure you want to edit this intern's information?");
-
       updateStagiaire(newIntern);
       toast.success("Intern updated successfully!");
     } else {
@@ -77,26 +80,14 @@ function Interns() {
     });
     setIsConfirmationModalOpen(true);
   };
-  // const generateAvatar = (name) => {
-  //   // Extraire les premières lettres du nom complet
-  //   if (!name) return "";
-  //   const initiales = name
-  //     .split(" ")
-  //     .map((name) => name[0])
-  //     .join("");
-  //   return initiales;
-  // };
 
   const handleFileAdded = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const text = e.target.result;
-
         const data = JSON.parse(text);
-
-        console.log("Parsed data:", data);
-
+        //console.log("Parsed data:", data);
         data.forEach((intern) => {
           // Générer l'avatar basé sur le nom complet
           // if (intern.name) {
@@ -104,12 +95,11 @@ function Interns() {
           // } else {
           //   intern.avatar = "DEFAULT";
           // }
-
           // Ajouter le stagiaire avec l'avatar généré
           addStagiaire(intern);
         });
       } catch (error) {
-        console.error("Error reading or parsing file:", error);
+        //console.error("Error reading or parsing file:", error);
       }
     };
     reader.readAsText(file);
