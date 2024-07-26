@@ -2,11 +2,10 @@ import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import VirtualReality from "layouts/virtual-reality";
-import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-import CollabProfile from "Admine/collaborator/CollabProfile";
-import CreateProfile from "./Admine/collaborator/CreateProfile";
+// import CollabProfile from "Admine/collaborator/CollabProfile";
+import CreateProfile from './Admine/collaborator/CreateProfile';
 import Collaborator from "./Admine/collaborator";
 import Interns from "./Admine/Interns";
 import InternForm from "Admine/Interns/InternForm";
@@ -23,6 +22,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import GroupDetails from "Admine/Groups/GroupDetails";
+import Profile from "layouts/profile";
+
 const routes = [
   {
     type: "collapse",
@@ -137,6 +138,12 @@ const routes = [
     component: <InternForm />,
   },
   {
+    name: "InternProfile",
+    key: "InternProfile",
+    route: "/Intern/Profile/:id",
+    component: <Profile />,
+  },
+  {
     type: "collapse",
     name: "Account",
     key: "account",
@@ -153,7 +160,7 @@ const routes = [
     name: "CollaboratorProfile",
     key: "CollaboratorProfile",
     route: "/Collaborator/Profile/:id",
-    component: <CollabProfile />,
+    component: <Profile />,
   },
 ];
 
