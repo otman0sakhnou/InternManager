@@ -15,6 +15,7 @@ import CustomProfileInfoCard from "./customComponents/CustomProfileInfoCard";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import ProjectsSection from "./customComponents/ProjectsSection";
 
 function Overview() {
   console.log(useStagiaireStore((state) => state.stagiaires));
@@ -107,6 +108,7 @@ function Overview() {
             </LocalizationProvider>
           </Grid>
           <TeamsCard />
+          {/* <ProjectsSection /> */}
         </Grid>
       </SoftBox>
       <Footer />
