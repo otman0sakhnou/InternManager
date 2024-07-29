@@ -1,168 +1,66 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { styled } from "@mui/material/styles";
-import Stack from "@mui/material/Stack";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
+import React, { useEffect, useState } from "react";
+import StyledIcon from "components/StyledIcon";
+import SoftButton from "components/SoftButton";
 import {
+  Modal,
   Box,
-  TextField,
-  InputAdornment,
-  Card,
+  IconButton,
+  Typography,
   MenuItem,
   Select,
-  FormHelperText,
   FormControl,
-  Grid,
+  InputAdornment,
+  TextField,
+  Icon,
+  FormHelperText,
 } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import LockIcon from "@mui/icons-material/Lock";
-import StepConnector, { stepConnectorClasses } from "@mui/material/StepConnector";
-import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import SoftButton from "components/SoftButton";
-import SoftTypography from "components/SoftTypography";
-import StyledIcon from "components/StyledIcon";
+import CloseIcon from "@mui/icons-material/Close";
+import useCollaboratorStore from "store/collaboratorStore";
+import useValidationStore from "store/useValidationStore";
+import PropTypes from "prop-types";
+import ConfirmationModal from "components/ConfirmationModals";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import useValidationStore from "store/useValidationStore";
-import dayjs from "dayjs";
-import useCollaboratorStore from "store/collaboratorStore";
-import { validate, validationSchemas } from "utils/validation";
+import dayjs from "dayjs"; // Import dayjs to handle date formats
 
-const QontoConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 22,
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage: "linear-gradient(95deg, #2152ff 0%, #21d4fd 100%)",
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage: "linear-gradient(95deg, #2152ff 0%, #21d4fd 100%)",
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    height: 3,
-    border: 0,
-    backgroundColor: theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
-    borderRadius: 1,
-  },
-}));
-const ColorlibStepIconRoot = styled("div")(({ theme, ownerState }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? theme.palette.grey[700] : "#ccc",
-  zIndex: 1,
-  color: "#fff",
-  width: 50,
-  height: 50,
-  display: "flex",
-  borderRadius: "50%",
-  justifyContent: "center",
-  alignItems: "center",
-  ...(ownerState.active && {
-    backgroundImage: "linear-gradient(136deg, #2152ff 0%, #21d4fd 100%)",
-    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
-  }),
-  ...(ownerState.completed && {
-    backgroundImage: "linear-gradient(136deg, #2152ff 0%, #21d4fd 100%)",
-  }),
-}));
-
-function ColorlibStepIcon(props) {
-  const { active, completed, className } = props;
-
-  const icons = {
-    1: <SettingsIcon />,
-    2: <GroupAddIcon />,
-    3: <LockIcon />,
-  };
-
-  return (
-    <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
-      {icons[String(props.icon)]}
-    </ColorlibStepIconRoot>
-  );
-}
-
-ColorlibStepIcon.propTypes = {
-  active: PropTypes.bool,
-  className: PropTypes.string,
-  completed: PropTypes.bool,
-  icon: PropTypes.node,
+const initialState = {
+  id: Date.now(),
+  name: "",
+  email: "",
+  phone: "",
+  job: "",
+  department: "",
+  organization: "",
+  employementDate: "",
+  password: "",
+  confirmPassword: "",
 };
 
-const steps = ["Personal Information", "Organization Details", "Account Setup"];
+function AddCollaborator({ visible, setVisible, selectedCollaborator, setSelectedCollaborator }) {
+  const [formData, setFormData] = useState(initialState);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
 
-export default function CreateProfile() {
-  const [activeStep, setActiveStep] = React.useState(0);
+  const { errors, validate, clearErrors } = useValidationStore((state) => ({
+    errors: state.errors,
+    validate: state.validate,
+    clearErrors: state.clearErrors,
+  }));
+
   const addCollaborator = useCollaboratorStore((state) => state.addCollaborator);
-  const [formData, setFormData] = React.useState({
-    name: "",
-    email: "",
-    phone: "",
-    gender: "",
-    job: "",
-    department: "",
-    organization: "",
-    employementDate: null,
-    password: "",
-    confirmPassword: "",
-  });
+  const updateCollaborator = useCollaboratorStore((state) => state.updateCollaborator);
 
-  const { errors, setErrors } = useValidationStore();
-
-  // Validation function
-  const getActiveStepSchema = (step) => {
-    if (step === 0) {
-      return {
-        name: validationSchemas.name,
-        email: validationSchemas.email,
-        phone: validationSchemas.phone,
-        gender: validationSchemas.gender,
-      };
-    } else if (step === 1) {
-      return {
-        organization: validationSchemas.organization,
-        department: validationSchemas.department,
-        job: validationSchemas.job,
-        employementDate: validationSchemas.employementDate,
-      };
-    } else if (step === 2) {
-      return {
-        password: validationSchemas.password,
-        confirmPassword: validationSchemas.confirmPassword,
-      };
-    }
-  };
-  const submit = () => {
-    addCollaborator(formData);
-    alert("Collaborator added successfully!");
-  };
-
-  const handleNext = () => {
-    const schema = getActiveStepSchema(activeStep);
-    const newErrors = validate(formData, schema);
-    
-
-    if (Object.keys(newErrors).length === 0) {
-      setErrors({});
-      if (activeStep === steps.length - 1) {
-        submit();
-      } else {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-      }
+  useEffect(() => {
+    if (selectedCollaborator) {
+      setFormData(selectedCollaborator);
     } else {
-      setErrors(newErrors);
+      setFormData(initialState);
     }
-  };
+  }, [selectedCollaborator]);
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  const handleJobChange = (event) => {
+    setFormData({ ...formData, job: event.target.value });
   };
 
   const handleInputChange = (e) => {
@@ -171,322 +69,272 @@ export default function CreateProfile() {
   };
 
   const handleDateChange = (date) => {
-    setFormData({ ...formData, employementDate: date ? dayjs(date).format("YYYY-MM-DD") : null });
+    setFormData({ ...formData, employementDate: date ? date.format("YYYY-MM-DD") : "" });
   };
-  const handleGenderChange = (event) => {
-    setFormData({ ...formData, gender: event.target.value });
-  };
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <Card sx={{ p: 4, m: 2, borderRadius: 4, boxShadow: 3 }}>
-        <Stack sx={{ my: 5, width: "100%" }} spacing={4}>
-          <SoftTypography
-            textAlign="center"
-            variant="h3"
-            fontWeight="bold"
-            color="dark"
-            textGradient
-          >
-            Set up a Profile for the Collaborator
-          </SoftTypography>
-          <Stepper alternativeLabel activeStep={activeStep} connector={<QontoConnector />}>
-            {steps.map((label, index) => (
-              <Step key={label}>
-                <StepLabel StepIconComponent={ColorlibStepIcon} StepIconProps={{ icon: index + 1 }}>
-                  {label}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
 
-          <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
-            <Box sx={{ width: "60%", display: "flex", flexDirection: "column", gap: 2 }}>
-              {activeStep === 0 && (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      placeholder="Name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      error={!!errors.name}
-                      helperText={errors.name}
-                      fullWidth
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>person</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      placeholder="Email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      error={!!errors.email}
-                      helperText={errors.email}
-                      fullWidth
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>email</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      placeholder="Phone Number"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      error={!!errors.phone}
-                      helperText={errors.phone}
-                      fullWidth
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>phone</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <FormControl fullWidth>
-                      <Select
-                        value={formData.gender}
-                        onChange={handleGenderChange}
-                        displayEmpty
-                        variant="outlined"
-                        renderValue={(selected) => {
-                          if (selected.length === 0) {
-                            return (
-                              <span style={{ color: "#CCCCCC" }}>
-                                Select collaborator&apos;s gender
-                              </span>
-                            );
-                          }
-                          return selected;
-                        }}
-                        startAdornment={
-                          <InputAdornment
-                            style={{ fontSize: 16, color: "#344767" }}
-                            position="start"
-                          >
-                            <StyledIcon>wc_icone</StyledIcon>
-                          </InputAdornment>
-                        }
-                      >
-                        <MenuItem value="" disabled>
-                          Select collaborator&apos;s gender
-                        </MenuItem>
-                        <MenuItem value="Male">Male</MenuItem>
-                        <MenuItem value="Female">Female</MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
-                      </Select>
-                      {!!errors.gender && <FormHelperText error>{errors.gender}</FormHelperText>}
-                    </FormControl>
-                  </Grid>
-                  <Grid container justifyContent="end" alignItems="end" margin={2}>
-                    <SoftButton variant="gradient" color="info" onClick={handleNext}>
-                      Next
-                    </SoftButton>
-                  </Grid>
-                </Grid>
-              )}
-              {activeStep === 1 && (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      placeholder="Organization"
-                      name="organization"
-                      value={formData.organization}
-                      onChange={handleInputChange}
-                      error={!!errors.organization}
-                      helperText={errors.organization}
-                      fullWidth
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>business</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <FormControl fullWidth>
-                      <Select
-                        value={formData.department}
-                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                        displayEmpty
-                        variant="outlined"
-                        error={!!errors.department}
-                        helperText={errors.department}
-                        renderValue={(selected) => {
-                          if (selected.length === 0) {
-                            return (
-                              <span style={{ color: "#CCCCCC" }}>Select internship department</span>
-                            );
-                          }
-                          return selected;
-                        }}
-                        startAdornment={
-                          <InputAdornment
-                            style={{ fontSize: 16, color: "#344767" }}
-                            position="start"
-                          >
-                            <StyledIcon>apartment</StyledIcon>
-                          </InputAdornment>
-                        }
-                      >
-                        <MenuItem value="" disabled>
-                          Select internship department
-                        </MenuItem>
-                        <MenuItem value="Microsoft&Data">Microsoft & Data</MenuItem>
-                        <MenuItem value="Front&Mobile">Front & Mobile</MenuItem>
-                        <MenuItem value="Java">Java</MenuItem>
-                        <MenuItem value="PHP">PHP</MenuItem>
-                        <MenuItem value="Devops">Devops</MenuItem>
-                        <MenuItem value="Test&Support">Test & Support</MenuItem>
-                      </Select>
-                      {!!errors.department && (
-                        <FormHelperText error>{errors.department}</FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      placeholder="Title"
-                      name="job"
-                      value={formData.job}
-                      onChange={handleInputChange}
-                      error={!!errors.job}
-                      helperText={errors.job}
-                      fullWidth
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>work</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth error={!!errors.employementDate}>
-                      <LocalizationProvider fullWidth dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          placeholder="Employment Date"
-                          value={formData.employementDate ? dayjs(formData.employementDate) : null}
-                          onChange={handleDateChange}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              fullWidth
-                              error={!!errors.employementDate}
-                              helperText={errors.employementDate}
-                            />
-                          )}
-                        />
-                        {errors.employementDate && (
-                          <FormHelperText p={2} error>
-                            {errors.employementDate}
-                          </FormHelperText>
-                        )}
-                      </LocalizationProvider>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    container
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    margin={2}
-                  >
-                    <SoftButton variant="gradient" color="dark" onClick={handleBack}>
-                      Previous
-                    </SoftButton>
-                    <SoftButton variant="gradient" color="info" onClick={handleNext}>
-                      Next
-                    </SoftButton>
-                  </Grid>
-                </Grid>
-              )}
-              {activeStep === 2 && (
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <TextField
-                      placeholder="Password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      error={!!errors.password}
-                      helperText={errors.password}
-                      fullWidth
-                      variant="outlined"
-                      type="password"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>lock</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      placeholder="Confirm Password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      error={!!errors.confirmPassword}
-                      helperText={errors.confirmPassword}
-                      fullWidth
-                      variant="outlined"
-                      type="password"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>lock</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid
-                    container
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    margin={2}
-                  >
-                    <SoftButton variant="gradient" color="dark" onClick={handleBack}>
-                      Previous
-                    </SoftButton>
-                    <SoftButton variant="gradient" color="info" onClick={handleNext}>
-                      Finish
-                    </SoftButton>
-                  </Grid>
-                </Grid>
-              )}
-            </Box>
+  const handleConfirm = () => {
+    const validationErrors = validate(formData);
+    if (Object.keys(validationErrors).length === 0) {
+      if (selectedCollaborator) {
+        updateCollaborator(formData);
+      } else {
+        addCollaborator(formData);
+      }
+      setSelectedCollaborator(null);
+      setConfirmOpen(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    clearErrors();
+    const validationErrors = validate(formData);
+    if (Object.keys(validationErrors).length === 0) {
+      setActionType(selectedCollaborator ? "update" : "add");
+      setConfirmOpen(true);
+      setVisible(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    clearErrors();
+    setVisible(false);
+    setSelectedCollaborator(null);
+  };
+
+  const modalTitle = actionType === "update" ? "Update Collaborator" : "Add Collaborator";
+  const modalBody =
+    actionType === "update"
+      ? "Are you sure you want to update this collaborator?"
+      : "Are you sure you want to add this new collaborator?";
+
+  return (
+    <>
+      <SoftButton variant="gradient" color="dark" onClick={() => setVisible(true)}>
+        <Icon sx={{ fontWeight: "bold" }}>add</Icon>
+        &nbsp;{selectedCollaborator ? "Edit Collaborator" : "Add New Collaborator"}
+      </SoftButton>
+      <Modal
+        open={visible}
+        onClose={handleModalClose}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "90%",
+            maxWidth: 600,
+            bgcolor: "#ffffff",
+            boxShadow: 24,
+            p: 4,
+            overflowY: "auto",
+            maxHeight: "90vh",
+            borderRadius: 8,
+          }}
+        >
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton onClick={handleModalClose}>
+              <CloseIcon sx={{ fontSize: 16, color: "#141727" }} />
+            </IconButton>
           </Box>
-        </Stack>
-      </Card>
-    </DashboardLayout>
+
+          <Typography variant="h6" align="center" gutterBottom id="modal-title">
+            {selectedCollaborator ? "Edit Collaborator" : "Add Collaborator"}
+          </Typography>
+
+          <Box
+            id="modal-description"
+            sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+          >
+            <TextField
+              placeholder="Name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              error={!!errors.name}
+              helperText={errors.name}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>person</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              error={!!errors.email}
+              helperText={errors.email}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>email</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Phone Number"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              error={!!errors.phone}
+              helperText={errors.phone}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>phone</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              error={!!errors.password}
+              helperText={errors.password}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>lock</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>lock</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          <Box
+            id="job-info"
+            sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 2, mt: 2 }}
+          >
+            <FormControl fullWidth variant="outlined">
+              <Select
+                value={formData.job}
+                onChange={handleJobChange}
+                displayEmpty
+                placeholder="Select a title"
+                startAdornment={
+                  <InputAdornment style={{ fontSize: 16, color: "#344767" }} position="start">
+                    <Icon>work</Icon>
+                  </InputAdornment>
+                }
+              >
+                <MenuItem value="" disabled>
+                  Select a title
+                </MenuItem>
+                <MenuItem value="Manager">Manager</MenuItem>
+                <MenuItem value="Collaborator">Collaborator</MenuItem>
+              </Select>
+              {errors.job && <FormHelperText error>{errors.job}</FormHelperText>}
+            </FormControl>
+            <TextField
+              placeholder="Department"
+              name="department"
+              value={formData.department}
+              onChange={handleInputChange}
+              error={!!errors.department}
+              helperText={errors.department}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>apartment</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Organization"
+              name="organization"
+              value={formData.organization}
+              onChange={handleInputChange}
+              error={!!errors.organization}
+              helperText={errors.organization}
+              fullWidth
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StyledIcon>business</StyledIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                placeholder="Employment Date"
+                value={formData.employementDate ? dayjs(formData.employementDate) : null}
+                onChange={handleDateChange}
+                renderInput={(params) => <TextField {...params} fullWidth variant="outlined" />}
+                error={!!errors.employementDate}
+                helperText={errors.employementDate}
+              />
+            </LocalizationProvider>
+          </Box>
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+            <SoftButton color="dark" variant="outlined" onClick={handleModalClose} sx={{ mr: 2 }}>
+              Close
+            </SoftButton>
+            <SoftButton variant="gradient" color="success" onClick={handleSubmit}>
+              Save changes
+            </SoftButton>
+          </Box>
+        </Box>
+      </Modal>
+      <ConfirmationModal
+        open={confirmOpen}
+        handleClose={() => setConfirmOpen(false)}
+        title={modalTitle}
+        description={modalBody}
+        actionType={actionType}
+        onConfirm={handleConfirm}
+      />
+    </>
   );
 }
+
+AddCollaborator.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  setVisible: PropTypes.func.isRequired,
+  selectedCollaborator: PropTypes.object,
+  setSelectedCollaborator: PropTypes.func.isRequired,
+};
+
+export default AddCollaborator;
