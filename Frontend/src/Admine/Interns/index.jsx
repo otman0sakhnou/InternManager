@@ -12,7 +12,7 @@ import Icon from "@mui/material/Icon";
 import useStagiaireStore from "store/InternStore";
 import SoftPagination from "components/SoftPagination";
 import { useNavigate } from "react-router-dom";
-import ConfirmationModal from "components/ConfirmatonModal";
+import ConfirmationModal from "components/ConfirmationModals";
 import CustomDropzone from "components/Dropzone";
 import toast from "react-hot-toast";
 
