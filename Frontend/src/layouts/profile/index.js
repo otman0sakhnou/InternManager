@@ -66,7 +66,7 @@ function Overview() {
           yearOfStudy: data.educationInfo.yearOfStudy,
           title: data.internshipInfo.title,
           department: data.internshipInfo.department,
-          startDate: data.internshipInfo.startDate,
+          startDate: data.internshipInfo.startDate.format("YYYY-MM-DD"),
           endDate: data.internshipInfo.endDate,
         }
       : {

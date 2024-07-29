@@ -17,7 +17,7 @@ export const validationSchemas = {
     minLength: { value: 10, message: "Phone number must be at least 10 digits long" },
   },
   gender: {
-    required: { value: true, message: "Gender is required" }
+    required: { value: true, message: "Gender is required" },
   },
   job: {
     required: { value: true, message: "Job role is required" },
