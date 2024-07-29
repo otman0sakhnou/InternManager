@@ -78,17 +78,17 @@ function ProfessionalInfoCard({ title, info, action, role }) {
 
   const handleDateChange = (name, date) => {
     setEditableInfo((prevInfo) => {
-       const updatedInfo = { ...prevInfo };
-       const keys = name.split(".");
-       keys.reduce((acc, key, index) => {
-         if (index === keys.length - 1) {
-           acc[key] = date ? date.format("YYYY-MM-DD") : "";
-         } else {
-           if (!acc[key]) acc[key] = {};
-           return acc[key];
-         }
-       }, updatedInfo);
-       return updatedInfo;
+      const updatedInfo = { ...prevInfo };
+      const keys = name.split(".");
+      keys.reduce((acc, key, index) => {
+        if (index === keys.length - 1) {
+          acc[key] = date ? date.format("YYYY-MM-DD") : "";
+        } else {
+          if (!acc[key]) acc[key] = {};
+          return acc[key];
+        }
+      }, updatedInfo);
+      return updatedInfo;
     });
   };
 
@@ -351,7 +351,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
               )
             : renderField(
                 "Start Date",
-                editableInfo.internshipInfo.startDate,
+                dayjs(editableInfo.internshipInfo.startDate).format("YYYY-MM-DD"),
                 "internshipInfo.startDate"
               )}
           {editable
@@ -362,7 +362,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
               )
             : renderField(
                 "End Date",
-                editableInfo.internshipInfo.endDate,
+                dayjs(editableInfo.internshipInfo.endDate).format("YYYY-MM-DD"),
                 "internshipInfo.endDate"
               )}
         </>
