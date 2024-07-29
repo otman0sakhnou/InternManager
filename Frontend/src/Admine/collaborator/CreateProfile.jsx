@@ -18,7 +18,7 @@ import StyledIcon from "components/StyledIcon";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import useValidationStore from "store/useValidationStore ";
+import useValidationStore from "store/useValidationStore";
 import dayjs from 'dayjs';
 import useCollaboratorStore from "store/collaboratorStore";
 import { validate, validationSchemas } from "utils/validation";
@@ -348,7 +348,7 @@ export default function CreateProfile() {
                   <Grid item xs={12} md={6}>
                     <TextField
                       placeholder="Title"
-                      name="Title"
+                      name="job"
                       value={formData.job}
                       onChange={handleInputChange}
                       error={!!errors.job}
@@ -371,6 +371,7 @@ export default function CreateProfile() {
                           placeholder="Employment Date"
                           value={formData.employementDate ? dayjs(formData.employementDate) : null}
                           onChange={handleDateChange}
+                          renderInput={(params) => <TextField {...params} fullWidth error={!!errors.employementDate} helperText={errors.employementDate} />}
                         />
                         {errors.employementDate && <FormHelperText p={2} error>{errors.employementDate}</FormHelperText>}
                       </LocalizationProvider>

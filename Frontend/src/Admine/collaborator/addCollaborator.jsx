@@ -16,9 +16,9 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useCollaboratorStore from "store/collaboratorStore";
-import useValidationStore from "store/useValidationStore ";
+import useValidationStore from "store/useValidationStore";
 import PropTypes from "prop-types";
-import ConfirmationModal from "components/ConfirmatonModal";
+import ConfirmationModal from "components/ConfirmationModals";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';

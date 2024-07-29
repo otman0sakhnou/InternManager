@@ -7,7 +7,7 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import toast from "react-hot-toast";
-import ConfirmationModal from "components/ConfirmatonModal";
+import ConfirmationModal from "components/ConfirmationModals";
 import {
   Box,
   TextField,
@@ -31,7 +31,7 @@ import StyledIcon from "components/StyledIcon";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import useValidationStore from "store/useValidationStore ";
+import useValidationStore from "store/useValidationStore";
 import dayjs from "dayjs";
 import SoftBox from "components/SoftBox";
 import { Grid } from "@mui/material";
