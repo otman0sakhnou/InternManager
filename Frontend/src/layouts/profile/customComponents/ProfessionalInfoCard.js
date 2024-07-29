@@ -231,9 +231,12 @@ function ProfessionalInfoCard({ title, info, action, role }) {
             : renderField("Job", editableInfo.job, "job")}
           {editable
             ? renderEditableSelectField("Department", editableInfo.department, "department", [
-                { value: "HR", label: "Human Resources" },
-                { value: "IT", label: "Information Technology" },
-                { value: "Finance", label: "Finance" },
+                { value: "Microsoft&Data", label: "Microsoft & Data" },
+                { value: "Front&Mobile", label: "Front & Mobile" },
+                { value: "Java", label: "Java" },
+                { value: "PHP", label: "PHP" },
+                { value: "Devops", label: "Devops" },
+                { value: "Test&Support", label: "Test & Support" },
               ])
             : renderField("Department", editableInfo.department, "department")}
           {editable
