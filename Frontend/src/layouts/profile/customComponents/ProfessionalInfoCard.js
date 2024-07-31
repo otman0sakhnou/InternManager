@@ -15,9 +15,9 @@ import CalendarToday from "@mui/icons-material/CalendarToday";
 import { MenuItem, Select } from "@mui/material";
 import dayjs from "dayjs";
 import StyledIcon from "components/StyledIcon";
-import useValidationStore from "store/useValidationStore ";
 import { validationSchemas, validate } from "utils/validation";
 import flattenObject from "utils/flattenObject";
+import useValidationStore from "store/useValidationStore";
 
 function ProfessionalInfoCard({ title, info, action, role }) {
   const infoRespectingFormCreation = {

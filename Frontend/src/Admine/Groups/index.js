@@ -295,8 +295,8 @@ const Groups = () => {
                     {showCreateGroupForm ? (
                       <Box
                         sx={{
-                          maxWidth: 900, // Fixed maximum width for the card
-
+                          //maxWidth: 900, // Fixed maximum width for the card
+                          width: "100%",
                           overflow: "hidden", // Hide any overflow from the card
                           padding: 2, // Add some padding
                           boxShadow: 1, // Optional: add a shadow for a card-like appearance
@@ -304,7 +304,7 @@ const Groups = () => {
                           backgroundColor: "#ffffff", // Background color
                         }}
                       >
-                        <Box mb={2}>
+                        <Box mb={2} >
                           <Typography variant="h6" textAlign="center">
                             Group Details:
                           </Typography>
@@ -329,7 +329,7 @@ const Groups = () => {
                             alignItems="center" // Align items vertically centered
                             mb={2}
                           >
-                            <Typography variant="h6" mb={1}>
+                            <Typography variant="h6">
                               Members:
                             </Typography>
                             <IconButton
@@ -354,14 +354,12 @@ const Groups = () => {
                             display="flex"
                             overflow="hidden"
                             sx={{
-                              gap: 1,
                               maxWidth: '100%',
-                              pb: 1,
                               whiteSpace: 'nowrap',
                             }}
                           >
                             {selectedInterns.length === 0 ? (
-                              <Typography>No members selected</Typography>
+                              <Typography variant="caption">No members selected</Typography>
                             ) : (
                               <Box
                                 display="flex"

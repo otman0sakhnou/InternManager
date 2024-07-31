@@ -32,6 +32,7 @@ import useValidationStore from "store/useValidationStore";
 import dayjs from "dayjs";
 import useCollaboratorStore from "store/collaboratorStore";
 import { validate, validationSchemas } from "utils/validation";
+import { useNavigate } from "react-router-dom";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -115,6 +116,8 @@ export default function CreateProfile() {
   });
 
   const { errors, setErrors } = useValidationStore();
+  
+  const navigate = useNavigate();
 
   // Validation function
   const getActiveStepSchema = (step) => {
@@ -152,6 +155,7 @@ export default function CreateProfile() {
       setErrors({});
       if (activeStep === steps.length - 1) {
         submit();
+        navigate("/collaborator");
       } else {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
@@ -336,7 +340,7 @@ export default function CreateProfile() {
                         renderValue={(selected) => {
                           if (selected.length === 0) {
                             return (
-                              <span style={{ color: "#CCCCCC" }}>Select internship department</span>
+                              <span style={{ color: "#CCCCCC" }}>Select department</span>
                             );
                           }
                           return selected;
@@ -351,7 +355,7 @@ export default function CreateProfile() {
                         }
                       >
                         <MenuItem value="" disabled>
-                          Select internship department
+                          Select department
                         </MenuItem>
                         <MenuItem value="Microsoft&Data">Microsoft & Data</MenuItem>
                         <MenuItem value="Front&Mobile">Front & Mobile</MenuItem>

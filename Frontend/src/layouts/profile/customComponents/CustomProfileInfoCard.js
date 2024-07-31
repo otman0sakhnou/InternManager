@@ -19,10 +19,9 @@ import useStagiaireStore from "store/InternStore";
 import useCollaboratorStore from "store/collaboratorStore";
 import useAuthStore from "store/AuthStore";
 import StyledIcon from "components/StyledIcon";
-import useValidationStore from "store/useValidationStore ";
-import validation from "ajv/dist/vocabularies/validation";
 import { validationSchemas } from "utils/validation";
 import { validate } from "utils/validation";
+import useValidationStore from "store/useValidationStore";
 
 function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const { role } = useAuthStore(); // Adjust based on how your auth store returns role
