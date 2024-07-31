@@ -15,6 +15,9 @@ import CalendarToday from "@mui/icons-material/CalendarToday";
 import { MenuItem, Select } from "@mui/material";
 import dayjs from "dayjs";
 import StyledIcon from "components/StyledIcon";
+import useValidationStore from "store/useValidationStore ";
+import { validationSchemas, validate } from "utils/validation";
+import flattenObject from "utils/flattenObject";
 
 function ProfessionalInfoCard({ title, info, action, role }) {
   const infoRespectingFormCreation = {
@@ -46,18 +49,72 @@ function ProfessionalInfoCard({ title, info, action, role }) {
   );
   const collaborator = useCollaboratorStore((state) => state.getCollaboratorById(info.id));
 
+  const { errors, setErrors } = useValidationStore();
+
   useEffect(() => {
     setEditableInfo(role === "intern" ? infoRespectingFormCreation : info);
   }, [role]);
 
   const originalData = role === "intern" ? intern : collaborator;
 
+  const getActiveSchema = () => {
+    if (role === "intern") {
+      return {
+        "educationInfo.institution": validationSchemas.institution,
+        "educationInfo.level": validationSchemas.level,
+        "educationInfo.specialization": validationSchemas.specialization,
+        "educationInfo.yearOfStudy": validationSchemas.yearOfStudy,
+        "internshipInfo.title": validationSchemas.title,
+        "internshipInfo.department": validationSchemas.department,
+        "internshipInfo.startDate": validationSchemas.startDate,
+        "internshipInfo.endDate": validationSchemas.endDate,
+      };
+    } else if (role === "collaborator") {
+      return {
+        organization: validationSchemas.organization,
+        department: validationSchemas.department,
+        job: validationSchemas.job,
+        employmentDate: validationSchemas.employementDate,
+      };
+    } else {
+      return {}
+    }
+  }
+ 
   const toggleEdit = () => {
     if (editable) {
-      handleSave();
+      const schema = getActiveSchema();
+      console.log(schema);
+      console.log(editableInfo)
+      const flattenedInfo = flattenObject(editableInfo)
+      const newErrors = validate(flattenedInfo, schema);
+      console.log(newErrors);
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        // handleSave();
+        // setEditable(false);
+      } else {
+        setErrors({});
+        handleSave();
+        setEditable(false);
+      }
+    } else {
+      setEditable(true);
     }
-    setEditable(!editable);
   };
+   const handleSave = () => {
+
+     if (role === "intern") {
+       const updatedData = { ...originalData, ...editableInfo };
+       updateStagiaire(updatedData);
+     } else if (role === "collaborator") {
+       const updatedData = { ...originalData, ...editableInfo };
+       updateCollaborator(updatedData);
+     }
+
+     setErrors({});
+     return null;
+   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,15 +149,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
     });
   };
 
-  const handleSave = () => {
-    if (role === "intern") {
-      const updatedData = { ...originalData, ...editableInfo };
-      updateStagiaire(updatedData);
-    } else if (role === "collaborator") {
-      const updatedData = { ...originalData, ...editableInfo };
-      updateCollaborator(updatedData);
-    }
-  };
+ 
 
   const renderEditableField = (label, value, key) => (
     <SoftBox key={key} display="flex" py={1} pr={2}>
@@ -119,6 +168,8 @@ function ProfessionalInfoCard({ title, info, action, role }) {
         value={value || ""}
         onChange={handleInputChange}
         fullWidth
+        error={!!errors[key]}
+        helperText={errors[key] || ""}
       />
     </SoftBox>
   );
@@ -154,6 +205,8 @@ function ProfessionalInfoCard({ title, info, action, role }) {
                   </InputAdornment>
                 ),
               }}
+              error={!!errors[key]}
+              helperText={errors[key] || ""}
             />
           )}
         />
@@ -189,6 +242,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
             }
             return selected;
           }}
+          error={!!errors[key]}
         >
           <MenuItem value="" disabled>
             {label}
@@ -199,6 +253,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
             </MenuItem>
           ))}
         </Select>
+        {errors[key] && <SoftTypography color="error">{errors[key]}</SoftTypography>}
       </FormControl>
     </SoftBox>
   );
