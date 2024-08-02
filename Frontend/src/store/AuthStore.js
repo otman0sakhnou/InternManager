@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const useAuthStore = create((set) => ({
-  role: "intern",
+  role: "collaborator",
 }));
 
 export default useAuthStore;

@@ -51,11 +51,13 @@ const Groups = () => {
   const deleteGroup = useGroupStore((state) => state.deleteGroup);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
 
+  const getGroupsByDepartment = useGroupStore((state) => state.getGroupsByDepartment)
+
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
   const departments = [
     { value: "Microsoft&Data", label: "Microsoft & Data" },
     { value: "Front&Mobile", label: "Front & Mobile" },
@@ -67,7 +69,7 @@ const Groups = () => {
   const getActiveInterns = (department) => {
     const today = new Date().toISOString().split("T")[0]; // Date actuelle au format YYYY-MM-DD
     const activeInterns =
-      groups[department]
+      getGroupsByDepartment(department)
         ?.flatMap((group) =>
           new Date(group.expirationDate) > new Date(today) ? group.stagiaires : []
         )
@@ -101,7 +103,6 @@ const Groups = () => {
   const navigate = useNavigate();
   const handleCreateGroup = () => {
     const newGroup = {
-      id: Date.now(),
       name: groupName,
       description,
       expirationDate,
@@ -110,12 +111,9 @@ const Groups = () => {
       collaborator: selectedCollaborator,
     };
 
-    console.log("Creating new group:", newGroup);
-
     // Rediriger vers la page de création de sujet si la case est cochée
     if (addSubject) {
-      addGroup(selectedDepartment, newGroup);
-
+      addGroup(newGroup);
       navigate(`/create-subject/${newGroup.id}`);
     } else {
       // Afficher la confirmation
@@ -125,8 +123,7 @@ const Groups = () => {
         "Are you sure you don't want to add a subject for this group?"
       );
       setOnConfirmAction(() => () => {
-        addGroup(selectedDepartment, newGroup);
-
+        addGroup(newGroup);
         setShowCreateGroupForm(false);
         setSelectedInterns([]);
         setGroupName("");
@@ -139,7 +136,7 @@ const Groups = () => {
     setIsConfirmationModalOpen(true);
   };
 
-  const departmentGroups = groups[selectedDepartment] || [];
+  const departmentGroups = getGroupsByDepartment(selectedDepartment) || [];
 
   const handleDelete = (id) => {
     setActionType("delete");
@@ -154,6 +151,7 @@ const Groups = () => {
     setIsConfirmationModalOpen(true);
   };
   const handleViewDetails = (id) => {
+    console.log(id)
     navigate(`/groupdetails/${id}`);
   };
   //Groups Pagination
@@ -244,6 +242,9 @@ const Groups = () => {
   const [addSubject, setAddSubject] = useState(false); // État pour la case à cocher
   const [open, setOpen] = useState(true);
   const [open2, setOpen2] = useState(true);
+
+  
+
   const handleToggle = () => {
     setOpen(!open);
   };
@@ -254,9 +255,7 @@ const Groups = () => {
   const handleRemoveIntern = (internId) => {
     setActionType("delete");
     setConfirmationModalTitle("Remove Selected Intern");
-    setConfirmationModalDescription(
-      "Are you sure you want to remove this intern for this group?"
-    );
+    setConfirmationModalDescription("Are you sure you want to remove this intern for this group?");
     setOnConfirmAction(() => () => {
       setSelectedInterns(selectedInterns.filter((intern) => intern.id !== internId));
     });
@@ -272,9 +271,8 @@ const Groups = () => {
           departments={departments}
         />
         <Box display="flex" flexDirection="column" flexWrap="wrap" gap={2} alignItems="stretch">
-
           <Box
-            flex={open ? 1 : '0 0 0'} // Adjust flex based on collapse state
+            flex={open ? 1 : "0 0 0"} // Adjust flex based on collapse state
             border={1}
             borderColor="divider"
             borderRadius={2}
@@ -282,10 +280,10 @@ const Groups = () => {
             m={1}
             display="flex"
             flexDirection="column"
-            sx={{ minHeight: '50px', transition: 'flex 0.3s ease', overflow: 'hidden', }} // Smooth transition
+            sx={{ minHeight: "50px", transition: "flex 0.3s ease", overflow: "hidden" }} // Smooth transition
           >
             <Button onClick={handleToggle}>
-              {open ? 'Hide' : 'Show'}
+              {open ? "Hide" : "Show"}
               {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </Button>
             <Collapse in={open}>
@@ -304,7 +302,7 @@ const Groups = () => {
                           backgroundColor: "#ffffff", // Background color
                         }}
                       >
-                        <Box mb={2} >
+                        <Box mb={2}>
                           <Typography variant="h6" textAlign="center">
                             Group Details:
                           </Typography>
@@ -322,40 +320,35 @@ const Groups = () => {
 
                         {/* Display selected members as buttons */}
                         <Box>
-
                           <Box
                             display="flex"
                             justifyContent="space-between" // Space between heading and checkbox
                             alignItems="center" // Align items vertically centered
                             mb={2}
                           >
-                            <Typography variant="h6">
-                              Members:
-                            </Typography>
+                            <Typography variant="h6">Members:</Typography>
                             <IconButton
                               onClick={() => setShowCreateGroupForm(false)} // Open the form when clicked
                               sx={{
-                                bgcolor: '#bdbdbd', // Gray color for the icon button
-                                color: '#fff',
-                                borderRadius: '50%', // Circular button
+                                bgcolor: "#bdbdbd", // Gray color for the icon button
+                                color: "#fff",
+                                borderRadius: "50%", // Circular button
                                 p: 1, // Padding for better spacing
-                                '&:hover': {
-                                  bgcolor: '#9e9e9e', // Darker gray on hover
+                                "&:hover": {
+                                  bgcolor: "#9e9e9e", // Darker gray on hover
                                 },
                               }}
                             >
                               <AddIcon /> {/* AddIcon is a built-in Material-UI icon for adding */}
                             </IconButton>
-
                           </Box>
-
 
                           <Box
                             display="flex"
                             overflow="hidden"
                             sx={{
-                              maxWidth: '100%',
-                              whiteSpace: 'nowrap',
+                              maxWidth: "100%",
+                              whiteSpace: "nowrap",
                             }}
                           >
                             {selectedInterns.length === 0 ? (
@@ -365,20 +358,20 @@ const Groups = () => {
                                 display="flex"
                                 sx={{
                                   gap: 1,
-                                  overflowX: 'auto', // Ensure horizontal scrolling
-                                  maxWidth: '100%',
+                                  overflowX: "auto", // Ensure horizontal scrolling
+                                  maxWidth: "100%",
                                   pb: 1,
-                                  whiteSpace: 'nowrap',
-                                  '&::-webkit-scrollbar': {
+                                  whiteSpace: "nowrap",
+                                  "&::-webkit-scrollbar": {
                                     // Optional: Styling for scrollbar
-                                    height: '8px',
+                                    height: "8px",
                                   },
-                                  '&::-webkit-scrollbar-thumb': {
-                                    backgroundColor: '#888',
-                                    borderRadius: '4px',
+                                  "&::-webkit-scrollbar-thumb": {
+                                    backgroundColor: "#888",
+                                    borderRadius: "4px",
                                   },
-                                  '&::-webkit-scrollbar-thumb:hover': {
-                                    backgroundColor: '#555',
+                                  "&::-webkit-scrollbar-thumb:hover": {
+                                    backgroundColor: "#555",
                                   },
                                 }}
                               >
@@ -387,33 +380,34 @@ const Groups = () => {
                                     key={intern.id}
                                     variant="contained"
                                     sx={{
-                                      bgcolor: '#4caf50', // Green background
-                                      color: '#fff',
+                                      bgcolor: "info.main", // blue background
+                                      color: "#fff",
                                       borderRadius: 20, // Fully rounded corners
                                       px: 2, // Padding for better spacing
                                       py: 1,
-                                      textTransform: 'none', // Prevents text from being uppercase
-                                      width: 'auto', // Automatically adjust width to content
-                                      minWidth: '120px', // Minimum width to prevent too small buttons
+                                      textTransform: "none", // Prevents text from being uppercase
+                                      width: "auto", // Automatically adjust width to content
+                                      minWidth: "120px", // Minimum width to prevent too small buttons
                                       flexShrink: 0, // Prevent the button from shrinking
-                                      display: 'inline-flex', // Ensure content and icon are aligned
-                                      alignItems: 'center',
-                                      '&:hover': {
-                                        bgcolor: '#388e3c', // Darker green on hover
+                                      display: "inline-flex", // Ensure content and icon are aligned
+                                      alignItems: "center",
+                                      "&:hover": {
+                                        bgcolor: "#388e3c", // Darker green on hover
                                       },
                                     }}
                                   >
-                                    {intern.name.length > 10 ? `${intern.name.substring(0, 10)}...` : intern.name}
+                                    {intern.name.length > 10
+                                      ? `${intern.name.substring(0, 10)}...`
+                                      : intern.name}
                                     <CloseIcon
                                       onClick={() => handleRemoveIntern(intern.id)}
-                                      sx={{ ml: 1, cursor: 'pointer' }} // Add some margin and make the icon clickable
+                                      sx={{ ml: 1, cursor: "pointer" }} // Add some margin and make the icon clickable
                                     />
                                   </Button>
                                 ))}
                               </Box>
                             )}
                           </Box>
-
                         </Box>
 
                         <Box
@@ -422,11 +416,11 @@ const Groups = () => {
                           gap={2}
                           p={2}
                           borderRadius={2}
-                          sx={{ backgroundColor: '#ffffff' }} // White background for fields
+                          sx={{ backgroundColor: "#ffffff" }} // White background for fields
                         >
-                          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
+                          <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={2}>
                             <FormControl fullWidth>
-                              <FormLabel sx={{ fontSize: 14, mb: 1, color: '#666' }}>Group Name</FormLabel>
+                              <FormLabel sx={{ fontSize: 14, mb: 1 }}>Group Name</FormLabel>
                               <TextField
                                 id="groupName"
                                 placeholder="Enter group name"
@@ -435,22 +429,22 @@ const Groups = () => {
                                 variant="outlined"
                                 sx={{
                                   borderRadius: 1,
-                                  bgcolor: '#ffffff',
-                                  '& .MuiOutlinedInput-root': {
+                                  bgcolor: "#ffffff",
+                                  "& .MuiOutlinedInput-root": {
                                     borderRadius: 1,
                                   },
                                 }}
                               />
                             </FormControl>
                             <FormControl fullWidth>
-                              <FormLabel htmlFor="expirationDate" sx={{ fontSize: 14, mb: 1, color: '#666' }}>
+                              <FormLabel htmlFor="expirationDate" sx={{ fontSize: 14, mb: 1 }}>
                                 Expiration Date
                               </FormLabel>
                               <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
                                   value={expirationDate ? dayjs(expirationDate) : null}
                                   onChange={(date) =>
-                                    setExpirationDate(date ? date.format('YYYY-MM-DD') : null)
+                                    setExpirationDate(date ? date.format("YYYY-MM-DD") : null)
                                   }
                                   renderInput={(params) => (
                                     <TextField
@@ -459,8 +453,8 @@ const Groups = () => {
                                       InputLabelProps={{ shrink: true }}
                                       sx={{
                                         borderRadius: 1,
-                                        bgcolor: '#ffffff',
-                                        '& .MuiOutlinedInput-root': {
+                                        bgcolor: "#ffffff",
+                                        "& .MuiOutlinedInput-root": {
                                           borderRadius: 1,
                                         },
                                       }}
@@ -471,7 +465,7 @@ const Groups = () => {
                             </FormControl>
                           </Box>
                           <FormControl fullWidth>
-                            <FormLabel htmlFor="description" sx={{ fontSize: 14, mb: 1, color: '#666' }}>
+                            <FormLabel htmlFor="description" sx={{ fontSize: 14, mb: 1 }}>
                               Description
                             </FormLabel>
                             <TextField
@@ -484,8 +478,8 @@ const Groups = () => {
                               rows={4}
                               sx={{
                                 borderRadius: 1,
-                                bgcolor: '#ffffff',
-                                '& .MuiOutlinedInput-root': {
+                                bgcolor: "#ffffff",
+                                "& .MuiOutlinedInput-root": {
                                   borderRadius: 1,
                                 },
                               }}
@@ -493,8 +487,8 @@ const Groups = () => {
                           </FormControl>
 
                           <FormControl fullWidth>
-                            <FormLabel sx={{ fontSize: 14, color: '#666' }}>Collaborator</FormLabel>
-                            <Box sx={{ bgcolor: '#ffffff' }}>
+                            <FormLabel sx={{ fontSize: 14 }}>Collaborator</FormLabel>
+                            <Box sx={{ bgcolor: "#ffffff" }}>
                               <CollaboratorSelector
                                 filteredCollaborators={filteredCollaborators}
                                 selectedCollaborator={selectedCollaborator}
@@ -507,15 +501,15 @@ const Groups = () => {
                         <Box
                           mt={3}
                           display="flex"
-                          flexDirection={{ xs: 'column', sm: 'row' }}
+                          flexDirection={{ xs: "column", sm: "row" }}
                           justifyContent="space-between"
                           gap={2}
                         >
                           <Button
                             variant="contained"
                             sx={{
-                              bgcolor: '#bdbdbd', // Gray color for Back button
-                              color: '#fff',
+                              bgcolor: "#bdbdbd", // Gray color for Back button
+                              color: "#fff",
                               borderRadius: 1,
                               px: 3,
                             }}
@@ -526,8 +520,8 @@ const Groups = () => {
                           <Button
                             variant="contained"
                             sx={{
-                              bgcolor: 'info.main', // Blue color for Create Group button
-                              color: '#fff',
+                              bgcolor: "info.main", // Blue color for Create Group button
+                              color: "#fff",
                               borderRadius: 1,
                               px: 3,
                             }}
@@ -562,7 +556,6 @@ const Groups = () => {
                               flexDirection="column"
                               alignItems="center"
                               justifyContent="center"
-
                               minHeight="200px"
                             >
                               <InfoIcon sx={{ fontSize: 50, mb: 2 }} />
@@ -581,10 +574,13 @@ const Groups = () => {
                                     border={1}
                                     borderColor="divider"
                                     borderRadius={2}
-                                    p={0.5}
-                                    maxHeight={'54px'}
+                                    py={0.5}
+                                    px={1}
+                                    maxHeight={"48px"}
                                     bgcolor={
-                                      selectedInterns.includes(stagiaire) ? "lightblue" : "transparent"
+                                      selectedInterns.includes(stagiaire)
+                                        ? "lightblue"
+                                        : "transparent"
                                     }
                                   >
                                     <SoftTypography variant="caption" color="dark" sx={{ mr: 1 }}>
@@ -609,8 +605,7 @@ const Groups = () => {
                                   display: "flex",
                                   justifyContent: "flex-end",
                                   gap: 1,
-                                  alignItems: 'flex-end',
-
+                                  alignItems: "flex-end",
                                 }}
                               >
                                 <IconButton
@@ -633,7 +628,9 @@ const Groups = () => {
                                   }}
                                 >
                                   <AddIcon
-                                    sx={{ color: selectedInterns.length === 0 ? "inherit" : "#fff" }}
+                                    sx={{
+                                      color: selectedInterns.length === 0 ? "inherit" : "#fff",
+                                    }}
                                   />
                                 </IconButton>
                               </Box>
@@ -644,7 +641,6 @@ const Groups = () => {
                                   display: "flex",
                                   justifyContent: "center",
                                   mt: 2,
-
                                 }}
                               >
                                 <SoftPagination
@@ -670,7 +666,8 @@ const Groups = () => {
 
                                   {renderPageButtonsintern()}
 
-                                  {totalPagesintern > (currentIntern + 1) * buttonsPerPageintern && (
+                                  {totalPagesintern >
+                                    (currentIntern + 1) * buttonsPerPageintern && (
                                     <Button onClick={() => setCurrentIntern(currentIntern + 1)}>
                                       ...
                                     </Button>
@@ -704,18 +701,17 @@ const Groups = () => {
                     minHeight="200px"
                   >
                     <InfoIcon sx={{ fontSize: 50, mb: 2 }} />
-                    <Typography variant="h6">Please select a department to create groups.</Typography>
+                    <Typography variant="h6">
+                      Please select a department to create groups.
+                    </Typography>
                   </Box>
                 )}
               </Box>
-
             </Collapse>
-
-
           </Box>
 
           <Box
-            flex={open2 ? 1 : '0 0 0'}
+            flex={open2 ? 1 : "0 0 0"} // Adjust flex based on collapse state
             border={1}
             borderColor="divider"
             borderRadius={2}
@@ -723,15 +719,11 @@ const Groups = () => {
             m={1}
             display="flex"
             flexDirection="column"
-            sx={{
-              minHeight: '50px', transition: 'flex 0.3s ease',
-              overflow: 'hidden',
-            }} // Added position relative
+            sx={{ minHeight: "50px", transition: "flex 0.3s ease", overflow: "hidden" }} // Smooth transition
           >
             <Button onClick={handleToggle2}>
-              {open2 ? 'Hide' : 'Show'}
+              {open2 ? "Hide" : "Show"}
               {open2 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-
             </Button>
             <Collapse in={open2}>
               <Box>
@@ -747,7 +739,6 @@ const Groups = () => {
                       flexDirection="column"
                       alignItems="center"
                       justifyContent="center"
-
                       minHeight="200px"
                     >
                       <InfoIcon sx={{ fontSize: 50, mb: 2 }} />
@@ -763,14 +754,99 @@ const Groups = () => {
                         mb={1}
                         sx={{
                           // Ensure the container takes up all available space
-
+                          flexGrow: 1,
                         }}
                       >
                         {/* Display Groups */}
-                        <Box display="flex" flexDirection="column" gap={2} mb={1} sx={{ flexGrow: 1 }}>
+                        <Box
+                          display="flex"
+                          flexDirection="column"
+                          gap={2}
+                          mb={1}
+                          sx={{ flexGrow: 1 }}
+                        >
                           {currentGroups.map((group) => {
                             const isExpired = new Date(group.expirationDate) < new Date();
                             return (
+                              // <Box
+                              //   key={group.id}
+                              //   display="flex"
+                              //   flexDirection="column"
+                              //   borderRadius={2}
+                              //   p={2}
+                              //   sx={{
+                              //     //backgroundColor: "#ffffff",
+                              //     boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                              //     border: "1px solid #e0e0e0",
+                              //     position: "relative",
+                              //     overflow: "hidden",
+                              //     opacity: isExpired ? 0.5 : 1,
+                              //     "&::before": {
+                              //       content: '""',
+                              //       position: "absolute",
+                              //       top: 0,
+                              //       left: 0,
+                              //       width: "4px",
+                              //       height: "100%",
+                              //       backgroundColor: "#4caf50",
+                              //       borderTopLeftRadius: "2px",
+                              //       borderBottomLeftRadius: "2px",
+                              //     },
+                              //   }}
+                              // >
+                              //   <Box
+                              //     display="flex"
+                              //     justifyContent="space-between"
+                              //     alignItems="center"
+                              //     mb={1}
+                              //     sx={{ backgroundColor: "red"}}
+                              //   >
+                              //     <Typography
+                              //       variant="h6"
+                              //       fontWeight="bold"
+                              //       sx={{ color: "#333", display: "flex", alignItems: "center" }}
+                              //     >
+                              //       <Box
+                              //         sx={{
+                              //           width: 10,
+                              //           height: 10,
+                              //           borderRadius: "50%",
+                              //           backgroundColor: "#4caf50",
+                              //           marginRight: 1,
+                              //         }}
+                              //       />
+                              //       {group.name}
+                              //     </Typography>
+                              //     <Box>
+                              //       <IconButton
+                              //         onClick={() => handleViewDetails(group.id)}
+                              //         sx={{
+                              //           color: "#007bff",
+                              //           "&:hover": { backgroundColor: "#e0e0e0" },
+                              //         }}
+                              //         disabled={isExpired}
+                              //       >
+                              //         <Icon>info</Icon>
+                              //       </IconButton>
+                              //       <IconButton
+                              //         onClick={() => handleDelete(group.id)}
+                              //         sx={{
+                              //           color: "#dc3545",
+                              //           "&:hover": { backgroundColor: "#f8d7da" },
+                              //         }}
+                              //         disabled={isExpired}
+                              //       >
+                              //         <Icon>delete</Icon>
+                              //       </IconButton>
+                              //     </Box>
+                              //   </Box>
+                              //   <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+                              //     Expiration Date: {group.expirationDate}
+                              //   </Typography>
+                              //   <Typography variant="body2" color="textSecondary">
+                              //     Members: {group.stagiaires.length}
+                              //   </Typography>
+                              // </Box>
                               <Box
                                 key={group.id}
                                 display="flex"
@@ -778,7 +854,6 @@ const Groups = () => {
                                 borderRadius={2}
                                 p={2}
                                 sx={{
-                                  backgroundColor: "#ffffff",
                                   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                                   border: "1px solid #e0e0e0",
                                   position: "relative",
@@ -791,7 +866,7 @@ const Groups = () => {
                                     left: 0,
                                     width: "4px",
                                     height: "100%",
-                                    backgroundColor: "#4caf50",
+                                    backgroundColor: "#info.main",
                                     borderTopLeftRadius: "2px",
                                     borderBottomLeftRadius: "2px",
                                   },
@@ -806,46 +881,46 @@ const Groups = () => {
                                   <Typography
                                     variant="h6"
                                     fontWeight="bold"
-                                    sx={{ color: "#333", display: "flex", alignItems: "center" }}
+                                    sx={{ display: "flex", alignItems: "center" }}
                                   >
                                     <Box
                                       sx={{
                                         width: 10,
                                         height: 10,
                                         borderRadius: "50%",
-                                        backgroundColor: "#4caf50",
+                                        backgroundColor: "info.main",
                                         marginRight: 1,
                                       }}
                                     />
                                     {group.name}
                                   </Typography>
-                                  <Box>
+                                  <Box display="flex" alignItems="center">
                                     <IconButton
                                       onClick={() => handleViewDetails(group.id)}
                                       sx={{
-                                        color: "#007bff",
-                                        "&:hover": { backgroundColor: "#e0e0e0" },
+                                        color: "#42aad4",
+                                        "&:hover": { backgroundColor: "#a5cbd1" },
                                       }}
                                       disabled={isExpired}
                                     >
-                                      <Icon>info</Icon>
+                                      <Icon>info_outline</Icon>
                                     </IconButton>
                                     <IconButton
                                       onClick={() => handleDelete(group.id)}
                                       sx={{
-                                        color: "#dc3545",
-                                        "&:hover": { backgroundColor: "#f8d7da" },
+                                        color: "#e64343",
+                                        "&:hover": { backgroundColor: "#e8cac8" },
                                       }}
                                       disabled={isExpired}
                                     >
-                                      <Icon>delete</Icon>
+                                      <Icon>delete_outline</Icon>
                                     </IconButton>
                                   </Box>
                                 </Box>
-                                <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+                                <Typography variant="body2" sx={{ mb: 0.5 }}>
                                   Expiration Date: {group.expirationDate}
                                 </Typography>
-                                <Typography variant="body2" color="textSecondary">
+                                <Typography variant="body2">
                                   Members: {group.stagiaires.length}
                                 </Typography>
                               </Box>
@@ -920,7 +995,7 @@ const Groups = () => {
             </Collapse>
           </Box>
         </Box>
-      </SoftBox >
+      </SoftBox>
       <ConfirmationModal
         open={isConfirmationModalOpen}
         handleClose={() => setIsConfirmationModalOpen(false)}
@@ -932,7 +1007,7 @@ const Groups = () => {
         }}
         actionType={actionType}
       />
-    </DashboardLayout >
+    </DashboardLayout>
   );
 };
 
