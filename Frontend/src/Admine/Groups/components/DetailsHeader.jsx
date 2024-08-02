@@ -26,34 +26,9 @@ import Settings from "examples/Icons/Settings";
 import curved0 from "assets/images/curved-images/curved0.jpg";
 // Soft UI Dashboard React base styles
 import breakpoints from "assets/theme/base/breakpoints";
-import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp"
-import femaleAvatar from 'assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg'
+import group from "../../../assets/avatars/group.webp"
 
-
-const getAvatarImage = (gender) => {
-  switch (gender.toLowerCase()) {
-    case "male":
-      return maleAvatar;
-    case "female":
-      return femaleAvatar;
-    default:
-      return null;
-  }
-};
-const avatarStyles = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 40,
-  height: 40,
-  borderRadius: "50%",
-  backgroundColor: "#fff",
-  color: "#fff",
-  fontSize: 16,
-  fontWeight: "bold",
-};
-
-function Header({ name, gender }) {
+function DetailsHeader({ name, avatarIcon }) {
   const navigate = useNavigate(); // Initialize navigate function
 
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
@@ -78,17 +53,14 @@ function Header({ name, gender }) {
       navigate(-1); // Navigate back to the previous page
     }
   };
-  
-  const avatarImage = getAvatarImage(gender)
 
   return (
     <SoftBox position="relative">
-      <DashboardNavbar absolute light />
       <SoftBox
         display="flex"
         alignItems="center"
         position="relative"
-        minHeight="18.75rem"
+        minHeight="8.75rem"
         borderRadius="xl"
         sx={{
           backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
@@ -115,18 +87,37 @@ function Header({ name, gender }) {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            {/* <SoftBox mr={2} style={avatarStyles}>
-              <SoftAvatar src={avatarImage} alt={name} size="sm" variant="rounded" />
-            </SoftBox> */}
             <SoftAvatar
               variant="rounded"
               size="xl"
               shadow="sm"
-              src={avatarImage}
-              alt={name}
-              sx={{ bgcolor: "primary" }}
-            />
+              sx={{
+                bgcolor: "primary",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <img
+                src={group} // Replace with your asset URL
+                alt={name}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "inherit",
+                }}
+              />
+            </SoftAvatar>
           </Grid>
+
+          {/* <Grid item>
+            <SoftAvatar variant="rounded" size="xl" shadow="sm" sx={{ bgcolor: "primary" }}>
+              {avatarIcon || (
+                <Icon sx={{ fontSize: 50, color: "primary.contrastText" }}>account_circle</Icon>
+              )}
+            </SoftAvatar>
+          </Grid> */}
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
@@ -150,8 +141,6 @@ function Header({ name, gender }) {
                   icon={<ArrowBack />}
                   onClick={() => navigate(-1)} // Handle click directly
                 />
-                <Tab label="Message" icon={<Document />} />
-                <Tab label="Settings" icon={<Settings />} />
               </Tabs>
             </AppBar>
           </Grid>
@@ -161,9 +150,9 @@ function Header({ name, gender }) {
   );
 }
 
-Header.propTypes = {
+DetailsHeader.propTypes = {
   name: PropTypes.string.isRequired,
-  gender: PropTypes.string.isRequired,
+  avatarIcon: PropTypes.element,
 };
 
-export default Header;
+export default DetailsHeader;

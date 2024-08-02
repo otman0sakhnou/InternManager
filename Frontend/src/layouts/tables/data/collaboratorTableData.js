@@ -12,7 +12,31 @@ import { useNavigate } from "react-router-dom";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import useCollaboratorStore from "store/collaboratorStore";
+import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg"
+import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp"
 
+const getAvatarImage = (gender) => {
+  switch (gender.toLowerCase()) {
+    case "male":
+      return maleAvatar;
+    case "female":
+      return femaleAvatar;
+    default:
+      return null;
+  }
+};
+const avatarStyles = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 40,
+  height: 40,
+  borderRadius: "50%",
+  backgroundColor: "#fff",
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "bold",
+};
 const getInitials = (name) => {
   const words = name.split(" ");
   if (words.length > 1) {
@@ -55,11 +79,12 @@ const EmployeeAvatar = ({ name }) => {
   );
 };
 
-function Author({ name, email, phone }) {
+function Author({ name, email, phone , gender}) {
+  const avatarImage = getAvatarImage(gender);
   return (
     <SoftBox display="flex" alignItems="center" px={1} py={0.5}>
-      <SoftBox mr={2}>
-        <EmployeeAvatar name={name} />
+      <SoftBox mr={2} style={avatarStyles}>
+        <SoftAvatar src={avatarImage} alt={name} size="sm" variant="rounded" />
       </SoftBox>
       <SoftBox display="flex" flexDirection="column">
         <SoftTypography variant="button" fontWeight="medium">
@@ -170,7 +195,7 @@ const collaboratorTableData = (collaborators, setVisible, setSelectedCollaborato
 
   const rows = collaborators.map((collaborator) => ({
     collaborator: (
-      <Author name={collaborator.name} email={collaborator.email} phone={collaborator.phone} />
+      <Author name={collaborator.name} email={collaborator.email} phone={collaborator.phone} gender={collaborator.gender}/>
     ),
     function: (
       <Function

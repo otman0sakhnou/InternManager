@@ -1,73 +1,90 @@
 import { create } from "zustand";
-const useGroupStore = create((set, get) => ({
-  groups: {},
-  addGroup: (department, group) =>
-    set((state) => {
-      const updatedGroups = {
-        ...state.groups,
-        [department]: [...(state.groups[department] || []), group],
-      };
 
+const useGroupStore = create((set, get) => ({
+  idCounter: 1627903200000, // Initialize with a value that ensures uniqueness, or use a more sophisticated approach
+
+  groups: [
+    {
+      id: 1627903200000,
+      name: "Group A",
+      description: "This is the first group",
+      expirationDate: "2024-12-31",
+      department: "PHP",
+      stagiaires: [
+        { id: 1, name: "Intern One" },
+        { id: 2, name: "Intern Two" },
+      ],
+      collaborator: { id: 101, name: "John Doe" },
+    },
+    {
+      id: 1627989600000,
+      name: "Group B",
+      description: "This is the second group",
+      expirationDate: "2024-11-30",
+      department: "PHP",
+      stagiaires: [
+        { id: 3, name: "Intern Three" },
+        { id: 4, name: "Intern Four" },
+      ],
+      collaborator: { id: 102, name: "Jane Smith" },
+    },
+    {
+      id: 1628076000000,
+      name: "Group C",
+      description: "This is the third group",
+      expirationDate: "2024-10-31",
+      department: "Java",
+      stagiaires: [
+        { id: 5, name: "Intern Five" },
+        { id: 6, name: "Intern Six" },
+      ],
+      collaborator: { id: 103, name: "Alice Johnson" },
+    },
+  ],
+
+  addGroup: (group) =>
+    set((state) => {
+      const newId = state.idCounter + 1; // Increment ID counter for new group
       return {
-        groups: updatedGroups,
+        groups: [...state.groups, { ...group, id: newId }],
+        idCounter: newId, // Update ID counter
       };
     }),
 
   updateGroup: (id, updatedGroup) =>
     set((state) => {
-      console.log("Current groups:", state.groups); // Debugging
+      const updatedGroups = state.groups.map((group) =>
+        group.id === id ? { ...group, ...updatedGroup } : group
+      );
 
-      const updatedGroups = { ...state.groups };
-
-      // Remove the old group from its department
-      for (const department in updatedGroups) {
-        updatedGroups[department] = updatedGroups[department].filter(
-          (group) => Number(group.id) !== Number(id)
-        );
-      }
-
-      // Add the updated group to its new department
-      if (updatedGroup.department) {
-        if (!updatedGroups[updatedGroup.department]) {
-          updatedGroups[updatedGroup.department] = [];
-        }
-        updatedGroups[updatedGroup.department].push(updatedGroup);
-      }
-
-      console.log("Updated groups:", updatedGroups); // Debugging
       return { groups: updatedGroups };
     }),
 
   deleteGroup: (id) =>
-    set((state) => {
-      const updatedGroups = Object.keys(state.groups).reduce((acc, department) => {
-        acc[department] = state.groups[department].filter((group) => group.id !== id);
-        return acc;
-      }, {});
+    set((state) => ({
+      groups: state.groups.filter((group) => group.id !== id),
+    })),
 
-      return { groups: updatedGroups };
-    }),
   getGroupById: (id) => {
     const { groups } = get();
-    console.log("Groups:", groups);
-    console.log("Looking for group with ID:", id);
+    //the id from the param is received as string
+    return groups.find((group) => group.id === Number(id)) || null;
+  },
 
-    const groupId = Number(id);
+  getGroupsByDepartment: (department) => {
+    const { groups } = get();
+    return groups.filter((group) => group.department === department);
+  },
 
-    for (const department of Object.keys(groups)) {
-      console.log("Checking department:", department);
-      const group = groups[department].find((group) => {
-        console.log("Checking group ID:", group.id);
-        return Number(group.id) === groupId;
-      });
-      if (group) {
-        console.log("Found group:", group);
-        return group;
-      }
-    }
+  getGroupsByCollaboratorId: (collaboratorId) => {
+    const { groups } = get();
+    return groups.filter((group) => group.collaborator.id === collaboratorId);
+  },
 
-    console.log("Group not found");
-    return null;
+  getGroupsByInternId: (internId) => {
+    const { groups } = get();
+    return groups.filter((group) => group.stagiaires.some((intern) => intern.id === internId));
   },
 }));
+
 export default useGroupStore;

@@ -1,6 +1,6 @@
 // Import necessary libraries and components
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
@@ -10,6 +10,10 @@ import SoftButton from "components/SoftButton";
 import SoftAvatar from "components/SoftAvatar";
 
 function CustomTeamsList({ title, teams }) {
+  const navigate = useNavigate();
+  const handleViewDetails = (id) => {
+    navigate(`/groupdetails/${id}`);
+  };
   const renderTeams = () => {
     if (teams.length === 0) {
       return (
@@ -21,7 +25,7 @@ function CustomTeamsList({ title, teams }) {
       );
     }
 
-    return teams.map(({ name, description, icon }) => (
+    return teams.map(({ id ,name, description, icon }) => (
       <SoftBox key={name} component="li" display="flex" alignItems="center" py={1} mb={1}>
         <SoftBox
           mr={2}
@@ -58,7 +62,7 @@ function CustomTeamsList({ title, teams }) {
         <SoftBox ml="auto">
           <SoftButton
             component={Link}
-            to={`/group-profile/${name}`} // Assuming you have a route for group profiles
+            onClick={() => handleViewDetails(id)}
             variant="text"
             color="info"
           >
