@@ -55,7 +55,6 @@ const avatarStyles = {
 
 function Header({ name, gender }) {
   const navigate = useNavigate(); // Initialize navigate function
-
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
 
@@ -126,6 +125,7 @@ function Header({ name, gender }) {
               alt={name}
               sx={{ bgcolor: "primary" }}
             />
+
           </Grid>
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>

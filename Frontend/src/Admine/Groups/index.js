@@ -302,7 +302,7 @@ const Groups = () => {
                           backgroundColor: "#ffffff", // Background color
                         }}
                       >
-                        <Box mb={2}>
+                        <Box mb={2} >
                           <Typography variant="h6" textAlign="center">
                             Group Details:
                           </Typography>
@@ -347,8 +347,8 @@ const Groups = () => {
                             display="flex"
                             overflow="hidden"
                             sx={{
-                              maxWidth: "100%",
-                              whiteSpace: "nowrap",
+                              maxWidth: '100%',
+                              whiteSpace: 'nowrap',
                             }}
                           >
                             {selectedInterns.length === 0 ? (

@@ -26,6 +26,7 @@ const subjects = [
   { name: "Training B", type: "Training" },
 ];
 
+
 const ProjectsSection = () => {
   return (
     <Card>
@@ -62,6 +63,7 @@ const ProjectsSection = () => {
             ))}
           </Grid>
           {/* <Grid item xs={12} md={6} xl={3}>
+
             <DefaultProjectCard
               image={homeDecor3}
               label="project #3"

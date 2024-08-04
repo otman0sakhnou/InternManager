@@ -26,6 +26,7 @@ const TeamsCard = (id) => {
 
   const title = getTitleByRole(role);
 
+
   const getGroupsByRole = (role, id) => {
     if (role === "intern") {
       return getGroupsByInternId(id);
@@ -45,7 +46,9 @@ const TeamsCard = (id) => {
   );
 }
 
+
 TeamsCard.propTypes={
   id: PropTypes.string.isRequired,
 }  
+
 export default TeamsCard

@@ -16,6 +16,8 @@ import CustomProfileInfoCard from "./customComponents/CustomProfileInfoCard";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
+
+
 function Overview() {
   console.log(useStagiaireStore((state) => state.stagiaires));
   const { id } = useParams(); // Extract ID from route parameters
@@ -77,11 +79,10 @@ function Overview() {
           organization: data.organization,
         };
 
-    
-
   return (
     <DashboardLayout>
       <Header key={data.id} name={data.name} gender={data.gender} />
+
       <SoftBox mt={5} mb={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} xl={4}>
@@ -109,6 +110,7 @@ function Overview() {
             </LocalizationProvider>
           </Grid>
           <TeamsCard  id={data.id}/>
+
           {/* <ProjectsSection /> */}
         </Grid>
       </SoftBox>
