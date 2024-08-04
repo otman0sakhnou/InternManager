@@ -10,6 +10,8 @@ import CreateProfile from './Admine/collaborator/CreateProfile';
 import Collaborator from "./Admine/collaborator";
 import Interns from "./Admine/Interns";
 import InternForm from "Admine/Interns/InternForm";
+import AddSubjectComponent from "Admine/Subjects/AddSubjectComponent";
+import SubjectPage from "Admine/Subjects/SubjectPage";
 
 // Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
@@ -46,6 +48,18 @@ const routes = [
     key: "c",
     route: "/createintern",
     component: <InternForm />,
+  },
+  {
+    name: "AddSubject",
+    key: "c",
+    route: "/Add-Subject",
+    component: <AddSubjectComponent />,
+  },
+  {
+    name: "subjects",
+    key: "subjects",
+    route: "/Subjects",
+    component: <SubjectPage />,
   },
   {
     type: "collapse",

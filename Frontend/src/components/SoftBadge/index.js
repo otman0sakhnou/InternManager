@@ -22,7 +22,7 @@ import PropTypes from "prop-types";
 import SoftBadgeRoot from "components/SoftBadge/SoftBadgeRoot";
 
 const SoftBadge = forwardRef(
-  ({ color, variant, size, circular, indicator, border, container, children, ...rest }, ref) => (
+  ({ color = "info", variant = "gradient", size = "sm", circular = false, indicator = false, border = false, container = false, children = false, ...rest }, ref) => (
     <SoftBadgeRoot
       {...rest}
       ownerState={{ color, variant, size, circular, indicator, border, container, children }}
@@ -33,18 +33,6 @@ const SoftBadge = forwardRef(
     </SoftBadgeRoot>
   )
 );
-
-// Setting default values for the props of SoftBadge
-SoftBadge.defaultProps = {
-  color: "info",
-  variant: "gradient",
-  size: "sm",
-  circular: false,
-  indicator: false,
-  border: false,
-  children: false,
-  container: false,
-};
 
 // Typechecking props of the SoftBadge
 SoftBadge.propTypes = {

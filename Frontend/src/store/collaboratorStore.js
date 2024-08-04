@@ -1,4 +1,3 @@
-import AddCollaborator from "Admine/collaborator/addCollaborator";
 import { create } from "zustand";
 
 const useCollaboratorStore = create((set) => ({
