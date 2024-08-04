@@ -7,7 +7,7 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import toast from "react-hot-toast";
-import ConfirmationModal from "components/ConfirmatonModal";
+import ConfirmationModal from "components/ConfirmationModals";
 import {
   Box,
   TextField,
@@ -31,7 +31,7 @@ import StyledIcon from "components/StyledIcon";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import useValidationStore from "store/useValidationStore ";
+import useValidationStore from "store/useValidationStore";
 import dayjs from "dayjs";
 import SoftBox from "components/SoftBox";
 import { Grid } from "@mui/material";
@@ -40,8 +40,6 @@ import useStagiaireStore from "store/InternStore";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 // Import the icon you want to use
 import { useNavigate } from "react-router-dom";
-
-
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -441,7 +439,7 @@ export default function CreateProfile() {
                           }}
                         />
                       </Grid>{" "}
-                      <Grid item xs={12} md={6}>
+                      <Grid item xs={12} md={6} >
                         <TextField
                           id="education-year"
                           variant="outlined"
@@ -500,7 +498,7 @@ export default function CreateProfile() {
                           }}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid item xs={12} md={6}>
                         <FormControl fullWidth error={!!errors.department} variant="outlined">
                           <Select
                             startAdornment={
@@ -541,93 +539,93 @@ export default function CreateProfile() {
                           )}
                         </FormControl>
                       </Grid>
-                      <Grid container spacing={2} marginLeft={1}>
-                        <Grid item xs={12} md={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              backgroundColor: "#ffffff",
-                              color: "#344767",
-                              gap: 1,
-                            }}
-                          >
-                            <Typography variant="body2" sx={{ textAlign: "right", marginRight: 1 }}>
-                              Start:
-                            </Typography>
-                            <FormControl fullWidth error={!!errors.startDate}>
-                              <DatePicker orientation="landscape" ma
-                                value={
-                                  internshipInfo.startDate ? dayjs(internshipInfo.startDate) : null
-                                }
-                                onChange={(date) =>
-                                  setInternshipInfo({
-                                    ...internshipInfo,
-                                    startDate: date ? date.format("YYYY-MM-DD") : "",
-                                  })
-                                }
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    variant="outlined"
-                                    fullWidth
-                                    error={!!errors.startDate}
-                                    placeholder="Start Date"
-                                    InputLabelProps={{ shrink: true }}
-                                    InputProps={{
-                                      ...params.InputProps,
-                                      startAdornment: (
-                                        <InputAdornment position="start">
-                                          <CalendarTodayIcon />
-                                        </InputAdornment>
-                                      ),
-                                    }}
-                                  />
-                                )}
-                              />
-                              {!!errors.startDate && (
-                                <FormHelperText>{errors.startDate}</FormHelperText>
+                      <Grid item xs={12} md={6}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            backgroundColor: "#ffffff",
+                            color: "#344767",
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ textAlign: "right", marginRight: 1 }}>
+                            Start:
+                          </Typography>
+                          <FormControl fullWidth error={!!errors.startDate}>
+                            <DatePicker
+                              orientation="landscape"
+                              ma
+                              value={
+                                internshipInfo.startDate ? dayjs(internshipInfo.startDate) : null
+                              }
+                              onChange={(date) =>
+                                setInternshipInfo({
+                                  ...internshipInfo,
+                                  startDate: date ? date.format("YYYY-MM-DD") : "",
+                                })
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  variant="outlined"
+                                  fullWidth
+                                  error={!!errors.startDate}
+                                  placeholder="Start Date"
+                                  InputLabelProps={{ shrink: true }}
+                                  InputProps={{
+                                    ...params.InputProps,
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        <CalendarTodayIcon />
+                                      </InputAdornment>
+                                    ),
+                                  }}
+                                />
                               )}
-                            </FormControl>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              backgroundColor: "#ffffff",
-                              color: "#344767",
-                              gap: 1,
-                            }}
-                          >
-                            <Typography variant="body2" sx={{ textAlign: "right", marginRight: 1 }}>
-                              End:
-                            </Typography>
-                            <FormControl fullWidth error={!!errors.endDate}>
-                              <DatePicker
-                                value={
-                                  internshipInfo.endDate ? dayjs(internshipInfo.endDate) : null
-                                }
-                                onChange={(date) =>
-                                  setInternshipInfo({
-                                    ...internshipInfo,
-                                    endDate: date ? date.format("YYYY-MM-DD") : "",
-                                  })
-                                }
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    variant="outlined"
-                                    fullWidth
-                                    error={!!errors.endDate}
-                                    placeholder="End Date"
-                                    InputLabelProps={{ shrink: true }}
-                                    InputProps={{
-                                      ...params.InputProps,
-                                      startAdornment: (
-                                        <InputAdornment position="start">
-                                          <CalendarTodayIcon />
+                            />
+                            {!!errors.startDate && (
+                              <FormHelperText>{errors.startDate}</FormHelperText>
+                            )}
+                          </FormControl>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            backgroundColor: "#ffffff",
+                            color: "#344767",
+                            gap: 1,
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ textAlign: "right", marginRight: 1 }}>
+                            End:
+                          </Typography>
+                          <FormControl fullWidth error={!!errors.endDate}>
+                            <DatePicker
+                              value={
+                                internshipInfo.endDate ? dayjs(internshipInfo.endDate) : null
+                              }
+                              onChange={(date) =>
+                                setInternshipInfo({
+                                  ...internshipInfo,
+                                  endDate: date ? date.format("YYYY-MM-DD") : "",
+                                })
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  variant="outlined"
+                                  fullWidth
+                                  error={!!errors.endDate}
+                                  placeholder="End Date"
+                                  InputLabelProps={{ shrink: true }}
+                                  InputProps={{
+                                    ...params.InputProps,
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        <CalendarTodayIcon />
                                         </InputAdornment>
                                       ),
                                     }}
@@ -641,7 +639,6 @@ export default function CreateProfile() {
                           </Box>
                         </Grid>
                       </Grid>
-                    </Grid>
                     <SoftBox
                       display="flex"
                       justifyContent="space-between"

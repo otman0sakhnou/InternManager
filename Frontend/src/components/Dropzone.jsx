@@ -12,7 +12,7 @@ const CustomDropzone = ({ onFileAdded }) => {
     const dropzone = new Dropzone(dropzoneRef.current, {
       url: "/target",
       autoProcessQueue: false,
-      init: function() {
+      init: function () {
         this.on("addedfile", file => {
           onFileAdded(file);
         });
@@ -26,7 +26,7 @@ const CustomDropzone = ({ onFileAdded }) => {
 
   return (
     <form ref={dropzoneRef} className="dropzone" id="my-dropzone">
-      <div className="dz-message"> Click to select files</div>
+      <div className="dz-message"> Click here to upload the interns&apos; file</div>
     </form>
   );
 };

@@ -12,6 +12,7 @@ import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp";
 import duration from "dayjs/plugin/duration";
 import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg";
 import SoftAvatar from "components/SoftAvatar";
+import { useNavigate } from "react-router-dom";
 // import neutralAvatar from "public/avatars/neutral.png";
 
 dayjs.extend(duration);
@@ -103,8 +104,8 @@ function ActionIcons({ onEdit, onDelete, onViewDetails }) {
           }}
         >
           <Tooltip title="View Details">
-            <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
-              visibility
+            <Icon sx={{ cursor: "pointer", color: "#77E4C8", mr: 1 }} fontSize="small">
+              info
             </Icon>
           </Tooltip>
           View Details
@@ -157,6 +158,10 @@ ContactInfos.propTypes = {
 };
 
 const InternsTableData = (paginatedInterns, handleDeleteClick, handleViewDetailsClick) => {
+  const navigate = useNavigate();
+  const handleViewDetails = (id) => {
+    navigate(`/Intern/Profile/${id}`); // Navigate to the profile page with the user's ID
+  };
   console.log(paginatedInterns);
   const columns = [
     { name: "Interns", align: "left" },
@@ -196,7 +201,7 @@ const InternsTableData = (paginatedInterns, handleDeleteClick, handleViewDetails
         <ActionIcons
           onEdit={() => handleEditClick(stagiaire)}
           onDelete={() => handleDeleteClick(stagiaire)}
-          onViewDetails={() => handleViewDetailsClick(stagiaire)}
+          onViewDetails={() => handleViewDetails(stagiaire.id)}
         />
       ),
     }));

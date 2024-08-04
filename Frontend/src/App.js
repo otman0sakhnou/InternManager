@@ -18,7 +18,6 @@ import Configurator from "examples/Configurator";
 // Soft UI Dashboard React themes
 import theme from "assets/theme";
 
-
 // Soft UI Dashboard React routes
 import routes from "routes";
 
@@ -33,7 +32,6 @@ export default function App() {
   const { miniSidenav, direction, layout, openConfigurator, sidenavColor } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const { pathname } = useLocation();
-
 
   // Open sidenav when mouse enter on mini sidenav
   const handleOnMouseEnter = () => {
@@ -125,7 +123,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </>
- ) : (
+  ) : (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {layout === "dashboard" && (

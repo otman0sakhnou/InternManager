@@ -1,19 +1,6 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -21,6 +8,8 @@ import Grid from "@mui/material/Grid";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import IconButton from "@mui/material/IconButton"; // Use IconButton for clickable icon
+import Icon from "@mui/material/Icon";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -31,42 +20,38 @@ import SoftAvatar from "components/SoftAvatar";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 // Soft UI Dashboard React icons
-import Cube from "examples/Icons/Cube";
+import ArrowBack from "@mui/icons-material/ArrowBack"; // Use appropriate back arrow icon
 import Document from "examples/Icons/Document";
 import Settings from "examples/Icons/Settings";
-
+import curved0 from "assets/images/curved-images/curved0.jpg";
 // Soft UI Dashboard React base styles
 import breakpoints from "assets/theme/base/breakpoints";
 
-// Images
-import burceMars from "assets/images/bruce-mars.jpg";
-import curved0 from "assets/images/curved-images/curved0.jpg";
+function Header({ name, avatarIcon }) {
+  const navigate = useNavigate(); // Initialize navigate function
 
-function Header() {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-    // A function that sets the orientation state of the tabs.
     function handleTabsOrientation() {
       return window.innerWidth < breakpoints.values.sm
         ? setTabsOrientation("vertical")
         : setTabsOrientation("horizontal");
     }
 
-    /** 
-     The event listener that's calling the handleTabsOrientation function when resizing the window.
-    */
     window.addEventListener("resize", handleTabsOrientation);
-
-    // Call the handleTabsOrientation function to set the state with the initial value.
     handleTabsOrientation();
 
-    // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleTabsOrientation);
   }, [tabsOrientation]);
 
-  const handleSetTabValue = (event, newValue) => setTabValue(newValue);
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+    if (newValue === 0) {
+      navigate(-1); // Navigate back to the previous page
+    }
+  };
 
   return (
     <SoftBox position="relative">
@@ -102,22 +87,20 @@ function Header() {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            <SoftAvatar
-              src={burceMars}
-              alt="profile-image"
-              variant="rounded"
-              size="xl"
-              shadow="sm"
-            />
+            <SoftAvatar variant="rounded" size="xl" shadow="sm" sx={{ bgcolor: "primary" }}>
+              {avatarIcon || (
+                <Icon sx={{ fontSize: 50, color: "primary.contrastText" }}>account_circle</Icon>
+              )}
+            </SoftAvatar>
           </Grid>
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
-                Alex Thompson
+                {name}
               </SoftTypography>
-              <SoftTypography variant="button" color="text" fontWeight="medium">
-                CEO / Co-Founder
-              </SoftTypography>
+              {/* <SoftTypography variant="button" color="text" fontWeight="medium">
+                {title}
+              </SoftTypography> */}
             </SoftBox>
           </Grid>
           <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
@@ -125,10 +108,14 @@ function Header() {
               <Tabs
                 orientation={tabsOrientation}
                 value={tabValue}
-                onChange={handleSetTabValue}
+                onChange={handleTabChange}
                 sx={{ background: "transparent" }}
               >
-                <Tab label="App" icon={<Cube />} />
+                <Tab
+                  label="Go Back"
+                  icon={<ArrowBack />}
+                  onClick={() => navigate(-1)} // Handle click directly
+                />
                 <Tab label="Message" icon={<Document />} />
                 <Tab label="Settings" icon={<Settings />} />
               </Tabs>
@@ -139,5 +126,10 @@ function Header() {
     </SoftBox>
   );
 }
+
+Header.propTypes = {
+  name: PropTypes.string.isRequired,
+  avatarIcon: PropTypes.element,
+};
 
 export default Header;

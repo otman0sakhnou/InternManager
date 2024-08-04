@@ -1,4 +1,3 @@
-
 /* eslint-disable react/prop-types */
 // Soft UI Dashboard React components
 import { useState } from "react";
@@ -7,8 +6,8 @@ import SoftTypography from "components/SoftTypography";
 import SoftAvatar from "components/SoftAvatar";
 import SoftBadge from "components/SoftBadge";
 import Icon from "@mui/material/Icon";
-import ConfirmationModal from "../../../components/ConfirmatonModal";
-import { useNavigate } from 'react-router-dom'; 
+import ConfirmationModal from "../../../components/ConfirmationModals";
+import { useNavigate } from "react-router-dom";
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -79,7 +78,7 @@ function Author({ name, email, phone }) {
 
 const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
   const navigate = useNavigate();
-  const deleteCollaborator = useCollaboratorStore((state) => state.deleteCollaborator)
+  const deleteCollaborator = useCollaboratorStore((state) => state.deleteCollaborator);
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -119,15 +118,21 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
         <MenuItem>
           <Icon sx={{ cursor: "pointer", color: "#77E4C8", mr: 1 }} fontSize="small">
             info
-          </Icon>details
+          </Icon>
+          details
         </MenuItem>
-        <MenuItem onClick={handleUpdate}> <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
-          edit
-        </Icon>Edit</MenuItem>
+        <MenuItem onClick={handleUpdate}>
+          {" "}
+          <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
+            edit
+          </Icon>
+          Edit
+        </MenuItem>
         <MenuItem onClick={handleDelete}>
           <Icon sx={{ cursor: "pointer", color: "red", mr: 1 }} fontSize="small">
             delete
-          </Icon>Delete
+          </Icon>
+          Delete
         </MenuItem>
       </Menu>
       <ConfirmationModal
@@ -165,11 +170,7 @@ const collaboratorTableData = (collaborators, setVisible, setSelectedCollaborato
 
   const rows = collaborators.map((collaborator) => ({
     collaborator: (
-      <Author
-        name={collaborator.name}
-        email={collaborator.email}
-        phone={collaborator.phone}
-      />
+      <Author name={collaborator.name} email={collaborator.email} phone={collaborator.phone} />
     ),
     function: (
       <Function
@@ -192,7 +193,14 @@ const collaboratorTableData = (collaborators, setVisible, setSelectedCollaborato
         {collaborator.employementDate}
       </SoftTypography>
     ),
-    action: <Action id={collaborator.id} setVisible={setVisible} setSelectedCollaborator={setSelectedCollaborator} collaborator={collaborator} />,
+    action: (
+      <Action
+        id={collaborator.id}
+        setVisible={setVisible}
+        setSelectedCollaborator={setSelectedCollaborator}
+        collaborator={collaborator}
+      />
+    ),
   }));
 
   return { columns, rows };
