@@ -18,7 +18,7 @@ const useStagiaireStore = create((set, get) => ({
       },
       internshipInfo: {
         title: "Software Developer Intern",
-        department: "IT",
+        department: "PHP",
         startDate: "2024-06-01",
         endDate: "2024-09-01",
       },
@@ -37,7 +37,7 @@ const useStagiaireStore = create((set, get) => ({
       },
       internshipInfo: {
         title: "Data Analyst Intern",
-        department: "Data Science",
+        department: "Java",
         startDate: "2024-06-15",
         endDate: "2024-09-15",
       },
@@ -56,7 +56,7 @@ const useStagiaireStore = create((set, get) => ({
       },
       internshipInfo: {
         title: "Network Engineer Intern",
-        department: "Networking",
+        department: "PHP",
         startDate: "2024-07-01",
         endDate: "2024-10-01",
       },
