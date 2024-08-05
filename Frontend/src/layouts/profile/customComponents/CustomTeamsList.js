@@ -10,8 +10,10 @@ import SoftButton from "components/SoftButton";
 import SoftAvatar from "components/SoftAvatar";
 
 function CustomTeamsList({ title, teams }) {
+  console.log(teams);
   const navigate = useNavigate();
   const handleViewDetails = (id) => {
+    console.log("view clicked");
     navigate(`/groupdetails/${id}`);
   };
   const renderTeams = () => {
@@ -25,7 +27,7 @@ function CustomTeamsList({ title, teams }) {
       );
     }
 
-    return teams.map(({ id ,name, description, icon }) => (
+    return teams.map(({ id, name, description, icon }) => (
       <SoftBox key={name} component="li" display="flex" alignItems="center" py={1} mb={1}>
         <SoftBox
           mr={2}
@@ -61,7 +63,6 @@ function CustomTeamsList({ title, teams }) {
         </SoftBox>
         <SoftBox ml="auto">
           <SoftButton
-            component={Link}
             onClick={() => handleViewDetails(id)}
             variant="text"
             color="info"

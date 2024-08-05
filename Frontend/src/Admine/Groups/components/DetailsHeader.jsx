@@ -26,7 +26,8 @@ import Settings from "examples/Icons/Settings";
 import curved0 from "assets/images/curved-images/curved0.jpg";
 // Soft UI Dashboard React base styles
 import breakpoints from "assets/theme/base/breakpoints";
-import group from "../../../assets/avatars/group.webp"
+import group from "../../../assets/avatars/group.webp";
+import { Box } from "@mui/material";
 
 function DetailsHeader({ name, avatarIcon }) {
   const navigate = useNavigate(); // Initialize navigate function
@@ -56,11 +57,12 @@ function DetailsHeader({ name, avatarIcon }) {
 
   return (
     <SoftBox position="relative">
+      <DashboardNavbar absolute light />
       <SoftBox
         display="flex"
         alignItems="center"
         position="relative"
-        minHeight="8.75rem"
+        minHeight="18.75rem"
         borderRadius="xl"
         sx={{
           backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
@@ -134,13 +136,27 @@ function DetailsHeader({ name, avatarIcon }) {
                 orientation={tabsOrientation}
                 value={tabValue}
                 onChange={handleTabChange}
-                sx={{ background: "transparent" }}
+                sx={{ background: "transparent",
+                }}
+
               >
-                <Tab
+                <Box sx={{ width: "fit-content", minWidth: "80px"}}>
+                  {" "}
+                  {/* Adjust this width as needed */}
+                  <Tab
+                    label="Go Back"
+                    icon={<ArrowBack />}
+                    onClick={() => navigate(-1)} // Handle click directly
+                    sx={{
+                      padding: "4px 8px", // Adjust padding for desired button size
+                    }}
+                  />
+                </Box>
+                {/* <Tab
                   label="Go Back"
                   icon={<ArrowBack />}
                   onClick={() => navigate(-1)} // Handle click directly
-                />
+                /> */}
               </Tabs>
             </AppBar>
           </Grid>

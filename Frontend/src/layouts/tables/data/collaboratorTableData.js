@@ -12,8 +12,8 @@ import { useNavigate } from "react-router-dom";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import useCollaboratorStore from "store/collaboratorStore";
-import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg"
-import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp"
+import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg";
+import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp";
 
 const getAvatarImage = (gender) => {
   switch (gender.toLowerCase()) {
@@ -79,7 +79,7 @@ const EmployeeAvatar = ({ name }) => {
   );
 };
 
-function Author({ name, email, phone , gender}) {
+function Author({ name, email, phone, gender }) {
   const avatarImage = getAvatarImage(gender);
   return (
     <SoftBox display="flex" alignItems="center" px={1} py={0.5}>
@@ -120,11 +120,11 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
     handleClose();
   };
 
-  const handleUpdate = () => {
-    handleClose();
-    setSelectedCollaborator(collaborator);
-    setVisible(true);
-  };
+  // const handleUpdate = () => {
+  //   handleClose();
+  //   setSelectedCollaborator(collaborator);
+  //   setVisible(true);
+  // };
   const handleConfirmDelete = () => {
     deleteCollaborator(id);
     setConfirmOpen(false);
@@ -142,20 +142,20 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClick={handleViewDetails}>
         <MenuItem>
           <Icon sx={{ cursor: "pointer", color: "#77E4C8", mr: 1 }} fontSize="small">
-            info
+            info_outline
           </Icon>
           details
         </MenuItem>
-        <MenuItem onClick={handleUpdate}>
+        {/* <MenuItem onClick={handleUpdate}>
           {" "}
           <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
             edit
           </Icon>
           Edit
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleDelete}>
           <Icon sx={{ cursor: "pointer", color: "red", mr: 1 }} fontSize="small">
-            delete
+            delete_outline
           </Icon>
           Delete
         </MenuItem>
@@ -195,7 +195,12 @@ const collaboratorTableData = (collaborators, setVisible, setSelectedCollaborato
 
   const rows = collaborators.map((collaborator) => ({
     collaborator: (
-      <Author name={collaborator.name} email={collaborator.email} phone={collaborator.phone} gender={collaborator.gender}/>
+      <Author
+        name={collaborator.name}
+        email={collaborator.email}
+        phone={collaborator.phone}
+        gender={collaborator.gender}
+      />
     ),
     function: (
       <Function
