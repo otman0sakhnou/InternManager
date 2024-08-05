@@ -9,6 +9,10 @@ import CreateProfile from './Admine/collaborator/CreateProfile';
 import Collaborator from "./Admine/collaborator";
 import Interns from "./Admine/Interns";
 import InternForm from "Admine/Interns/InternForm";
+import AddSubjectComponent from "Admine/Subjects/AddSubjectComponent";
+import SubjectPage from "Admine/Subjects/SubjectPage";
+
+import Groups from "./Admine/Groups";
 
 // Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
