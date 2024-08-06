@@ -36,6 +36,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/Info";
 import useGroupStore from "store/GroupsStore";
+import { useGroupName } from 'context/GroupeNameContext';
 
 const Groups = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -50,6 +51,7 @@ const Groups = () => {
   const addGroup = useGroupStore((state) => state.addGroup);
   const deleteGroup = useGroupStore((state) => state.deleteGroup);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
+  const { setGroupNameC } = useGroupName();
 
   const getGroupsByDepartment = useGroupStore((state) => state.getGroupsByDepartment)
 
@@ -114,7 +116,7 @@ const Groups = () => {
     // Rediriger vers la page de création de sujet si la case est cochée
     if (addSubject) {
       addGroup(newGroup);
-      navigate(`/create-subject/${newGroup.id}`);
+      navigate(`/Add-Subject/${newGroup.id}`);
     } else {
       // Afficher la confirmation
       setActionType("success");
@@ -151,7 +153,7 @@ const Groups = () => {
     setIsConfirmationModalOpen(true);
   };
   const handleViewDetails = (id) => {
-    console.log(id)
+    setGroupNameC(groups.find(group => group.id === id)?.name || "");
     navigate(`/groupdetails/${id}`);
   };
   //Groups Pagination
@@ -768,85 +770,6 @@ const Groups = () => {
                           {currentGroups.map((group) => {
                             const isExpired = new Date(group.expirationDate) < new Date();
                             return (
-                              // <Box
-                              //   key={group.id}
-                              //   display="flex"
-                              //   flexDirection="column"
-                              //   borderRadius={2}
-                              //   p={2}
-                              //   sx={{
-                              //     //backgroundColor: "#ffffff",
-                              //     boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                              //     border: "1px solid #e0e0e0",
-                              //     position: "relative",
-                              //     overflow: "hidden",
-                              //     opacity: isExpired ? 0.5 : 1,
-                              //     "&::before": {
-                              //       content: '""',
-                              //       position: "absolute",
-                              //       top: 0,
-                              //       left: 0,
-                              //       width: "4px",
-                              //       height: "100%",
-                              //       backgroundColor: "#4caf50",
-                              //       borderTopLeftRadius: "2px",
-                              //       borderBottomLeftRadius: "2px",
-                              //     },
-                              //   }}
-                              // >
-                              //   <Box
-                              //     display="flex"
-                              //     justifyContent="space-between"
-                              //     alignItems="center"
-                              //     mb={1}
-                              //     sx={{ backgroundColor: "red"}}
-                              //   >
-                              //     <Typography
-                              //       variant="h6"
-                              //       fontWeight="bold"
-                              //       sx={{ color: "#333", display: "flex", alignItems: "center" }}
-                              //     >
-                              //       <Box
-                              //         sx={{
-                              //           width: 10,
-                              //           height: 10,
-                              //           borderRadius: "50%",
-                              //           backgroundColor: "#4caf50",
-                              //           marginRight: 1,
-                              //         }}
-                              //       />
-                              //       {group.name}
-                              //     </Typography>
-                              //     <Box>
-                              //       <IconButton
-                              //         onClick={() => handleViewDetails(group.id)}
-                              //         sx={{
-                              //           color: "#007bff",
-                              //           "&:hover": { backgroundColor: "#e0e0e0" },
-                              //         }}
-                              //         disabled={isExpired}
-                              //       >
-                              //         <Icon>info</Icon>
-                              //       </IconButton>
-                              //       <IconButton
-                              //         onClick={() => handleDelete(group.id)}
-                              //         sx={{
-                              //           color: "#dc3545",
-                              //           "&:hover": { backgroundColor: "#f8d7da" },
-                              //         }}
-                              //         disabled={isExpired}
-                              //       >
-                              //         <Icon>delete</Icon>
-                              //       </IconButton>
-                              //     </Box>
-                              //   </Box>
-                              //   <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
-                              //     Expiration Date: {group.expirationDate}
-                              //   </Typography>
-                              //   <Typography variant="body2" color="textSecondary">
-                              //     Members: {group.stagiaires.length}
-                              //   </Typography>
-                              // </Box>
                               <Box
                                 key={group.id}
                                 display="flex"

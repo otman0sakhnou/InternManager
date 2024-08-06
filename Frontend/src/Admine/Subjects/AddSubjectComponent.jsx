@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -36,7 +37,7 @@ import SoftButton from 'components/SoftButton';
 
 const AddSubjectComponent = () => {
   const { addSubject } = useSubjectStore();
-
+  const { id } = useParams();
   const [title, setTitle] = useState('');
   const [type, setType] = useState('');
   const [description, setDescription] = useState('');
@@ -49,13 +50,6 @@ const AddSubjectComponent = () => {
       setStepInput('');
     }
   };
-
-  const handleStepChange = (index, key, value) => {
-    const newSteps = [...steps];
-    newSteps[index][key] = value;
-    setSteps(newSteps);
-  };
-
   const handleRemoveStep = (index) => {
     const newSteps = steps.filter((_, i) => i !== index);
     setSteps(newSteps);
@@ -74,12 +68,14 @@ const AddSubjectComponent = () => {
   const handleSubmit = () => {
     const newSubject = {
       id: Date.now().toString(),
+      groupeId:id,
       title,
       type,
       description,
       steps,
     };
     addSubject(newSubject);
+    console.log("new subject :",newSubject);
     setTitle('');
     setType('');
     setDescription('');

@@ -1,10 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import FilterButton from "./FilterButton";
+import { Box } from "@mui/material";
 
 const GroupFilter = ({ selectedDepartment, setSelectedDepartment, departments }) => {
   return (
-    <div style={{ marginBottom: "16px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+    <Box 
+    // justifyContent="center"
+     style={{ marginBottom: "16px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
       {departments.map((dept) => (
         <FilterButton
           key={dept.value}
@@ -13,7 +16,7 @@ const GroupFilter = ({ selectedDepartment, setSelectedDepartment, departments })
           onClick={() => setSelectedDepartment(dept.value)}
         />
       ))}
-    </div>
+    </Box>
   );
 };
 

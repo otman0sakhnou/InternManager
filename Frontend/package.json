@@ -45,6 +45,7 @@
     "slate": "^0.103.0",
     "slate-history": "^0.100.0",
     "slate-react": "^0.107.1",
+    "soft-ui-dashboard-react": "file:",
     "stylis": "4.2.0",
     "stylis-plugin-rtl": "2.1.1",
     "uuid": "^9.0.0",

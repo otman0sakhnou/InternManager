@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
@@ -49,7 +49,12 @@ const ContentContainer = styled(CardContent)(({ theme }) => ({
 }));
 
 // Main component definition
-const ProjectCard = ({ name, title, viewRoute, onDelete }) => {
+const ProjectCard = ({ subject, onDelete }) => {
+  const navigate = useNavigate();
+
+  const subjectDetails = () => {
+    navigate(`/Subject/${subject.id}`);
+  }
   return (
     <StyledCard>
       <IconContainer>
@@ -57,15 +62,15 @@ const ProjectCard = ({ name, title, viewRoute, onDelete }) => {
       </IconContainer>
       <ContentContainer>
         <Typography variant="h6" component="div">
-          {name}
+          {subject.name}
         </Typography>
         <Typography variant="body2" color="textSecondary">
-          {title}
+          {subject.type}
         </Typography>
       </ContentContainer>
       <CardActions>
         <Tooltip title="View Project">
-          <IconButton component={Link} to={viewRoute} color="info">
+          <IconButton onClick={subjectDetails} color="info">
             <VisibilityOutlinedIcon />
           </IconButton>
         </Tooltip>
@@ -81,8 +86,7 @@ const ProjectCard = ({ name, title, viewRoute, onDelete }) => {
 
 // Prop type validation
 ProjectCard.propTypes = {
-  name: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
+  subject: PropTypes.array.isRequired,
   viewRoute: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

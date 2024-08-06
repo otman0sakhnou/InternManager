@@ -6,22 +6,16 @@ import useInternStore from "store/InternStore";
 import { Grid, Card, Box, Typography, Avatar } from "@mui/material";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "examples/Footer";
-import DashboardNavbar from "../../examples/Navbars/DashboardNavbar";
-import curved0 from "assets/images/curved-images/curved0.jpg";
 import ConfirmationModal from "components/ConfirmationModals";
 import toast from "react-hot-toast";
 import ProjectsSection from "layouts/profile/customComponents/ProjectsSection";
 import InfoGroupCard from "./components/InfoGroupCard";
-import SoftBox from "components/SoftBox";
 import CollaboratorsInternsCard from "./components/CollaboratorsInternsCard";
-import styled from "@emotion/styled";
 import DetailsHeader from "./components/DetailsHeader";
 
 
 const GroupDetails = () => { 
-  console.log("page rerendered")
-  const { id } = useParams();  //the id is received as string
-  const navigate = useNavigate();
+  const { id } = useParams();
   const getGroupById = useGroupStore((state) => state.getGroupById);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
   const [group, setGroup] = useState(null);
@@ -131,7 +125,6 @@ const GroupDetails = () => {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
       <DetailsHeader name={groupName}/>
       <Box mt={5} mb={3} px={6}>
         <Grid container spacing={3} mt={3}>

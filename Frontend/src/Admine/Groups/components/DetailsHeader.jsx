@@ -56,11 +56,12 @@ function DetailsHeader({ name, avatarIcon }) {
 
   return (
     <SoftBox position="relative">
+      <DashboardNavbar absolute light />
       <SoftBox
         display="flex"
         alignItems="center"
         position="relative"
-        minHeight="8.75rem"
+        minHeight="15rem"
         borderRadius="xl"
         sx={{
           backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
@@ -110,22 +111,11 @@ function DetailsHeader({ name, avatarIcon }) {
               />
             </SoftAvatar>
           </Grid>
-
-          {/* <Grid item>
-            <SoftAvatar variant="rounded" size="xl" shadow="sm" sx={{ bgcolor: "primary" }}>
-              {avatarIcon || (
-                <Icon sx={{ fontSize: 50, color: "primary.contrastText" }}>account_circle</Icon>
-              )}
-            </SoftAvatar>
-          </Grid> */}
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
                 {name}
               </SoftTypography>
-              {/* <SoftTypography variant="button" color="text" fontWeight="medium">
-                {title}
-              </SoftTypography> */}
             </SoftBox>
           </Grid>
           <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
@@ -139,7 +129,7 @@ function DetailsHeader({ name, avatarIcon }) {
                 <Tab
                   label="Go Back"
                   icon={<ArrowBack />}
-                  onClick={() => navigate(-1)} // Handle click directly
+                  onClick={() => navigate(-1)}
                 />
               </Tabs>
             </AppBar>
