@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -12,6 +12,7 @@ import {
   InputAdornment,
   Paper,
   Icon,
+  useMediaQuery,
 } from '@mui/material';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
@@ -43,6 +44,7 @@ const AddSubjectComponent = () => {
   const [description, setDescription] = useState('');
   const [steps, setSteps] = useState([]);
   const [stepInput, setStepInput] = useState('');
+  const navigate = useNavigate();
 
   const handleAddStep = () => {
     if (stepInput.trim() !== '') {
@@ -68,14 +70,15 @@ const AddSubjectComponent = () => {
   const handleSubmit = () => {
     const newSubject = {
       id: Date.now().toString(),
-      groupeId:id,
+      groupeId: id,
       title,
       type,
       description,
       steps,
     };
     addSubject(newSubject);
-    console.log("new subject :",newSubject);
+    navigate(`/groupdetails/${newSubject.groupeId}`);
+    console.log("new subject :", newSubject);
     setTitle('');
     setType('');
     setDescription('');

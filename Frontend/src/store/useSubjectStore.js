@@ -1,25 +1,25 @@
 import { createWithEqualityFn } from "zustand/traditional"
 
 const useSubjectStore = createWithEqualityFn((set) => ({
-  subjects :[
+  subjects: [
     {
       id: "1",
-      name: "Project A",
+      title: "Project A",
       type: "Project",
       description: "This is the description for Project A.",
       steps: [
         { description: "Initial planning" },
-        { description: "Design phase"},
+        { description: "Design phase" },
       ],
     },
     {
       id: "2",
-      name: "Training B",
+      title: "Training B",
       type: "Training",
       description: "This is the description for Training B.",
       steps: [
-        { description: "Introduction to the training"},
-        { description: "Practical exercises"},
+        { description: "Introduction to the training" },
+        { description: "Practical exercises" },
       ],
     },
   ],

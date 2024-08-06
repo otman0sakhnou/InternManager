@@ -5,14 +5,17 @@ const useGroupStore = create((set, get) => ({
 
   groups: [],
 
-  addGroup: (group) =>
+  addGroup: (group) => {
+    let newId;
     set((state) => {
-      const newId = state.idCounter + 1; // Increment ID counter for new group
+      newId = state.idCounter + 1; // Increment ID counter for new group
       return {
         groups: [...state.groups, { ...group, id: newId }],
         idCounter: newId, // Update ID counter
       };
-    }),
+    });
+    return newId;
+  },
 
   updateGroup: (id, updatedGroup) => {
     console.log(id, updatedGroup);
@@ -45,16 +48,16 @@ const useGroupStore = create((set, get) => ({
     return groups.filter((group) => group.collaborator === collaboratorId.id);
   },
 
-  getGroupsByInternId : (internId) => {
-  const { groups } = get(); // Ensure get() returns the correct groups array
+  getGroupsByInternId: (internId) => {
+    const { groups } = get(); // Ensure get() returns the correct groups array
 
-  // Filtering groups that contain an intern with the specified internId
-  return groups.filter((group) =>
-    group.stagiaires.some(
-      (intern) => intern.id === internId.id
-    )
-  );
-},
+    // Filtering groups that contain an intern with the specified internId
+    return groups.filter((group) =>
+      group.stagiaires.some(
+        (intern) => intern.id === internId.id
+      )
+    );
+  },
 
   // Method to remove an intern from a specific group
   removeInternFromGroup: (groupId, internId) =>

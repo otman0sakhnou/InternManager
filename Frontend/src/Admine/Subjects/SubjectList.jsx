@@ -9,7 +9,7 @@ import { useGroupName } from 'context/GroupeNameContext';
 
 const SubjectList = ({ subjects }) => {
   const { groupNameC } = useGroupName();
-  console.log("groupe name :",groupNameC);
+  console.log("groupe name :", groupNameC);
   if (subjects.length === 0) {
     return <Typography>No subjects available.</Typography>;
   }
@@ -19,7 +19,7 @@ const SubjectList = ({ subjects }) => {
       {subjects.map((subject, index) => (
         <SubjectsCover
           key={index}
-          title={subject.name}
+          title={subject.title}
           description="Discover key information about the selected subject, including objectives, and main topics. Perfect for interns and supervisors alike."
           image={curved6}
           type={subject.type}
