@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import useCollaboratorStore from "store/collaboratorStore";
 import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg";
 import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp";
-
+import toast from "react-hot-toast";
 const getAvatarImage = (gender) => {
   switch (gender.toLowerCase()) {
     case "male":
@@ -105,7 +105,11 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
   const navigate = useNavigate();
   const deleteCollaborator = useCollaboratorStore((state) => state.deleteCollaborator);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
+  const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
+  const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -114,33 +118,42 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const handleDelete = () => {
-    setConfirmOpen(true);
-    handleClose();
-  };
-
-  // const handleUpdate = () => {
-  //   handleClose();
-  //   setSelectedCollaborator(collaborator);
-  //   setVisible(true);
-  // };
-  const handleConfirmDelete = () => {
-    deleteCollaborator(id);
-    setConfirmOpen(false);
-  };
   const handleViewDetails = () => {
     navigate(`/Collaborator/Profile/${collaborator.id}`); // Navigate to the profile page with the user's ID
     handleClose();
   };
+
+  const handleDelete = () => {
+    setActionType("delete");
+    setConfirmationModalTitle("Delete Collaborator");
+    setConfirmationModalDescription("Are you sure you want to delete this collaborator?");
+    setOnConfirmAction(() => () => {
+      deleteCollaborator(id);
+      toast.success("Collaborator deleted successfully!");
+    });
+    setIsConfirmationModalOpen(true);
+  };
+
+
+
 
   return (
     <>
       <Icon sx={{ cursor: "pointer", fontWeight: "bold" }} fontSize="small" onClick={handleClick}>
         more_vert
       </Icon>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClick={handleViewDetails}>
-        <MenuItem>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose} anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}>
+        <MenuItem onClick={() => {
+          handleViewDetails();
+
+        }}>
           <Icon sx={{ cursor: "pointer", color: "#77E4C8", mr: 1 }} fontSize="small">
             info_outline
           </Icon>
@@ -153,7 +166,10 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
           </Icon>
           Edit
         </MenuItem> */}
-        <MenuItem onClick={handleDelete}>
+        <MenuItem onClick={() => {
+          handleDelete();
+
+        }}>
           <Icon sx={{ cursor: "pointer", color: "red", mr: 1 }} fontSize="small">
             delete_outline
           </Icon>
@@ -161,12 +177,15 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
         </MenuItem>
       </Menu>
       <ConfirmationModal
-        open={confirmOpen}
-        handleClose={() => setConfirmOpen(false)}
-        title="Confirm Deletion"
-        description="Are you sure you want to delete this collaborator?"
-        onConfirm={handleConfirmDelete}
-        actionType="delete"
+        open={isConfirmationModalOpen}
+        handleClose={() => setIsConfirmationModalOpen(false)}
+        title={confirmationModalTitle}
+        description={confirmationModalDescription}
+        onConfirm={() => {
+          onConfirmAction();
+          setIsConfirmationModalOpen(false);
+        }}
+        actionType={actionType}
       />
     </>
   );

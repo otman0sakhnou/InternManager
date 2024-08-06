@@ -15,6 +15,7 @@ import ConfirmationModal from "components/ConfirmationModals";
 import CustomDropzone from "components/Dropzone";
 import toast from "react-hot-toast";
 import useStagiaireStore from "store/InternStore";
+import { Grid } from "@mui/material";
 
 function Interns() {
   const [selectedIntern, setSelectedIntern] = useState(null);
@@ -27,7 +28,7 @@ function Interns() {
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -108,7 +109,7 @@ function Interns() {
     setCurrentPage(value);
   };
   const handleViewDetailsClick = (intern) => {
-    navigate(`/collaborator`); 
+    navigate(`/collaborator`);
   };
   const { columns, rows } = InternsTableData(
     getPaginatedInterns(),
@@ -125,23 +126,23 @@ function Interns() {
             <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
               <SoftTypography variant="h6">Interns Table</SoftTypography>
 
-              <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-                <SoftBox>
-                  <SoftButton variant="gradient" color="info" onClick={handleAddIntern}>
-                    <Icon sx={{ fontWeight: "bold" }}>add</Icon>
-                    Add Intern
-                  </SoftButton>
-                  <SoftButton
-                    variant="gradient"
-                    color="error"
-                    onClick={handleDeleteAllClick}
-                    sx={{ ml: 2 }}
-                  >
-                    <Icon sx={{ fontWeight: "bold" }}>delete_sweep</Icon>
-                    Delete All
-                  </SoftButton>
-                </SoftBox>
+              <SoftBox display="flex" justifyContent="flex-end" p={3}>
+                <Grid container spacing={2} justifyContent="flex-end"> {/* Alignement des boutons à droite */}
+                  <Grid item xs={12} sm="auto">
+                    <SoftButton variant="gradient" color="info" onClick={handleAddIntern}>
+                      <Icon sx={{ fontWeight: "bold" }}>add</Icon>
+                      Add Intern
+                    </SoftButton>
+                  </Grid>
+                  <Grid item xs={12} sm="auto">
+                    <SoftButton variant="gradient" color="error" onClick={handleDeleteAllClick}>
+                      <Icon sx={{ fontWeight: "bold" }}>delete_sweep</Icon>
+                      Delete All
+                    </SoftButton>
+                  </Grid>
+                </Grid>
               </SoftBox>
+
             </SoftBox>
             <SoftBox
               sx={{

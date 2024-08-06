@@ -136,11 +136,12 @@ function DetailsHeader({ name, avatarIcon }) {
                 orientation={tabsOrientation}
                 value={tabValue}
                 onChange={handleTabChange}
-                sx={{ background: "transparent",
+                sx={{
+                  background: "transparent",
                 }}
 
               >
-                <Box sx={{ width: "fit-content", minWidth: "80px"}}>
+                <Box sx={{ width: "fit-content", minWidth: "80px" }}>
                   {" "}
                   {/* Adjust this width as needed */}
                   <Tab

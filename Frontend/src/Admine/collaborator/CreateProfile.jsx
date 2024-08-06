@@ -33,6 +33,11 @@ import dayjs from "dayjs";
 import useCollaboratorStore from "store/collaboratorStore";
 import { validate, validationSchemas } from "utils/validation";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import ConfirmationModal from "components/ConfirmationModals";
+
+
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -100,6 +105,11 @@ ColorlibStepIcon.propTypes = {
 const steps = ["Personal Information", "Organization Details", "Account Setup"];
 
 export default function CreateProfile() {
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
+  const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
+  const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const [activeStep, setActiveStep] = React.useState(0);
   const addCollaborator = useCollaboratorStore((state) => state.addCollaborator);
   const [formData, setFormData] = React.useState({
@@ -116,7 +126,7 @@ export default function CreateProfile() {
   });
 
   const { errors, setErrors } = useValidationStore();
-  
+
   const navigate = useNavigate();
 
   // Validation function
@@ -144,7 +154,8 @@ export default function CreateProfile() {
   };
   const submit = () => {
     addCollaborator(formData);
-    alert("Collaborator added successfully!");
+    toast.success("Collab added successfully!");
+
   };
 
   const handleNext = () => {
@@ -154,8 +165,15 @@ export default function CreateProfile() {
     if (Object.keys(newErrors).length === 0) {
       setErrors({});
       if (activeStep === steps.length - 1) {
-        submit();
-        navigate("/collaborator");
+        setConfirmationModalTitle("Add Collaborator");
+        setConfirmationModalDescription("Are you sure you want to add this collab ?");
+        setOnConfirmAction(() => () => {
+          submit();
+          navigate("/collaborator");
+
+        })
+        setIsConfirmationModalOpen(true);
+
       } else {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
@@ -490,6 +508,17 @@ export default function CreateProfile() {
           </Box>
         </Stack>
       </Card>
+      <ConfirmationModal
+        open={isConfirmationModalOpen}
+        handleClose={() => setIsConfirmationModalOpen(false)}
+        title={confirmationModalTitle}
+        description={confirmationModalDescription}
+        onConfirm={() => {
+          onConfirmAction();
+          setIsConfirmationModalOpen(false);
+        }}
+        actionType={actionType}
+      />
     </DashboardLayout>
   );
 }
