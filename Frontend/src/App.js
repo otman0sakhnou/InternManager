@@ -23,6 +23,8 @@ import routes from "routes";
 
 // Soft UI Dashboard React contexts
 import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import { GroupNameProvider } from 'context/GroupeNameContext';
+
 
 // Images
 import brand from "assets/images/images-removebg-preview.png";
@@ -141,10 +143,12 @@ export default function App() {
         </>
       )}
       {layout === "vr" && <Configurator />}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+      <GroupNameProvider>
+        <Routes>
+          {getRoutes(routes)}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </GroupNameProvider>
     </ThemeProvider>
   );
 }

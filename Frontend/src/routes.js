@@ -56,13 +56,13 @@ const routes = [
   {
     name: "AddSubject",
     key: "c",
-    route: "/Add-Subject",
+    route: "/Add-Subject/:id",
     component: <AddSubjectComponent />,
   },
   {
     name: "subjects",
     key: "subjects",
-    route: "/Subjects",
+    route: "/Subject/:id",
     component: <SubjectPage />,
   },
   {

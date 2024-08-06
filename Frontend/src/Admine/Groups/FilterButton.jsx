@@ -6,9 +6,8 @@ const FilterButton = ({ label, isActive, onClick }) => {
   return (
     <Box
       display="flex"
-      alignItems="center"
       sx={{
-        flexShrink: 0, // Prevent buttons from shrinking
+        flexShrink: 0,
       }}
     >
       <Button

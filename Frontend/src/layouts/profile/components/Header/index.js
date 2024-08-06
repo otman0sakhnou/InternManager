@@ -115,9 +115,6 @@ function Header({ name, gender }) {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            {/* <SoftBox mr={2} style={avatarStyles}>
-              <SoftAvatar src={avatarImage} alt={name} size="sm" variant="rounded" />
-            </SoftBox> */}
             <SoftAvatar
               variant="rounded"
               size="xl"

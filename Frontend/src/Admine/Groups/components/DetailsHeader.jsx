@@ -62,7 +62,11 @@ function DetailsHeader({ name, avatarIcon }) {
         display="flex"
         alignItems="center"
         position="relative"
+<<<<<<< HEAD
+        minHeight="15rem"
+=======
         minHeight="18.75rem"
+>>>>>>> a522361e183e85d4c7b3185b0f10ef3e70ea1764
         borderRadius="xl"
         sx={{
           backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
@@ -112,22 +116,11 @@ function DetailsHeader({ name, avatarIcon }) {
               />
             </SoftAvatar>
           </Grid>
-
-          {/* <Grid item>
-            <SoftAvatar variant="rounded" size="xl" shadow="sm" sx={{ bgcolor: "primary" }}>
-              {avatarIcon || (
-                <Icon sx={{ fontSize: 50, color: "primary.contrastText" }}>account_circle</Icon>
-              )}
-            </SoftAvatar>
-          </Grid> */}
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
                 {name}
               </SoftTypography>
-              {/* <SoftTypography variant="button" color="text" fontWeight="medium">
-                {title}
-              </SoftTypography> */}
             </SoftBox>
           </Grid>
           <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
@@ -156,8 +149,13 @@ function DetailsHeader({ name, avatarIcon }) {
                 {/* <Tab
                   label="Go Back"
                   icon={<ArrowBack />}
+<<<<<<< HEAD
+                  onClick={() => navigate(-1)}
+                />
+=======
                   onClick={() => navigate(-1)} // Handle click directly
                 /> */}
+>>>>>>> a522361e183e85d4c7b3185b0f10ef3e70ea1764
               </Tabs>
             </AppBar>
           </Grid>

@@ -38,7 +38,7 @@ function LinearProgressWithLabel(props) {
       <Box sx={{ width: '100%', mr: 1 }}>
         <LinearProgress color="success" variant="determinate" {...props} />
       </Box>
-      <Box sx={{width:'fit-content'}}>
+      <Box sx={{ width: 'fit-content' }}>
         <SoftTypography variant="body2" color="text.secondary">{`${Math.round(
           props.value,
         )}%`}</SoftTypography>
@@ -46,7 +46,7 @@ function LinearProgressWithLabel(props) {
     </Box>
   );
 }
-function SubjectsCover({ title = "", description = "",type, image, children }) {
+function SubjectsCover({ team, title = "", description = "", type, image, children }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
   const [progress, setProgress] = useState(10);
@@ -141,7 +141,7 @@ function SubjectsCover({ title = "", description = "",type, image, children }) {
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
-                Team
+                {team}
               </SoftTypography>
               <SoftTypography variant="button" color="text" fontWeight="medium">
                 {title} / {type}
@@ -177,7 +177,7 @@ function SubjectsCover({ title = "", description = "",type, image, children }) {
                 <SoftTypography variant="body2" fontWeight="medium">
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Box sx={{ width: '100%', mr: 1 }}>
-                      <LinearProgressWithLabel  value={progress} />
+                      <LinearProgressWithLabel value={progress} />
                     </Box>
                   </Box>
                 </SoftTypography>
@@ -192,6 +192,7 @@ function SubjectsCover({ title = "", description = "",type, image, children }) {
 
 // Typechecking props for the BasicLayout
 SubjectsCover.propTypes = {
+  team: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   image: PropTypes.string.isRequired,
