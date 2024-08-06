@@ -33,6 +33,7 @@ import ConfirmationModal from "components/ConfirmationModals";
 import toast from "react-hot-toast";
 import useCollaboratorStore from "store/collaboratorStore";
 import useInternStore from "store/InternStore";
+import { useParams } from "react-router-dom";
 
 const CircleIcon = styled("div")(({ theme }) => ({
   display: "flex",
@@ -53,19 +54,19 @@ const CollaboratorsInternsCard = ({
   onEditCollaborator,
   onUpdate,
 }) => {
-  console.log("it gets rerendered")
   console.log(collaborator)
   const [currentCollaborator, setCurrentCollaborator] = useState(collaborator);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
   // const [selectedInterns, setSelectedInterns] = useState([]);
   // const [selectedCollaborator, setSelectedCollaborator] = useState("");
   const stagiaires = useInternStore((state) => state.stagiaires);
+  
 
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingInterns, setIsEditingInterns] = useState(false);
   const [isEditingCollaborator, setIsEditingCollaborator] = useState(false);
-  
+
   const [selectedInternIds, setSelectedInternIds] = useState([]);
   const [selectedCollaboratorId, setSelectedCollaboratorId] = useState(collaborator?.id || "");
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -74,19 +75,21 @@ const CollaboratorsInternsCard = ({
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
   const updateGroup = useGroupStore((state) => state.updateGroup);
-  const getGroupsByDepartment = useGroupStore((state) => state.getGroupsByDepartment)
-
-   useEffect(() => {
-     console.log("Updating currentCollaborator in child", collaborator);
-     setCurrentCollaborator(collaborator);
-     setSelectedCollaboratorId(collaborator.id)
-   }, [collaborator]);
+  const getGroupsByDepartment = useGroupStore((state) => state.getGroupsByDepartment);
 
   const getCollaboratorNameById = (id) => {
     const collaborator = collaborators.find((collaborator) => collaborator.id === id);
     return collaborator ? collaborator.name : "Unknown Collaborator";
   };
-  
+
+  useEffect(() => {
+    if (collaborator) {
+      setCurrentCollaborator({id: collaborator, name: getCollaboratorNameById(collaborator)})
+      console.log(currentCollaborator)
+      setSelectedCollaboratorId(collaborator.id);
+    }
+  }, [collaborator]);
+
   const getActiveInterns = (department) => {
     const today = new Date().toISOString().split("T")[0];
     const activeInterns =
@@ -110,7 +113,7 @@ const CollaboratorsInternsCard = ({
     ? collaborators.filter((collab) => collab.department === department)
     : [];
 
-  
+  const removeInternFromGroup = useGroupStore((state) => state.removeInternFromGroup);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -136,6 +139,7 @@ const CollaboratorsInternsCard = ({
       ...selectedInterns.filter((intern) => !selectedInternIds.includes(intern.id)),
       ...selectedInternsToAdd,
     ];
+
     setConfirmationModalTitle("Confirm Save");
     setConfirmationModalDescription("Are you sure you want to save the changes?");
     setOnConfirmAction(() => () => {
@@ -143,7 +147,6 @@ const CollaboratorsInternsCard = ({
         ...group,
         stagiaires: updatedSelectedInterns,
       };
-      console.log(updatedGroup);
       updateGroup(group.id, updatedGroup);
       onUpdate();
       setIsEditing(false);
@@ -155,41 +158,36 @@ const CollaboratorsInternsCard = ({
     setSelectedInternIds([]);
     handleClose();
   };
-  
-const handleEditToggle = () => {
-  setIsEditing(!isEditing);
-  
-  if (isEditing) {
-    const selectedCollaborator = remainingCollaborators.find(
-      (collab) => collab.id === selectedCollaboratorId
-    );
-    console.log("Selected Collaborator:", selectedCollaborator); // Debugging line
-    setConfirmationModalTitle("Confirm Save");
-    setConfirmationModalDescription("Are you sure you want to save the changes?");
-    setOnConfirmAction(() => () => {
-      const updatedGroup = {
-        ...group,
-        collaborator: currentCollaborator, // Ensure this is correct
-      };
-      console.log("Updated Group:", updatedGroup); // Debugging line
-      updateGroup(group.id, updatedGroup);
-      onEditCollaborator(selectedCollaborator);
-      onUpdate();
-      setIsEditing(false);
-      setIsEditingInterns(false);
-      setIsEditingCollaborator(false);
-      toast.success("Group updated successfully!");
-    });
-    setIsConfirmationModalOpen(true);
-  }
-};
 
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
 
-  const handleCollaboratorChange = (event) => {
-    console.log(event.target.value)
-    setSelectedCollaboratorId(event.target.value);
+    if (isEditing) {
+      const selectedCollaborator = remainingCollaborators.find(
+        (collab) => collab.id === selectedCollaboratorId
+      );
+      setConfirmationModalTitle("Confirm Save");
+      setConfirmationModalDescription("Are you sure you want to save the changes?");
+      setOnConfirmAction(() => () => {
+        const updatedGroup = {
+          ...group,
+          collaborator: selectedCollaborator, // Ensure this is correct
+        };
+        updateGroup(group.id, updatedGroup);
+        onEditCollaborator(selectedCollaborator);
+        onUpdate();
+        setIsEditing(false);
+        setIsEditingInterns(false);
+        setIsEditingCollaborator(false);
+        toast.success("Group updated successfully!");
+      });
+      setIsConfirmationModalOpen(true);
+    }
   };
 
+  const handleCollaboratorChange = (event) => {
+    setSelectedCollaboratorId(event.target.value);
+  };
 
   const renderEditableSelectField = (label, value, key, options) => (
     <SoftBox key={key} display="flex" py={1} pr={2}>
@@ -218,15 +216,30 @@ const handleEditToggle = () => {
           <MenuItem value="" disabled>
             {label}
           </MenuItem>
-          {options.map((option) => (
-            <MenuItem key={option.id} value={option.id}>
-              {option.name}
-            </MenuItem>
-          ))}
+          {options.map((option) => {
+            return (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
     </SoftBox>
   );
+
+  const handleRemoveIntern = (groupId, internId) => {
+    setActionType("delete")
+    setConfirmationModalTitle("Confirm Delete");
+    setConfirmationModalDescription("Are you sure you want to delete this intern?");
+    setOnConfirmAction(() => () => {
+      removeInternFromGroup(groupId, internId);
+      onUpdate(); // Call to trigger a re-render or additional logic
+      toast.success("Intern deleted successfully!");
+    });
+    setIsConfirmationModalOpen(true);
+  };
+
 
   return (
     <Card sx={{ height: "100%", width: "100%" }}>
@@ -243,15 +256,20 @@ const handleEditToggle = () => {
           </Button>
         </Box>
         <Box px={2} pb={2}>
+          {selectedInterns.length === 0 ? (
+          <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 1 }}>
+            No interns available. Please add interns.
+          </Typography>
+          ) : (
           <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: 2, py: 2 }}>
             {selectedInterns.map((intern) => (
-              <Card key={intern.id} sx={{ borderRadius: 2, width: "200px" }}>
+              <Card key={intern.id} sx={{ borderRadius: 2, width: "200px", px: 2, py: 1 }}>
                 <ListItem
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    p: 1,
+                    flexWrap: "no-wrap",
                   }}
                 >
                   <CircleIcon>
@@ -262,7 +280,7 @@ const handleEditToggle = () => {
 
                   <ListItemText
                     primary={intern.name}
-                    primaryTypographyProps={{ fontSize: "1rem", color: "#3a416f" }}
+                    primaryTypographyProps={{ fontSize: "0.75rem", color: "#3a416f" }}
                     sx={{ pl: "12px" }}
                   />
                   <ListItemSecondaryAction>
@@ -270,7 +288,7 @@ const handleEditToggle = () => {
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        // onClick={() => handleRemove(intern.id)}
+                        onClick={() => handleRemoveIntern(group.id, intern.id)}
                       >
                         <StyledIcon>
                           <ClearOutlined />
@@ -282,6 +300,7 @@ const handleEditToggle = () => {
               </Card>
             ))}
           </List>
+          )}
         </Box>
       </Box>
 
@@ -311,7 +330,7 @@ const handleEditToggle = () => {
                 {remainingCollaborators.length > 0 ? (
                   renderEditableSelectField(
                     "Collaborator",
-                    selectedCollaboratorId,
+                    collaborator.name,
                     "collaborator",
                     remainingCollaborators
                   )
@@ -340,8 +359,8 @@ const handleEditToggle = () => {
                   </CircleIcon>
 
                   <ListItemText
-                    primary={ currentCollaborator.name}
-                    primaryTypographyProps={{ fontSize: "1rem", color: "#3a416f" }}
+                    primary={currentCollaborator.name}
+                    primaryTypographyProps={{ fontSize: "0.75rem", color: "#3a416f" }}
                     sx={{ pl: "12px" }}
                   />
                 </ListItem>

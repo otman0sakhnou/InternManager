@@ -13,9 +13,15 @@ import InfoGroupCard from "./components/InfoGroupCard";
 import CollaboratorsInternsCard from "./components/CollaboratorsInternsCard";
 import DetailsHeader from "./components/DetailsHeader";
 
+<<<<<<< HEAD
 
 const GroupDetails = () => { 
   const { id } = useParams();
+=======
+const GroupDetails = () => {
+  const { id } = useParams(); //the id is received as string
+  const navigate = useNavigate();
+>>>>>>> a522361e183e85d4c7b3185b0f10ef3e70ea1764
   const getGroupById = useGroupStore((state) => state.getGroupById);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
   const [group, setGroup] = useState(null);
@@ -33,20 +39,15 @@ const GroupDetails = () => {
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
   const groups = useGroupStore((state) => state.groups);
   const stagiaires = useInternStore((state) => state.stagiaires);
-  console.log(groups)
 
   const [refresh, setRefresh] = useState(false); //this state is added to trigger the update in this component when the name changed in the CustonInfoCard so the header get the up to date value of name at real time
-
-  
 
   const handleDataUpdate = () => {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger useEffect
   };
-
-  
 
   useEffect(() => {
     const fetchedGroup = getGroupById(id);
@@ -63,9 +64,6 @@ const GroupDetails = () => {
         { name: "Training B", type: "Training" },
       ]);
     }
-    console.log("from the useEffect")
-    console.log(selectedCollaborator)
-    console.log(fetchedGroup)
   }, [id, getGroupById, refresh]);
 
   const handleSave = () => {
@@ -82,7 +80,6 @@ const GroupDetails = () => {
         collaborator: selectedCollaborator,
         subjects,
       };
-      console.log(updatedGroup)
       useGroupStore.getState().updateGroup(id, updatedGroup);
       setGroup(updatedGroup);
       setIsEditing(false);
@@ -92,7 +89,6 @@ const GroupDetails = () => {
     });
     setIsConfirmationModalOpen(true);
   };
-
 
   const handleSelectIntern = (intern) => {
     setSelectedInterns((prev) => {
@@ -118,14 +114,16 @@ const GroupDetails = () => {
 
   const handleEditCollaborator = (collaborator) => {
     setSelectedCollaborator(collaborator);
-    console.log(selectedCollaborator)
     handleDataUpdate();
   };
 
-
   return (
     <DashboardLayout>
+<<<<<<< HEAD
       <DetailsHeader name={groupName}/>
+=======
+      <DetailsHeader name={groupName} />
+>>>>>>> a522361e183e85d4c7b3185b0f10ef3e70ea1764
       <Box mt={5} mb={3} px={6}>
         <Grid container spacing={3} mt={3}>
           <Grid item xs={12} md={6}>

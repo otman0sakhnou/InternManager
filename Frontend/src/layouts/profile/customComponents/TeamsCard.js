@@ -37,6 +37,7 @@ const TeamsCard = (id) => {
   };
 
   const groups = getGroupsByRole(role, id);
+  console.log(groups);
 
   return (
     <Grid item xs={12} xl={4}>
