@@ -116,7 +116,10 @@ const Groups = () => {
     // Rediriger vers la page de création de sujet si la case est cochée
     if (addSubject) {
       addGroup(newGroup);
-      navigate(`/Add-Subject/${newGroup.id}`);
+
+      const groupId = addGroup(newGroup);
+
+      navigate(`/Add-Subject/${groupId}`);
     } else {
       // Afficher la confirmation
       setActionType("success");

@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link , useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
@@ -62,7 +62,7 @@ const ProjectCard = ({ subject, onDelete }) => {
       </IconContainer>
       <ContentContainer>
         <Typography variant="h6" component="div">
-          {subject.name}
+          {subject.title}
         </Typography>
         <Typography variant="body2" color="textSecondary">
           {subject.type}

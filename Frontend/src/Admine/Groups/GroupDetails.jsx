@@ -13,15 +13,9 @@ import InfoGroupCard from "./components/InfoGroupCard";
 import CollaboratorsInternsCard from "./components/CollaboratorsInternsCard";
 import DetailsHeader from "./components/DetailsHeader";
 
-<<<<<<< HEAD
 
-const GroupDetails = () => { 
-  const { id } = useParams();
-=======
 const GroupDetails = () => {
-  const { id } = useParams(); //the id is received as string
-  const navigate = useNavigate();
->>>>>>> a522361e183e85d4c7b3185b0f10ef3e70ea1764
+  const { id } = useParams();
   const getGroupById = useGroupStore((state) => state.getGroupById);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
   const [group, setGroup] = useState(null);
@@ -39,7 +33,7 @@ const GroupDetails = () => {
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const groups = useGroupStore((state) => state.groups);
   const stagiaires = useInternStore((state) => state.stagiaires);
 
@@ -119,11 +113,7 @@ const GroupDetails = () => {
 
   return (
     <DashboardLayout>
-<<<<<<< HEAD
-      <DetailsHeader name={groupName}/>
-=======
       <DetailsHeader name={groupName} />
->>>>>>> a522361e183e85d4c7b3185b0f10ef3e70ea1764
       <Box mt={5} mb={3} px={6}>
         <Grid container spacing={3} mt={3}>
           <Grid item xs={12} md={6}>

@@ -27,7 +27,7 @@ import Icon from "@mui/material/Icon";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
-function Breadcrumbs({ icon, title, route, light =false }) {
+function Breadcrumbs({ icon, title, route, light = false }) {
   const routes = route.slice(0, -1);
 
   return (

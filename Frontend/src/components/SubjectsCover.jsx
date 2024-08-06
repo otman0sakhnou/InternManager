@@ -15,6 +15,7 @@ Coded by www.creative-tim.com
 */
 import { useState, useEffect } from "react";
 // prop-types is a library for typechecking of props
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // @mui material components
@@ -50,6 +51,8 @@ function SubjectsCover({ team, title = "", description = "", type, image, childr
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
   const [progress, setProgress] = useState(10);
+  const navigate = useNavigate()
+
 
 
   useEffect(() => {
@@ -82,6 +85,9 @@ function SubjectsCover({ team, title = "", description = "", type, image, childr
     return () => window.removeEventListener("resize", handleTabsOrientation);
   }, [tabsOrientation]);
   const handleSetTabValue = (event, newValue) => setTabValue(newValue);
+  const handlegoBack = () => {
+    navigate(-1)
+  }
   return (
     <SoftBox position="relative">
       <DashboardNavbar absolute light />
@@ -156,7 +162,7 @@ function SubjectsCover({ team, title = "", description = "", type, image, childr
                 onChange={handleSetTabValue}
                 sx={{ background: "transparent" }}
               >
-                <Tab label="Back to team details" icon={<ArrowBackIosIcon />} />
+                <Tab label="Back to team details" onClick={handlegoBack} icon={<ArrowBackIosIcon />} />
               </Tabs>
             </AppBar>
           </Grid>
