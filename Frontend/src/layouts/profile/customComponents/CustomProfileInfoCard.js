@@ -22,6 +22,8 @@ import StyledIcon from "components/StyledIcon";
 import { validationSchemas } from "utils/validation";
 import { validate } from "utils/validation";
 import useValidationStore from "store/useValidationStore";
+import toast from "react-hot-toast";
+import ConfirmationModal from "../../../components/ConfirmationModals";
 
 function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const { role } = useAuthStore(); // Adjust based on how your auth store returns role
@@ -35,9 +37,15 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const updateCollaborator = useCollaboratorStore((state) => state.updateCollaborator);
   const collaborator = useCollaboratorStore((state) => state.getCollaboratorById(info.id));
 
-  const {errors, setErrors } = useValidationStore();
+  const { errors, setErrors } = useValidationStore();
 
   const data = role === "intern" ? intern : collaborator;
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
+  const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
+  const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
 
   const handleEditClick = () => {
     if (isEditMode) {
@@ -58,21 +66,36 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
 
   const handleSave = () => {
     if (role === "intern") {
-      const updatedStagiaire = {
-        ...data,
-        ...editableInfo,
-        description: editableDescription,
-      };
-      updateStagiaire(updatedStagiaire);
-      setErrors({});
+
+      setConfirmationModalTitle("Update Intern");
+      setConfirmationModalDescription("Are you sure you want to update this intern?");
+      setOnConfirmAction(() => () => {
+        const updatedStagiaire = {
+          ...data,
+          ...editableInfo,
+          description: editableDescription,
+        };
+        updateStagiaire(updatedStagiaire);
+        setErrors({});
+        toast.success("Intern updated successfully!");
+      });
+      setIsConfirmationModalOpen(true);
+
     } else if (role === "collaborator") {
-      const updatedCollaborator = {
-        ...data,
-        ...editableInfo,
-        description: editableDescription,
-      };
-      updateCollaborator(updatedCollaborator);
-      setErrors({});
+      setConfirmationModalTitle("Update Collaborator");
+      setConfirmationModalDescription("Are you sure you want to update this collab?");
+      setOnConfirmAction(() => () => {
+        const updatedCollaborator = {
+          ...data,
+          ...editableInfo,
+          description: editableDescription,
+        };
+        updateCollaborator(updatedCollaborator);
+        setErrors({});
+        toast.success("Collab updated successfully!");
+      });
+      setIsConfirmationModalOpen(true);
+
     }
     if (onUpdate) {
       onUpdate(); // Call callback to update parent state
@@ -103,21 +126,21 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const filteredInfo =
     role === "intern"
       ? {
-          name: editableInfo.name,
-          phone: editableInfo.phone,
-          email: editableInfo.email,
-          gender: editableInfo.gender,
-        }
+        name: editableInfo.name,
+        phone: editableInfo.phone,
+        email: editableInfo.email,
+        gender: editableInfo.gender,
+      }
       : {
-          name: editableInfo.name,
-          phone: editableInfo.phone,
-          email: editableInfo.email,
-          gender: editableInfo.gender,
-          // job: editableInfo.job,
-          // department: editableInfo.department,
-          // organization: editableInfo.organization,
-          // employmentDate: editableInfo.employmentDate,
-        };
+        name: editableInfo.name,
+        phone: editableInfo.phone,
+        email: editableInfo.email,
+        gender: editableInfo.gender,
+        // job: editableInfo.job,
+        // department: editableInfo.department,
+        // organization: editableInfo.organization,
+        // employmentDate: editableInfo.employmentDate,
+      };
 
   const labels = Object.keys(filteredInfo).map((el) => {
     if (el.match(/[A-Z\s]+/)) {
@@ -126,58 +149,58 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
     }
     return el;
   });
-const renderItems = labels.map((label, key) => (
-  <SoftBox key={label} display="flex" flexDirection="column" py={1} pr={2}>
-    <SoftTypography variant="button" fontWeight="bold" textTransform="capitalize">
-      {label}: &nbsp;
-    </SoftTypography>
-    {isEditMode ? (
-      Object.keys(filteredInfo)[key] === "gender" ? (
-        <FormControl fullWidth variant="outlined">
-          <Select
-            name="gender"
-            value={editableInfo.gender}
-            onChange={handleInputChange}
-            displayEmpty
-            startAdornment={
-              <InputAdornment position="start">
-                <StyledIcon>wc_icon</StyledIcon>
-              </InputAdornment>
-            }
-            renderValue={(selected) => {
-              if (!selected) {
-                return <span style={{ color: "#CCCCCC" }}>Gender</span>;
-              }
-              return selected;
-            }}
-          >
-            <MenuItem value="" disabled>
-              Gender
-            </MenuItem>
-            <MenuItem value="Male">Male</MenuItem>
-            <MenuItem value="Female">Female</MenuItem>
-          </Select>
-          {errors.gender && <FormHelperText error>{errors.gender}</FormHelperText>}
-        </FormControl>
-      ) : (
-        <TextField
-          name={Object.keys(filteredInfo)[key]}
-          value={Object.values(filteredInfo)[key]}
-          onChange={handleInputChange}
-          size="small"
-          fullWidth
-          variant="outlined"
-          error={!!errors[Object.keys(filteredInfo)[key]]}
-          helperText={errors[Object.keys(filteredInfo)[key]]}
-        />
-      )
-    ) : (
-      <SoftTypography variant="button" fontWeight="regular" color="text">
-        &nbsp;{Object.values(filteredInfo)[key]}
+  const renderItems = labels.map((label, key) => (
+    <SoftBox key={label} display="flex" flexDirection="column" py={1} pr={2}>
+      <SoftTypography variant="button" fontWeight="bold" textTransform="capitalize">
+        {label}: &nbsp;
       </SoftTypography>
-    )}
-  </SoftBox>
-));
+      {isEditMode ? (
+        Object.keys(filteredInfo)[key] === "gender" ? (
+          <FormControl fullWidth variant="outlined">
+            <Select
+              name="gender"
+              value={editableInfo.gender}
+              onChange={handleInputChange}
+              displayEmpty
+              startAdornment={
+                <InputAdornment position="start">
+                  <StyledIcon>wc_icon</StyledIcon>
+                </InputAdornment>
+              }
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span style={{ color: "#CCCCCC" }}>Gender</span>;
+                }
+                return selected;
+              }}
+            >
+              <MenuItem value="" disabled>
+                Gender
+              </MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+            </Select>
+            {errors.gender && <FormHelperText error>{errors.gender}</FormHelperText>}
+          </FormControl>
+        ) : (
+          <TextField
+            name={Object.keys(filteredInfo)[key]}
+            value={Object.values(filteredInfo)[key]}
+            onChange={handleInputChange}
+            size="small"
+            fullWidth
+            variant="outlined"
+            error={!!errors[Object.keys(filteredInfo)[key]]}
+            helperText={errors[Object.keys(filteredInfo)[key]]}
+          />
+        )
+      ) : (
+        <SoftTypography variant="button" fontWeight="regular" color="text">
+          &nbsp;{Object.values(filteredInfo)[key]}
+        </SoftTypography>
+      )}
+    </SoftBox>
+  ));
 
 
   return (
@@ -227,6 +250,17 @@ const renderItems = labels.map((label, key) => (
         </SoftBox>
         <SoftBox>{renderItems}</SoftBox>
       </SoftBox>
+      <ConfirmationModal
+        open={isConfirmationModalOpen}
+        handleClose={() => setIsConfirmationModalOpen(false)}
+        title={confirmationModalTitle}
+        description={confirmationModalDescription}
+        onConfirm={() => {
+          onConfirmAction();
+          setIsConfirmationModalOpen(false);
+        }}
+        actionType={actionType}
+      />
     </Card>
   );
 }

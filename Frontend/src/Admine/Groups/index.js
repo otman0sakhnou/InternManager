@@ -59,7 +59,7 @@ const Groups = () => {
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const departments = [
     { value: "Microsoft&Data", label: "Microsoft & Data" },
     { value: "Front&Mobile", label: "Front & Mobile" },
@@ -152,6 +152,7 @@ const Groups = () => {
     });
     setIsConfirmationModalOpen(true);
   };
+
   const handleViewDetails = (id) => {
     setGroupNameC(groups.find(group => group.id === id)?.name || "");
     navigate(`/groupdetails/${id}`);
@@ -245,7 +246,7 @@ const Groups = () => {
   const [open, setOpen] = useState(true);
   const [open2, setOpen2] = useState(true);
 
-  
+
 
   const handleToggle = () => {
     setOpen(!open);
@@ -261,6 +262,7 @@ const Groups = () => {
     setOnConfirmAction(() => () => {
       setSelectedInterns(selectedInterns.filter((intern) => intern.id !== internId));
     });
+    toast.success("Intern deleted successfully!");
     setIsConfirmationModalOpen(true);
   };
   return (
@@ -670,10 +672,10 @@ const Groups = () => {
 
                                   {totalPagesintern >
                                     (currentIntern + 1) * buttonsPerPageintern && (
-                                    <Button onClick={() => setCurrentIntern(currentIntern + 1)}>
-                                      ...
-                                    </Button>
-                                  )}
+                                      <Button onClick={() => setCurrentIntern(currentIntern + 1)}>
+                                        ...
+                                      </Button>
+                                    )}
 
                                   <IconButton
                                     onClick={() => handlePageChangeintern(currentPageintern + 1)}

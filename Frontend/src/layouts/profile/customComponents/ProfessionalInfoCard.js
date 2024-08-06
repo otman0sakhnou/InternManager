@@ -18,6 +18,8 @@ import StyledIcon from "components/StyledIcon";
 import { validationSchemas, validate } from "utils/validation";
 import flattenObject from "utils/flattenObject";
 import useValidationStore from "store/useValidationStore";
+import toast from "react-hot-toast";
+import ConfirmationModal from "../../../components/ConfirmationModals";
 
 function ProfessionalInfoCard({ title, info, action, role }) {
   const infoRespectingFormCreation = {
@@ -50,7 +52,11 @@ function ProfessionalInfoCard({ title, info, action, role }) {
   const collaborator = useCollaboratorStore((state) => state.getCollaboratorById(info.id));
 
   const { errors, setErrors } = useValidationStore();
-
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
+  const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
+  const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   useEffect(() => {
     setEditableInfo(role === "intern" ? infoRespectingFormCreation : info);
   }, [role]);
@@ -80,7 +86,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
       return {}
     }
   }
- 
+
   const toggleEdit = () => {
     if (editable) {
       const schema = getActiveSchema();
@@ -102,20 +108,37 @@ function ProfessionalInfoCard({ title, info, action, role }) {
       setEditable(true);
     }
   };
-   const handleSave = () => {
+  const handleSave = () => {
 
-     if (role === "intern") {
-       const updatedData = { ...originalData, ...editableInfo };
-       updateStagiaire(updatedData);
-     } else if (role === "collaborator") {
-       const updatedData = { ...originalData, ...editableInfo };
-       updateCollaborator(updatedData);
-     }
+    if (role === "intern") {
+      console.log("Intern role detected");
 
-     setErrors({});
-     return null;
-   };
+      setConfirmationModalTitle("Update Intern");
 
+      setConfirmationModalDescription("Are you sure you want to update this intern?");
+      setOnConfirmAction(() => () => {
+        const updatedData = { ...originalData, ...editableInfo };
+        updateStagiaire(updatedData);
+        setErrors({});
+        toast.success("Intern updated successfully!");
+      });
+      setIsConfirmationModalOpen(true);
+    } else if (role === "collaborator") {
+
+
+      setConfirmationModalTitle("Update Collaborator");
+      setConfirmationModalDescription("Are you sure you want to update this collab?");
+      setOnConfirmAction(() => () => {
+        const updatedData = { ...originalData, ...editableInfo };
+        updateCollaborator(updatedData);
+        setErrors({});
+        toast.success("Collab updated successfully!");
+      });
+      setIsConfirmationModalOpen(true);
+
+
+    };
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditableInfo((prevInfo) => {
@@ -149,7 +172,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
     });
   };
 
- 
+
 
   const renderEditableField = (label, value, key) => (
     <SoftBox key={key} display="flex" py={1} pr={2}>
@@ -286,23 +309,23 @@ function ProfessionalInfoCard({ title, info, action, role }) {
             : renderField("Job", editableInfo.job, "job")}
           {editable
             ? renderEditableSelectField("Department", editableInfo.department, "department", [
-                { value: "Microsoft&Data", label: "Microsoft & Data" },
-                { value: "Front&Mobile", label: "Front & Mobile" },
-                { value: "Java", label: "Java" },
-                { value: "PHP", label: "PHP" },
-                { value: "Devops", label: "Devops" },
-                { value: "Test&Support", label: "Test & Support" },
-              ])
+              { value: "Microsoft&Data", label: "Microsoft & Data" },
+              { value: "Front&Mobile", label: "Front & Mobile" },
+              { value: "Java", label: "Java" },
+              { value: "PHP", label: "PHP" },
+              { value: "Devops", label: "Devops" },
+              { value: "Test&Support", label: "Test & Support" },
+            ])
             : renderField("Department", editableInfo.department, "department")}
           {editable
             ? renderEditableField("Organization", editableInfo.organization, "organization")
             : renderField("Organization", editableInfo.organization, "organization")}
           {editable
             ? renderEditableDateField(
-                "Employment Date",
-                editableInfo.employmentDate,
-                "employmentDate"
-              )
+              "Employment Date",
+              editableInfo.employmentDate,
+              "employmentDate"
+            )
             : renderField("Employment Date", editableInfo.employmentDate, "employmentDate")}
         </>
       );
@@ -329,40 +352,40 @@ function ProfessionalInfoCard({ title, info, action, role }) {
           </SoftTypography>
           {editable
             ? renderEditableField(
-                "Institution",
-                editableInfo.educationInfo.institution,
-                "educationInfo.institution"
-              )
+              "Institution",
+              editableInfo.educationInfo.institution,
+              "educationInfo.institution"
+            )
             : renderField(
-                "Institution",
-                editableInfo.educationInfo.institution,
-                "educationInfo.institution"
-              )}
+              "Institution",
+              editableInfo.educationInfo.institution,
+              "educationInfo.institution"
+            )}
           {editable
             ? renderEditableField("Level", editableInfo.educationInfo.level, "educationInfo.level")
             : renderField("Level", editableInfo.educationInfo.level, "educationInfo.level")}
           {editable
             ? renderEditableField(
-                "Specialization",
-                editableInfo.educationInfo.specialization,
-                "educationInfo.specialization"
-              )
+              "Specialization",
+              editableInfo.educationInfo.specialization,
+              "educationInfo.specialization"
+            )
             : renderField(
-                "Specialization",
-                editableInfo.educationInfo.specialization,
-                "educationInfo.specialization"
-              )}
+              "Specialization",
+              editableInfo.educationInfo.specialization,
+              "educationInfo.specialization"
+            )}
           {editable
             ? renderEditableField(
-                "Year of Study",
-                editableInfo.educationInfo.yearOfStudy,
-                "educationInfo.yearOfStudy"
-              )
+              "Year of Study",
+              editableInfo.educationInfo.yearOfStudy,
+              "educationInfo.yearOfStudy"
+            )
             : renderField(
-                "Year of Study",
-                editableInfo.educationInfo.yearOfStudy,
-                "educationInfo.yearOfStudy"
-              )}
+              "Year of Study",
+              editableInfo.educationInfo.yearOfStudy,
+              "educationInfo.yearOfStudy"
+            )}
 
           <SoftTypography
             variant="h6"
@@ -374,52 +397,52 @@ function ProfessionalInfoCard({ title, info, action, role }) {
           </SoftTypography>
           {editable
             ? renderEditableField(
-                "Title",
-                editableInfo.internshipInfo.title,
-                "internshipInfo.title"
-              )
+              "Title",
+              editableInfo.internshipInfo.title,
+              "internshipInfo.title"
+            )
             : renderField("Title", editableInfo.internshipInfo.title, "internshipInfo.title")}
           {editable
             ? renderEditableSelectField(
-                "Department",
-                editableInfo.internshipInfo.department,
-                "internshipInfo.department",
-                [
-                  { value: "Microsoft&Data", label: "Microsoft & Data" },
-                  { value: "Front&Mobile", label: "Front & Mobile" },
-                  { value: "Java", label: "Java" },
-                  { value: "PHP", label: "PHP" },
-                  { value: "Devops", label: "Devops" },
-                  { value: "Test&Support", label: "Test & Support" },
-                ]
-              )
+              "Department",
+              editableInfo.internshipInfo.department,
+              "internshipInfo.department",
+              [
+                { value: "Microsoft&Data", label: "Microsoft & Data" },
+                { value: "Front&Mobile", label: "Front & Mobile" },
+                { value: "Java", label: "Java" },
+                { value: "PHP", label: "PHP" },
+                { value: "Devops", label: "Devops" },
+                { value: "Test&Support", label: "Test & Support" },
+              ]
+            )
             : renderField(
-                "Department",
-                editableInfo.internshipInfo.department,
-                "internshipInfo.department"
-              )}
+              "Department",
+              editableInfo.internshipInfo.department,
+              "internshipInfo.department"
+            )}
           {editable
             ? renderEditableDateField(
-                "Start Date",
-                editableInfo.internshipInfo.startDate,
-                "internshipInfo.startDate"
-              )
+              "Start Date",
+              editableInfo.internshipInfo.startDate,
+              "internshipInfo.startDate"
+            )
             : renderField(
-                "Start Date",
-                dayjs(editableInfo.internshipInfo.startDate).format("YYYY-MM-DD"),
-                "internshipInfo.startDate"
-              )}
+              "Start Date",
+              dayjs(editableInfo.internshipInfo.startDate).format("YYYY-MM-DD"),
+              "internshipInfo.startDate"
+            )}
           {editable
             ? renderEditableDateField(
-                "End Date",
-                editableInfo.internshipInfo.endDate,
-                "internshipInfo.endDate"
-              )
+              "End Date",
+              editableInfo.internshipInfo.endDate,
+              "internshipInfo.endDate"
+            )
             : renderField(
-                "End Date",
-                dayjs(editableInfo.internshipInfo.endDate).format("YYYY-MM-DD"),
-                "internshipInfo.endDate"
-              )}
+              "End Date",
+              dayjs(editableInfo.internshipInfo.endDate).format("YYYY-MM-DD"),
+              "internshipInfo.endDate"
+            )}
         </>
       );
     }
@@ -440,6 +463,17 @@ function ProfessionalInfoCard({ title, info, action, role }) {
       <SoftBox px={2} pb={2}>
         <SoftBox mt={2}>{renderItems()}</SoftBox>
       </SoftBox>
+      <ConfirmationModal
+        open={isConfirmationModalOpen}
+        handleClose={() => setIsConfirmationModalOpen(false)}
+        title={confirmationModalTitle}
+        description={confirmationModalDescription}
+        onConfirm={() => {
+          onConfirmAction();
+          setIsConfirmationModalOpen(false);
+        }}
+        actionType={actionType}
+      />
     </Card>
   );
 }

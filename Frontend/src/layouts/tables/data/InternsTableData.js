@@ -105,12 +105,12 @@ function ActionIcons({ onEdit, onDelete, onViewDetails }) {
         >
           <Tooltip title="View Details">
             <Icon sx={{ cursor: "pointer", color: "#77E4C8", mr: 1 }} fontSize="small">
-              info
+              info_outline
             </Icon>
           </Tooltip>
           View Details
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             onEdit();
             handleClose();
@@ -122,7 +122,7 @@ function ActionIcons({ onEdit, onDelete, onViewDetails }) {
             </Icon>
           </Tooltip>
           Edit
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem
           onClick={() => {
             onDelete();
@@ -131,7 +131,7 @@ function ActionIcons({ onEdit, onDelete, onViewDetails }) {
         >
           <Tooltip title="Delete">
             <Icon sx={{ cursor: "pointer", color: "red", mr: 1 }} fontSize="small">
-              delete
+              delete_outline
             </Icon>
           </Tooltip>
           Delete
