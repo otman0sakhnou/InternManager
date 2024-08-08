@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj": {}
+    "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj": {}
   },
   "projects": {
-    "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj": {
+    "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj",
+        "projectUniqueName": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj",
         "projectName": "Deployment",
-        "projectPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj",
-        "packagesPath": "C:\\Users\\merie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Deployment\\obj\\",
+        "projectPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Deployment\\Deployment.csproj",
+        "packagesPath": "C:\\Users\\SARA-PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Deployment\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\merie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\SARA-PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -61,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

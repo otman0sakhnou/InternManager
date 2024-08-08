@@ -19,14 +19,17 @@ namespace Infrastructure.Data.Context
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Step> Steps { get; set; }
         public DbSet<InternStep> InternSteps { get; set; }
+        public DbSet<LogEntry> LogEntries { get; set; }
 
-        public Context(DbContextOptions<Context> options) : base(options)
-        {
-        }
+        //public Context(DbContextOptions<Context> options) : base(options)
+        //{
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            //Logger
+            modelBuilder.Entity<LogEntry>().ToTable("Logs");
 
             // One-to-Many: Group -> Subject
             modelBuilder.Entity<Subject>()
@@ -55,7 +58,14 @@ namespace Infrastructure.Data.Context
                 .HasOne(p => p.Intern)
                 .WithMany(i => i.Periods)
                 .HasForeignKey(p => p.InternId)
-                .OnDelete(DeleteBehavior.Cascade); ;
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // One-to-Many: Collaborator -> Group
+            modelBuilder.Entity<Group>()
+               .HasOne(c => c.Collaborator)
+               .WithMany(g => g.Groups)
+               .HasForeignKey(c => c.CollaboratorId)
+               .OnDelete(DeleteBehavior.Cascade);
 
             // Many-to-Many: Intern -> Step through InternStep
             modelBuilder.Entity<InternStep>()

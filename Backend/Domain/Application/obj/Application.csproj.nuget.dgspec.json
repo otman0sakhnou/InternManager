@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Application\\Application.csproj": {}
+    "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Application\\Application.csproj": {}
   },
   "projects": {
-    "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Application\\Application.csproj": {
+    "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Application\\Application.csproj",
-        "packagesPath": "C:\\Users\\merie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Application\\obj\\",
+        "projectPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Application\\Application.csproj",
+        "packagesPath": "C:\\Users\\SARA-PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\merie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\SARA-PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -29,8 +29,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj"
+              "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj"
               }
             }
           }
@@ -75,21 +75,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj": {
+    "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\merie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\merie\\OneDrive\\Bureau\\Project_Intern\\InternManager\\Backend\\Domain\\Domain\\obj\\",
+        "projectPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\SARA-PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\SARA-PC\\OneDrive\\Bureau\\SQLI\\InternManager\\Backend\\Domain\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\merie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\SARA-PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -121,6 +121,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.9.2, )"
+            },
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.0, )"
+            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.7, )"
@@ -142,7 +150,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
