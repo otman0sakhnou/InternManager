@@ -21,7 +21,7 @@ namespace Domain.Models
         public string Department { get; set; }
         //public int PeriodId { get; set; }
         [ForeignKey("userId")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         public ICollection<Period> Periods { get; set; } // Navigation property
         public ApplicationUser User { get; set; } // Navigation property

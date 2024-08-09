@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Context
 {
-    public class Context : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-       
-        public Context(DbContextOptions<Context> options) : base(options)
+   
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
         public DbSet<Collaborator> Collaborators { get; set; }
@@ -48,7 +48,7 @@ namespace Infrastructure.Data.Context
                 .HasOne(p => p.Group)
                 .WithMany(g => g.Periods)
                 .HasForeignKey(p => p.GroupId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             // One-to-Many: Intern -> Period
             modelBuilder.Entity<Period>()
@@ -78,7 +78,7 @@ namespace Infrastructure.Data.Context
                 .HasOne(ints => ints.Step)
                 .WithMany(s => s.InternSteps)
                 .HasForeignKey(ints => ints.StepId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             // One-to-One: Intern -> ApplicationUser
             modelBuilder.Entity<Intern>()

@@ -19,7 +19,7 @@ namespace Domain.Models
         public DateTime EmploymentDate { get; set; }
         public string Gender { get; set; }
         [ForeignKey("userId")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         public ApplicationUser User { get; set; } 
         public ICollection<Group> Groups { get; set; } 

@@ -1,32 +1,30 @@
 using Application.Mapping;
 using Application.Repositories;
 using Domain.Models;
-
 using Infrastructure.Data.Context;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
-
 var builder = WebApplication.CreateBuilder(args);
-var Configuration = builder.Configuration;
+var configuration = builder.Configuration;
 
-builder.Services.AddDbContext<Context>(options =>
-{ 
-    options.UseSqlServer(
-       Configuration.GetConnectionString("DefaultConnection"));
+// Configure DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Add  services FluentValidation
+// Configure services
 builder.Services.AddControllers();
-
+// Uncomment and configure FluentValidation if needed
 //builder.Services.AddControllers()
 //    .AddFluentValidationAutoValidation()
 //    .AddFluentValidationClientsideAdapters()
 //    .AddValidatorsFromAssemblyContaining<YourValidatorClass>();
 
-
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -37,24 +35,17 @@ builder.Services.AddCors(options =>
             .AllowCredentials()); // Use if you need to allow credentials
 });
 
-
-builder.Services.AddAuthorization();
-
-
+// Configure Identity
 //builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<Context>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<Context>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-
-
+// Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(MappinProfile));
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-// Register the Swagger generator
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -69,24 +60,28 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        new OpenApiSecurityScheme
         {
-            Reference = new OpenApiReference
+            new OpenApiSecurityScheme
             {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Bearer"
-            }
-        },
-        new string[] { }
-    }});
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
 });
+
+// Configure Repositories
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -94,16 +89,10 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.MapIdentityApi<IdentityUser>();
-
 app.UseAuthentication();
-
-
 app.UseHttpsRedirection();
-
 app.UseCors("AllowSpecificOrigin");
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
