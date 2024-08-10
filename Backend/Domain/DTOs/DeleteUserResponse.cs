@@ -6,6 +6,5 @@ using System.Threading.Tasks;
 
 namespace Domain.DTOs
 {
-    public record LoginResponse(
-        string AccessToken, string RefreshToken);
+    public record DeleteUserResponse(bool Success, string Message);
 }

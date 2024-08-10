@@ -39,16 +39,17 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
             var user = await _userManager.FindByEmailAsync(request.Email);
 
             if (user == null)
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                throw new UnauthorizedAccessException("Invalid email or password.");
 
             var result = await _signInManager.PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: false);
 
             if (!result.Succeeded)
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                throw new UnauthorizedAccessException("Invalid email or password.");
 
-            var token = await _tokenService.GenerateAccessTokenAsync(user);
+            var accessToken = await _tokenService.GenerateAccessTokenAsync(user);
+            var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user);
 
-            return new LoginResponse(token);
+            return new LoginResponse(accessToken, refreshToken);
         }
     }
 }

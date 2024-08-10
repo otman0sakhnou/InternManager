@@ -1,4 +1,5 @@
-﻿using Application.Services.AuthenticationAndAuthorization.Common;
+﻿using Application.Repositories;
+using Application.Services.AuthenticationAndAuthorization.Common;
 using Domain.DTOs;
 using Domain.Models;
 using MediatR;
@@ -11,40 +12,64 @@ using System.Threading.Tasks;
 
 namespace Application.Services.AuthenticationAndAuthorization.Commands
 {
-    public record RefreshTokenCommand(string refreshToken) : IRequest<RefreshTokenResponse>;
+    public record RefreshTokenCommand(string RefreshToken) : IRequest<RefreshTokenResponse>;
 
     public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshTokenResponse>
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-        public RefreshTokenCommandHandler(UserManager<ApplicationUser> userManager, ITokenService tokenService)
+        public RefreshTokenCommandHandler(UserManager<ApplicationUser> userManager, ITokenService tokenService, IRefreshTokenRepository refreshTokenRepository)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task<RefreshTokenResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            var principal = _tokenService.GetPrincipalFromExpiredToken(request.refreshToken);
+             //Validate the refresh token
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
 
-            if (principal == null)
+            if (refreshToken == null || refreshToken.IsRevoked || refreshToken.ExpirationDate < DateTime.UtcNow)
             {
-                return new RefreshTokenResponse(false, null, null, new[] { "Invalid refresh token" });
+                return new RefreshTokenResponse(false, null, null, new[] { "Invalid or expired refresh token" });
             }
-
-            var username = principal.Identity.Name;
-            var user = await _userManager.FindByNameAsync(username);
+            // Get the user associated with the refresh token
+            var user = await _userManager.FindByIdAsync(refreshToken.UserId);
 
             if (user == null)
             {
                 return new RefreshTokenResponse(false, null, null, new[] { "User not found" });
             }
 
+            // Generate new tokens
             var newAccessToken = await _tokenService.GenerateAccessTokenAsync(user);
-            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            var newRefreshToken = await _tokenService.GenerateRefreshTokenAsync(user);
 
-            return new RefreshTokenResponse(true, newAccessToken, newRefreshToken, Array.Empty<string>());  
+            var refreshTokenEntity = new RefreshToken
+            {
+                Token = newRefreshToken,
+                UserId = user.Id,
+                ExpirationDate = DateTime.UtcNow.AddMonths(6), // Example expiration time
+                IsRevoked = false
+            };
+
+            // Invalidate the old refresh token
+            await _tokenService.InvalidateRefreshTokenAsync(request.RefreshToken);
+
+            // Add the new refresh token to the repository
+            await _refreshTokenRepository.AddOrUpdateAsync(refreshTokenEntity);
+
+            //await _refreshTokenRepository.AddOrUpdateAsync(new RefreshToken
+            //{
+            //    Token = newRefreshToken,
+            //    UserId = user.Id,
+            //    ExpirationDate = DateTime.UtcNow.AddMonths(1)
+            //});
+
+            return new RefreshTokenResponse(true, newAccessToken, newRefreshToken, Array.Empty<string>());
         }
     }
 }

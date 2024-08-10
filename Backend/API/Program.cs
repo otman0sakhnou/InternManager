@@ -71,6 +71,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Register TokenService
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 // Configure JWT authentication
 //var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();

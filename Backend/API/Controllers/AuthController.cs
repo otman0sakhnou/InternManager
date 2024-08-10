@@ -1,4 +1,5 @@
 ﻿using Application.Services.AuthenticationAndAuthorization.Commands;
+using Application.Services.AuthenticationAndAuthorization.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -100,9 +101,37 @@ namespace API.Controllers
             var response = await _mediator.Send(command);
             if (response.Success)
             {
-                return Ok();
+                return Ok("Logout successfully");
             }
             return BadRequest(response.Errors);
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUser(string userId)
+        {
+            var query = new GetUserQuery(userId);
+            var response = await _mediator.Send(query);
+
+            if (response.User != null)
+            {
+                return Ok(response.User);
+            }
+
+            return NotFound(response.Error);
+        }
+
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var command = new DeleteUserCommand(userId);
+            var response = await _mediator.Send(command);
+
+            if (response.Success)
+            {
+                return Ok(response.Message);
+            }
+
+            return NotFound(response.Message);
         }
 
     }

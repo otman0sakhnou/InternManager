@@ -12,8 +12,8 @@ namespace Application.Services.AuthenticationAndAuthorization.Common
     public interface ITokenService
     {
         Task<string> GenerateAccessTokenAsync(ApplicationUser user);
-        string GenerateRefreshToken();
-        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+        Task<string> GenerateRefreshTokenAsync(ApplicationUser user);
+        Task<ClaimsPrincipal> GetPrincipalFromExpiredTokenAsync(string token);
         Task<bool> InvalidateRefreshTokenAsync(string refreshToken);
     }
 }
