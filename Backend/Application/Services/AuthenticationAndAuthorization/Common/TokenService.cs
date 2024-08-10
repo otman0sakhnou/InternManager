@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Application.Repositories;
+using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,10 +18,12 @@ namespace Application.Services.AuthenticationAndAuthorization.Common
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-        public TokenService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        public TokenService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IRefreshTokenRepository refreshTokenRepository)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
@@ -50,57 +54,87 @@ namespace Application.Services.AuthenticationAndAuthorization.Common
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        //public string GenerateAccessToken(ApplicationUser user)
-        //{
-
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(_secretKey);
-
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new[]
-        //        {
-        //            new Claim(ClaimTypes.Name, user.UserName)
-        //        }),
-        //        Expires = DateTime.UtcNow.AddHours(1),
-        //        Issuer = _issuer,
-        //        Audience = _audience,
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        //    };
-
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    return tokenHandler.WriteToken(token);
-        //}
-
-        public string GenerateRefreshToken()
+        public async Task<string> GenerateRefreshTokenAsync(ApplicationUser user)
         {
-            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            var existingToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
+
+            if (existingToken != null)
+            {
+                //removing the existing token so maintaining only one token per user
+                await _refreshTokenRepository.RemoveAsync(existingToken.Token);
+            }
+
+            var newToken = new RefreshToken
+            {
+                Token = GenerateRandomToken(), 
+                UserId = user.Id,
+                ExpirationDate = DateTime.UtcNow.AddMonths(1)
+            };
+            
+            await _refreshTokenRepository.AddAsync(newToken);
+
+            return newToken.Token;
+        }
+        private string GenerateRandomToken()
+        {
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                var tokenData = new byte[32];
+                rng.GetBytes(tokenData);
+                return Convert.ToBase64String(tokenData);
+            }
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+
+        public async Task<ClaimsPrincipal>  GetPrincipalFromExpiredTokenAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var validationParameters = new TokenValidationParameters
+            try
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = false, // Ignore expiration for refresh token
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = _configuration["Jwt:Issuer"],
-                ValidAudience = _configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(key)
-            };
-            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-            return principal;
+                // Validate token without checking expiration
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = false, // Allow expired tokens
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidAudience = _configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken securityToken);
+
+                var jwtToken = securityToken as JwtSecurityToken;
+                if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    throw new SecurityTokenException("Invalid token");
+
+                // Check if the refresh token exists and is valid
+                var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+                if (refreshToken == null || refreshToken.IsRevoked || refreshToken.ExpirationDate < DateTime.UtcNow)
+                    return null; // Invalid or expired refresh token
+
+                return principal;
+            }
+            catch (Exception)
+            {
+                // Handle token parsing and validation exceptions
+                return null;
+            }
+
         }
 
-        public Task<bool> InvalidateRefreshTokenAsync(string refreshToken)
+        public async Task<bool> InvalidateRefreshTokenAsync(string refreshToken)
         {
-            // Your logic to invalidate the refresh token
-            // This might involve adding the token to a blacklist or updating its status in the database
-           // return await Task.FromResult(true); // Placeholder
-           return Task.FromResult(true);
+            // Fetch the refresh token from the repository
+            var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+
+            if (token == null || token.IsRevoked)
+                return false; // Token not found or already revoked
+
+            token.IsRevoked = true; // Mark the token as revoked
+            await _refreshTokenRepository.UpdateAsync(token);
+
+            return true;
         }
     }
 }
