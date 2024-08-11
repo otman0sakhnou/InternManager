@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Domain.Models;
+using Application.Services.AuthenticationAndAuthorization.Common;
 
 namespace Application.Services.AuthenticationAndAuthorization.Commands
 {
@@ -15,10 +16,12 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public RegisterCommandHandler(UserManager<ApplicationUser> userManager)
+        public RegisterCommandHandler(UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         public async Task<RegisterResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -32,6 +35,12 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
 
             if (result.Succeeded)
             {
+
+                var link = $"http://localhost:3000";
+                var emailSubject = "Log In To Your Account";
+                var emailBody = $"<p>You were registred to our application. Please click the link below to log in your account:</p><p><a href=\"{link}\">Log In To Your Account</a></p>";
+
+                await _emailService.SendEmailAsync(request.Email, emailSubject, emailBody);
                 return new RegisterResponse(true, user.Id, Array.Empty<string>());
             }
 

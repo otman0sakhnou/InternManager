@@ -106,6 +106,19 @@ namespace API.Controllers
             return BadRequest(response.Errors);
         }
 
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+        {
+            var result = await _mediator.Send(command);
+
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+
+            return BadRequest(result.Errors);
+        }
+
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUser(string userId)
         {
