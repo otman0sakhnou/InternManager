@@ -1,7 +1,9 @@
+using Application.Behaviors;
 using Application.Mapping;
 using Application.Repositories;
 using Application.Services.AuthenticationAndAuthorization.Commands;
 using Application.Services.AuthenticationAndAuthorization.Common;
+using Application.Services.AuthenticationAndAuthorization.Validators;
 using Domain.Models;
 using FluentValidation;
 using Infrastructure.Data.Context;
@@ -67,12 +69,14 @@ builder.Services.AddAutoMapper(typeof(MappinProfile));
 
 //builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterCommand>());
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+//builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Register TokenService
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<IEmailService, EmailService>();  
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 
 // Configure JWT authentication
 //var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
