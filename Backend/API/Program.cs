@@ -1,28 +1,24 @@
-using Application.Mapping;
-using Application.Repositories;
-using Domain.Models;
-using Infrastructure.Data.Context;
-using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Domain.Models;
+using Infrastructure.Data.Context;
+using Application.Mapping;
+using Application.Repositories;
+using Application.Validators;
+using Application;
+using FluentValidation;
+using Infrastructure.Repositories;
 using Microsoft.OpenApi.Models;
+using Domain.DTOs;
+using Deployment.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-// Configure DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-});
-
 // Configure services
 builder.Services.AddControllers();
-// Uncomment and configure FluentValidation if needed
-//builder.Services.AddControllers()
-//    .AddFluentValidationAutoValidation()
-//    .AddFluentValidationClientsideAdapters()
-//    .AddValidatorsFromAssemblyContaining<YourValidatorClass>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CollaboratorReqValidator>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -32,17 +28,33 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials()); // Use if you need to allow credentials
+            .AllowCredentials());
 });
 
 // Configure Identity
-//builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<Context>();
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Configure identity options here if needed
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 // Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(MappinProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Configure MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.AssemblyReference).Assembly));
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -77,9 +89,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Configure Repositories
+builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
+builder.Services.AddTransient<IValidator<CollaboratorReq>, CollaboratorReqValidator>();
+
+// Register the seeder
+builder.Services.AddTransient<DatabaseSeeder>();
 
 var app = builder.Build();
+
+// Run the seeder
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
@@ -88,11 +112,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.MapIdentityApi<IdentityUser>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers(); // Ensure this maps Identity endpoints
 
 app.Run();
