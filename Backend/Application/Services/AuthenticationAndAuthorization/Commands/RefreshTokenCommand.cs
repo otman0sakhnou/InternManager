@@ -52,7 +52,7 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
             {
                 Token = newRefreshToken,
                 UserId = user.Id,
-                ExpirationDate = DateTime.UtcNow.AddMonths(6), // Example expiration time
+                ExpirationDate = DateTime.UtcNow.AddMonths(6), 
                 IsRevoked = false
             };
 
@@ -61,13 +61,6 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
 
             // Add the new refresh token to the repository
             await _refreshTokenRepository.AddOrUpdateAsync(refreshTokenEntity);
-
-            //await _refreshTokenRepository.AddOrUpdateAsync(new RefreshToken
-            //{
-            //    Token = newRefreshToken,
-            //    UserId = user.Id,
-            //    ExpirationDate = DateTime.UtcNow.AddMonths(1)
-            //});
 
             return new RefreshTokenResponse(true, newAccessToken, newRefreshToken, Array.Empty<string>());
         }

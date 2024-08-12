@@ -1,8 +1,11 @@
 ﻿using Application.Services.AuthenticationAndAuthorization.Commands;
 using Application.Services.AuthenticationAndAuthorization.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers
@@ -147,5 +150,50 @@ namespace API.Controllers
             return NotFound(response.Message);
         }
 
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+        {
+            var response = await _mediator.Send(command);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Errors);
+            }
+
+            return Ok(response.Message);
+        }
+
+        [Authorize]
+        [HttpPost("change-email")]
+        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailCommand command)
+        {
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Assuming you're using the default claim for user ID
+
+            //var command = new ChangeEmailCommand(userId, request.NewEmail, request.Password);
+            var response = await _mediator.Send(command);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Errors);
+            }
+
+            return Ok(response.Message);
+        }
+
+        [Authorize]
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string email, [FromQuery] string token)
+        {
+            var command = new ConfirmEmailCommand(userId, email, token);
+            var response = await _mediator.Send(command);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response.Message);
+        }
     }
 }
