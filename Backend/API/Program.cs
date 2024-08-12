@@ -4,6 +4,9 @@ using Application.Repositories;
 using Application.Services.AuthenticationAndAuthorization.Commands;
 using Application.Services.AuthenticationAndAuthorization.Common;
 using Application.Services.AuthenticationAndAuthorization.Validators;
+using Application.Validators;
+using Deployment.Seeders;
+using Domain.DTOs;
 using Domain.Models;
 using FluentValidation;
 using Infrastructure.Data.Context;
@@ -13,29 +16,23 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+// Configure services
+builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CollaboratorReqValidator>();
 
 // Configure DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 });
-
-// Configure services
-builder.Services.AddControllers();
-// Uncomment and configure FluentValidation if needed
-//builder.Services.AddControllers()
-//    .AddFluentValidationAutoValidation()
-//    .AddFluentValidationClientsideAdapters()
-//    .AddValidatorsFromAssemblyContaining<YourValidatorClass>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -45,30 +42,22 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials()); // Use if you need to allow credentials
+            .AllowCredentials());
 });
 
 // Configure Identity
-//builder.Services.AddIdentityApiEndpoints<ApplicationUser>().AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>( options =>
-    { 
-    // Password settings
-    options.Password.RequireDigit = false;            // Password does not require a digit
-    options.Password.RequireLowercase = false;        // Password does not require a lowercase letter
-    options.Password.RequireUppercase = false;        // Password does not require an uppercase letter
-    options.Password.RequireNonAlphanumeric = false;  // Password does not require a non-alphanumeric character
-    options.Password.RequiredLength = 6;              // Minimum length of 6 characters
-    options.Password.RequiredUniqueChars = 1;         // Number of unique characters required
-    })
+//builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<Context>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 // Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(MappinProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-
+//register MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(Application.AssemblyReference).Assembly));
 //builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterCommand>());
+//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterCommand>());
 //builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Register TokenService
@@ -137,9 +126,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Configure Repositories
+builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
+builder.Services.AddTransient<IValidator<CollaboratorReq>, CollaboratorReqValidator>();
+
+// Register the seeder
+builder.Services.AddTransient<DatabaseSeeder>();
 
 var app = builder.Build();
+
+// Run the seeder
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
@@ -148,12 +149,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.MapIdentityApi<IdentityUser>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers(); // Ensure this maps Identity endpoints
 
 // Seed roles in the database
 using (var scope = app.Services.CreateScope())
