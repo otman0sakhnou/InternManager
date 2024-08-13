@@ -5,7 +5,6 @@ using Application.Services.AuthenticationAndAuthorization.Commands;
 using Application.Services.AuthenticationAndAuthorization.Common;
 using Application.Services.AuthenticationAndAuthorization.Validators;
 using Application.Validators;
-using Deployment.Seeders;
 using Domain.DTOs;
 using Domain.Models;
 using FluentValidation;
@@ -45,11 +44,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 });
-
-
-builder.Services.AddControllers();
-builder.Services.AddControllers()
-    .AddNewtonsoftJson();
 
 
 // MediatR
@@ -157,8 +151,7 @@ builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
 builder.Services.AddTransient<IValidator<CollaboratorReq>, CollaboratorReqValidator>();
 
-// Register the seeder
-builder.Services.AddTransient<DatabaseSeeder>();
+
 
 builder.Services.AddScoped<IInternRepository, InternRepository>();
 builder.Services.AddScoped<IPeriodRepository, PeriodRepository>();
@@ -168,33 +161,10 @@ builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetInternByIdQueryHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateInternCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllInternsQueryHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateInternCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteInternCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllLogsQueryHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateLogEntryCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteAllInternsCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreatePeriodCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeletePeriodCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdatePeriodCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetPeriodByIdQueryHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetPeriodsByInternIdQueryHandler).Assembly));
 
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateGroupCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteGroupCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateGroupCommandHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllGroupsQueryHandler).Assembly));
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetGroupByIdQueryHandler).Assembly));
 
 var app = builder.Build();
 
-// Run the seeder
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
-}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
