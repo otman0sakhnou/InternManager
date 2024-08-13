@@ -167,7 +167,14 @@ builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetInternByIdQueryHandler).Assembly));
 
 
+
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<IStepRepository, StepRepository>();
+
+
+
 var app = builder.Build();
+
 
 
 // Configure the HTTP request pipeline
