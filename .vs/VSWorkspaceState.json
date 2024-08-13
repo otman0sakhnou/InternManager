@@ -2,15 +2,17 @@
   "ExpandedNodes": [
     "",
     "\\Backend",
-    "\\Backend\\API",
     "\\Backend\\Application",
     "\\Backend\\Application\\Services",
     "\\Backend\\Application\\Services\\Collaborator",
     "\\Backend\\Application\\Services\\Collaborator\\Queries",
+    "\\Backend\\Application\\Validators",
+    "\\Backend\\Deployment",
+    "\\Backend\\Deployment\\Scripts",
     "\\Backend\\Infrastructure",
     "\\Backend\\Infrastructure\\Data",
     "\\Backend\\Infrastructure\\Data\\Context"
   ],
-  "SelectedNode": "\\Backend\\Application\\Services\\Collaborator\\Queries\\GetAllCollaboratorsQuery.cs",
+  "SelectedNode": "\\Backend\\Deployment\\Deployment.csproj",
   "PreviewInSolutionExplorer": false
 }

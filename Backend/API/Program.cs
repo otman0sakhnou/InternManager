@@ -1,16 +1,17 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Domain.Models;
-using Infrastructure.Data.Context;
 using Application.Mapping;
 using Application.Repositories;
 using Application.Validators;
-using Application;
-using FluentValidation;
-using Infrastructure.Repositories;
-using Microsoft.OpenApi.Models;
 using Domain.DTOs;
-using Deployment.Seeders;
+using Domain.Models;
+using FluentValidation;
+using Infrastructure.Data.Context;
+using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -30,10 +31,13 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowCredentials());
 });
+//Connection string
+var ConnectionString = configuration.GetConnectionString("DefaultConnection");
 
 // Configure Identity
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(ConnectionString));
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -55,6 +59,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Configure MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.AssemblyReference).Assembly));
+
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -93,23 +98,15 @@ builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
 builder.Services.AddTransient<IValidator<CollaboratorReq>, CollaboratorReqValidator>();
 
-// Register the seeder
-builder.Services.AddTransient<DatabaseSeeder>();
 
 var app = builder.Build();
 
-// Run the seeder
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
-}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(); 
 }
 
 app.UseAuthentication();
