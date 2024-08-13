@@ -50,18 +50,7 @@ namespace Application.Services.Collaborator.Handlers
             var user = await _userManager.FindByIdAsync(request.CollaboratorReq.UserId);
             if (user == null)
             {
-                //var newUser = new ApplicationUser
-                //{
-                //    UserName = request.CollaboratorReq.Name,
-                //    Email = "default@example.com"
-                //};
-
-                //var result = await _userManager.CreateAsync(newUser, "DefaultPassword123!");
-                //if (!result.Succeeded)
-                //{
-                //    throw new ValidationException($"Failed to create user: {string.Join(", ", result.Errors)}");
-                //}
-
+                
                 var registerCommand = new RegisterCommand("DefaultPassword123!", request.CollaboratorReq.Email);
                 var registerResult = await _mediator.Send(registerCommand, cancellationToken);
 
