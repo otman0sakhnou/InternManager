@@ -130,7 +130,12 @@ namespace API.Controllers
 
             if (response.User != null)
             {
-                return Ok(response.User);
+                var result = new
+                {
+                    User = response.User,
+                    Roles = response.Roles
+                };
+                return Ok(result);
             }
 
             return NotFound(response.Error);
