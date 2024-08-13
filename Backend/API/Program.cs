@@ -5,7 +5,6 @@ using Application.Services.AuthenticationAndAuthorization.Commands;
 using Application.Services.AuthenticationAndAuthorization.Common;
 using Application.Services.AuthenticationAndAuthorization.Validators;
 using Application.Validators;
-using Deployment.Seeders;
 using Domain.DTOs;
 using Domain.Models;
 using FluentValidation;
@@ -18,7 +17,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using FluentValidation.AspNetCore;
+using Application.Services.InternService.Queries;
 using System.Text;
+
+using Application.Validators.Interns;
+
+using Application.Repositories.Periods;
+using Infrastructure.Repositories.Periods;
+using Application.Validators.Periods;
+
+using Infrastructure.Repositories.Groups;
+using Application.Repositories.Groups;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -34,6 +45,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+// MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+
+//Validators
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateInternCommandValidator>());
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UpdateInternCommandValidator>());
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UpdatePeriodCommandValidator>());
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreatePeriodCommandValidator>());
 // Configure CORS
 builder.Services.AddCors(options =>
 {
@@ -130,17 +151,20 @@ builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
 builder.Services.AddTransient<IValidator<CollaboratorReq>, CollaboratorReqValidator>();
 
-// Register the seeder
-builder.Services.AddTransient<DatabaseSeeder>();
+
+
+builder.Services.AddScoped<IInternRepository, InternRepository>();
+builder.Services.AddScoped<IPeriodRepository, PeriodRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+
+
+
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetInternByIdQueryHandler).Assembly));
+
 
 var app = builder.Build();
 
-// Run the seeder
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
-}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
