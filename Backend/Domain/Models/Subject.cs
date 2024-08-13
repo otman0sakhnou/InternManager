@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Domain.Models
@@ -16,6 +17,7 @@ namespace Domain.Models
         [ForeignKey("groupId")]
         public Guid GroupId { get; set; }
 
+        [JsonIgnore]
         public Group Group { get; set; } // Navigation property
         public ICollection<Step> Steps { get; set; } // Navigation property
     }

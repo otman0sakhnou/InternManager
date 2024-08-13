@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 
 namespace Domain.Models
 {
@@ -17,6 +14,7 @@ namespace Domain.Models
         [ForeignKey("collaboratorId")]
         public Guid CollaboratorId { get; set; }
 
+        [JsonIgnore]
         public Collaborator Collaborator { get; set; } // Navigation property
 
         public ICollection<Subject> Subjects { get; set; } // Navigation property

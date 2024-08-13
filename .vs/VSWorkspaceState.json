@@ -2,17 +2,28 @@
   "ExpandedNodes": [
     "",
     "\\Backend",
+<<<<<<< HEAD
+=======
+    "\\Backend\\API",
+>>>>>>> 373b90a2909f5f5b36dbe24b938092534a01cc5f
     "\\Backend\\Application",
     "\\Backend\\Application\\Services",
     "\\Backend\\Application\\Services\\Collaborator",
     "\\Backend\\Application\\Services\\Collaborator\\Queries",
+<<<<<<< HEAD
     "\\Backend\\Application\\Validators",
     "\\Backend\\Deployment",
     "\\Backend\\Deployment\\Scripts",
+=======
+>>>>>>> 373b90a2909f5f5b36dbe24b938092534a01cc5f
     "\\Backend\\Infrastructure",
     "\\Backend\\Infrastructure\\Data",
     "\\Backend\\Infrastructure\\Data\\Context"
   ],
+<<<<<<< HEAD
   "SelectedNode": "\\Backend\\Deployment\\Deployment.csproj",
+=======
+  "SelectedNode": "\\Backend\\Application\\Services\\Collaborator\\Queries\\GetAllCollaboratorsQuery.cs",
+>>>>>>> 373b90a2909f5f5b36dbe24b938092534a01cc5f
   "PreviewInSolutionExplorer": false
 }

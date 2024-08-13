@@ -1,32 +1,49 @@
+using Application.Behaviors;
 using Application.Mapping;
 using Application.Repositories;
+using Application.Services.AuthenticationAndAuthorization.Commands;
+using Application.Services.AuthenticationAndAuthorization.Common;
+using Application.Services.AuthenticationAndAuthorization.Validators;
 using Application.Validators;
 using Domain.DTOs;
 using Domain.Models;
 using FluentValidation;
 using Infrastructure.Data.Context;
+using Infrastructure.Data.Seed;
 using Infrastructure.Repositories;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
-
-
+using FluentValidation.AspNetCore;
+using Application.Services.InternService.Queries;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+// Configure DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+});
+
 // Configure services
 builder.Services.AddControllers();
-
-builder.Services.AddValidatorsFromAssemblyContaining<CollaboratorReqValidator>();
+// Uncomment and configure FluentValidation if needed
+//builder.Services.AddControllers()
+//    .AddFluentValidationAutoValidation()
+//    .AddFluentValidationClientsideAdapters()
+//    .AddValidatorsFromAssemblyContaining<YourValidatorClass>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         builder => builder
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -55,11 +72,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 // Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// Configure MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.AssemblyReference).Assembly));
-
+builder.Services.AddAutoMapper(typeof(MappinProfile));
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -96,8 +109,6 @@ builder.Services.AddSwaggerGen(c =>
 // Configure Repositories
 builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped(typeof(ILoggerRepository<>), typeof(LoggerRepository<>));
-builder.Services.AddTransient<IValidator<CollaboratorReq>, CollaboratorReqValidator>();
-
 
 var app = builder.Build();
 
@@ -113,6 +124,6 @@ app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthorization();
-app.MapControllers(); // Ensure this maps Identity endpoints
+app.MapControllers();
 
 app.Run();

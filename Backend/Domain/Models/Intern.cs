@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.DTOs.Groups;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace Domain.Models
         public ICollection<Period> Periods { get; set; } // Navigation property
         public ApplicationUser User { get; set; } // Navigation property
         public ICollection<InternStep> InternSteps { get; set; } // Navigation property
+     
     }
 }
 
