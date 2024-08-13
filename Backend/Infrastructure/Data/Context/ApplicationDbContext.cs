@@ -20,7 +20,9 @@ namespace Infrastructure.Data.Context
         public DbSet<InternStep> InternSteps { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
 
-       
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -116,6 +118,17 @@ namespace Infrastructure.Data.Context
             modelBuilder.Entity<InternStep>()
                 .HasKey(ints => ints.Id);
 
+
+            modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany()
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            // Ensure unique constraint on token for each user
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.Token)
+                .IsUnique();
         }
     }
 }

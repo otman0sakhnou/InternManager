@@ -1,7 +1,16 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Backend",
+    "\\Backend\\API",
+    "\\Backend\\Application",
+    "\\Backend\\Application\\Services",
+    "\\Backend\\Application\\Services\\Collaborator",
+    "\\Backend\\Application\\Services\\Collaborator\\Queries",
+    "\\Backend\\Infrastructure",
+    "\\Backend\\Infrastructure\\Data",
+    "\\Backend\\Infrastructure\\Data\\Context"
   ],
-  "SelectedNode": "\\Domain.sln",
+  "SelectedNode": "\\Backend\\Application\\Services\\Collaborator\\Queries\\GetAllCollaboratorsQuery.cs",
   "PreviewInSolutionExplorer": false
 }
