@@ -79,5 +79,7 @@ namespace API.Controllers.Period
             var periodDtos = _mapper.Map<IEnumerable<PeriodDto>>(periods);
             return Ok(periodDtos);
         }
+
+     
     }
 }
