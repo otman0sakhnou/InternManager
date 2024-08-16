@@ -31,15 +31,24 @@ namespace Infrastructure.Repositories
             await _context.Subjects.AddAsync(subject);
             await _context.SaveChangesAsync();
         }
-        public void Update(Subject subject)
+        public async Task UpdateAsync(Subject subject)
         {
             _context.Subjects.Update(subject);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void Delete(Subject subject)
+        public async Task DeleteAsync(Guid subjectId)
         {
+            var subject = await _context.Subjects
+                .Include(s => s.Steps)
+                .FirstOrDefaultAsync(s => s.Id == subjectId);
+
+            if (subject == null)
+            {
+                throw new KeyNotFoundException("Subject not found");
+            }
+
             _context.Subjects.Remove(subject);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

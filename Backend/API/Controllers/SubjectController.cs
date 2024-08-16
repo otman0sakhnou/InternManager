@@ -9,7 +9,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class SubjectController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -56,7 +56,7 @@ namespace API.Controllers
         public async Task<IActionResult> CreateSubject(CreateSubjectCommand command)
         {
             var subjectId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetSubjectByIdQuery), new { id = subjectId }, subjectId);
+            return CreatedAtAction(nameof(GetSubjectById), new { id = subjectId }, subjectId);
         }
 
         [HttpPut("{id}")]

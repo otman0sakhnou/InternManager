@@ -12,7 +12,7 @@ namespace Application.Repositories
         Task<Subject> GetByIdAsync(Guid id);
         Task<IEnumerable<Subject>> GetAllAsync();
         Task AddAsync(Subject subject);
-        void Update(Subject subject);
-        void Delete(Subject subject);
+        Task UpdateAsync(Subject subject);
+        Task DeleteAsync(Guid id);
     }
 }

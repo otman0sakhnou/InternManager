@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Application.Services.Subjects.Commands
 {
-    public record StepDto(string Description);
     public record CreateSubjectCommand(
         string Title,
         string Type,
@@ -43,7 +42,7 @@ namespace Application.Services.Subjects.Commands
             {
                 subject.Steps.Add(new Step
                 {
-                    //Id = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     Description = stepDto.Description,
                     SubjectId = subject.Id
                 });

@@ -21,15 +21,18 @@ namespace Application.Services.Subjects.Commands
 
         public async Task<Unit> Handle(DeleteSubjectCommand request, CancellationToken cancellationToken)
         {
-            var subject = await _subjectRepository.GetByIdAsync(request.Id);
-            if (subject == null)
-            {
-                // Handle not found
-                throw new KeyNotFoundException("Subject not found");
-            }
+            //var subject = await _subjectRepository.GetByIdAsync(request.Id);
+            //if (subject == null)
+            //{
+            //    // Handle not found
+            //    throw new KeyNotFoundException("Subject not found");
+            //}
 
-            _subjectRepository.Delete(subject);
+            
+            await _subjectRepository.DeleteAsync(request.Id);
+            
             return Unit.Value;
+
         }
     }
 }
