@@ -1,9 +1,12 @@
 ﻿using Application.Repositories.Groups;
-using Application.Repositories.Periods;
+
+using Application.Services.PriodService.Commands;
+using Application.Services.PriodService.Queries;
 using AutoMapper;
-using Domain.DTOs.Groups;
 using Domain.Models;
+
 using MediatR;
+
 
 
 
@@ -22,14 +25,14 @@ namespace Application.Services.GroupService.Commands
     public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, Group>
     {
         private readonly IGroupRepository _repository;
-        private readonly IPeriodRepository _periodRepository; // Accès direct à DbContext pour gérer les périodes
+        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
-        public CreateGroupCommandHandler(IGroupRepository repository, IMapper mapper, IPeriodRepository periodRepository)
+        public CreateGroupCommandHandler(IGroupRepository repository, IMapper mapper, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
-            _periodRepository = periodRepository;
+            _mediator = mediator;
         }
 
         public async Task<Group> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
@@ -41,34 +44,51 @@ namespace Application.Services.GroupService.Commands
 
             foreach (var internId in request.InternIds)
             {
-                // Récupérer la période la plus récente de l'intern
-                var recentPeriod = (await _periodRepository.GetByInternIdAsync(internId))
-                    .OrderByDescending(p => p.EndDate)
-                    .FirstOrDefault();
+                try
+                {
+                    // Utilisation de la query pour récupérer la dernière période
+                    var recentPeriod = await _mediator.Send(new GetLatestPeriodQuery(internId), cancellationToken);
 
-                if (recentPeriod != null)
-                {
-                    // Associer le groupe à cette période
-                    recentPeriod.GroupId = group.Id;
-                    await _periodRepository.UpdateAsync(recentPeriod);
-                }
-                else
-                {
-                    // Créer une nouvelle période si aucune n'existe
-                    var newPeriod = new Period
+                    if (recentPeriod != null)
                     {
-                        Id = Guid.NewGuid(),
-                        InternId = internId,
-                        GroupId = group.Id,
-                        StartDate = DateTime.UtcNow,
-                        EndDate = request.ExpirationDate
-                    };
-                    await _periodRepository.AddAsync(newPeriod);
+                        var updatePeriodCommand = new UpdatePeriodCommand
+                        {
+                            Id = recentPeriod.Id,
+                            StartDate = recentPeriod.StartDate,
+                            EndDate = recentPeriod.EndDate,
+                            InternId = recentPeriod.InternId,
+                            GroupId = group.Id
+                        };
+
+                        await _mediator.Send(updatePeriodCommand, cancellationToken);
+                    }
+                    else
+                    {
+                        // Créer une nouvelle période si aucune n'existe
+                        var newPeriod = new Period
+                        {
+                            Id = Guid.NewGuid(),
+                            InternId = internId,
+                            GroupId = group.Id,
+                            StartDate = DateTime.UtcNow,
+                            EndDate = request.ExpirationDate
+                        };
+
+                        // Utilisation de la commande pour ajouter la nouvelle période
+                        await _mediator.Send(newPeriod, cancellationToken);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Gestion de l'exception pour chaque internId
+                    throw new Exception($"Failed to process internId: {internId}", ex);
                 }
             }
 
             return group;
         }
-    }
 
+    }
 }
+
+
