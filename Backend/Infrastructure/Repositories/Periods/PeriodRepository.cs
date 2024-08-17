@@ -2,11 +2,6 @@
 using Domain.Models;
 using Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories.Periods
 {
@@ -46,6 +41,7 @@ namespace Infrastructure.Repositories.Periods
         {
             return await _context.Periods
                 .Where(p => p.InternId == internId)
+                .Include(p => p.Intern)
                 .ToListAsync();
         }
         public async Task<IEnumerable<Period>> GetByGroupIdAsync(Guid groupId)

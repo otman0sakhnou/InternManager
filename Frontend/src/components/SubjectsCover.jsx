@@ -31,38 +31,13 @@ import SoftAvatar from "./SoftAvatar";
 import Cube from "examples/Icons/Cube";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import burceMars from "assets/images/icons8-projet-64.png";
+import TrackingteamComponent from "Admine/Subjects/TrackingteamComponent";
 
 
-function LinearProgressWithLabel(props) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress color="success" variant="determinate" {...props} />
-      </Box>
-      <Box sx={{ width: 'fit-content' }}>
-        <SoftTypography variant="body2" color="text.secondary">{`${Math.round(
-          props.value,
-        )}%`}</SoftTypography>
-      </Box>
-    </Box>
-  );
-}
 function SubjectsCover({ team, title = "", description = "", type, image, children }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
-  const [progress, setProgress] = useState(10);
   const navigate = useNavigate()
-
-
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
-    }, 800);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
 
   useEffect(() => {
@@ -175,19 +150,8 @@ function SubjectsCover({ team, title = "", description = "", type, image, childr
             </Card>
           </Grid>
           <Grid item xs={12} lg={12}>
-            <Card sx={{ p: 3 }}>
-              <SoftTypography variant="h5" fontWeight="bold">
-                Tracking the team Progress
-              </SoftTypography>
-              <Box mt={2}>
-                <SoftTypography variant="body2" fontWeight="medium">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box sx={{ width: '100%', mr: 1 }}>
-                      <LinearProgressWithLabel value={progress} />
-                    </Box>
-                  </Box>
-                </SoftTypography>
-              </Box>
+            <Card sx={{ p: 5 }}>
+              <TrackingteamComponent/>
             </Card>
           </Grid>
         </Grid>

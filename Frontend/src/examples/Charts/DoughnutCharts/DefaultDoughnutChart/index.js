@@ -30,17 +30,22 @@ import SoftTypography from "components/SoftTypography";
 
 // DefaultDoughnutChart configurations
 import configs from "examples/Charts/DoughnutCharts/DefaultDoughnutChart/configs";
+import { Box } from "@mui/material";
 
-function DefaultDoughnutChart({ title="", description="", height="19.125rem", chart }) {
+function DefaultDoughnutChart({ title = "", description = "", height = "19.125rem", chart }) {
   const { data, options } = configs(chart.labels || [], chart.datasets || {}, chart.cutout);
 
   const renderChart = (
-    <SoftBox p={2}>
+    <Box p={2}
+      sx={{
+        borderRadius: 2,
+        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+      }}>
       {title || description ? (
         <SoftBox px={description ? 1 : 0} pt={description ? 1 : 0}>
           {title && (
             <SoftBox mb={1}>
-              <SoftTypography variant="h6">{title}</SoftTypography>
+              <SoftTypography variant="h5" fontWeight="bold" color='dark' textGradient>{title}</SoftTypography>
             </SoftBox>
           )}
           <SoftBox mb={2}>
@@ -52,13 +57,13 @@ function DefaultDoughnutChart({ title="", description="", height="19.125rem", ch
       ) : null}
       {useMemo(
         () => (
-          <SoftBox height={height}>
+          <SoftBox height={height} >
             <Doughnut data={data} options={options} />
           </SoftBox>
         ),
         [chart, height]
       )}
-    </SoftBox>
+    </Box>
   );
 
   return title || description ? <Card>{renderChart}</Card> : renderChart;

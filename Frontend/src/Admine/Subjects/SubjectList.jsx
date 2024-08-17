@@ -26,11 +26,11 @@ const SubjectList = ({ subjects }) => {
           team={groupNameC}
         >
           <Box p={3}>
-            <SoftTypography variant='h2' mb={2} color='info' textGradient>
+            <SoftTypography variant='h2' mb={2} color='dark' textGradient>
               Subject Details
             </SoftTypography>
             <Divider sx={{ mb: 2 }} />
-            <SoftTypography variant="body1" textGradient color='info' mb={2}>
+            <SoftTypography variant="body1" textGradient color='dark' mb={2}>
               <strong>Description:</strong>
             </SoftTypography>
             <Box
@@ -45,7 +45,7 @@ const SubjectList = ({ subjects }) => {
             >
               <div dangerouslySetInnerHTML={{ __html: subject.description }} />
             </Box>
-            <SoftTypography variant="body1" textGradient color='info' mb={2}>
+            <SoftTypography variant="body1" textGradient color='dark' mb={2}>
               <strong>Steps:</strong>
             </SoftTypography>
             {subject.steps.length === 0 ? (
@@ -67,7 +67,7 @@ const SubjectList = ({ subjects }) => {
                       border: '1px solid #d1d9ff',
                       boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
                       borderRadius: 2,
-                      backgroundColor: '#f0f4ff',
+                      background: 'linear-gradient(135deg, #2152ff 0%, #6e7eff 50%, #21d4fd 100%)',
                       '&:hover': {
                         backgroundColor: '#e1eaff',
                       },
@@ -96,12 +96,9 @@ const SubjectList = ({ subjects }) => {
                       Step {idx + 1}
                     </Typography>
                     <Typography
-                      variant="body2"
+                      variant="caption"
                       sx={{
-                        flexGrow: 1,
-                        overflowWrap: 'break-word',
-                        ml: 3,
-                        color: '#333',
+                        color: '#fff',
                       }}
                     >
                       {step.description}

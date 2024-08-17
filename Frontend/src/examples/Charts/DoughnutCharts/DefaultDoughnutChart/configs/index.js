@@ -17,13 +17,16 @@ Coded by www.creative-tim.com
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 
-const { gradients, dark } = colors;
+const { gradients, primary } = colors;
 
 function configs(labels, datasets, cutout = 60) {
-  const backgroundColors = [];
+  let backgroundColors = [];
 
-  if (datasets.backgroundColors) {
-    datasets.backgroundColors.forEach((color) => {
+  const dataset = datasets[0];
+  if (dataset.customColors && dataset.customColors.length > 0) {
+    backgroundColors = dataset.customColors;
+  } else if (dataset.backgroundColors) {
+    dataset.backgroundColors.forEach((color) => {
       if (gradients[color]) {
         if (color === "info") {
           backgroundColors.push(gradients.info.main);
@@ -31,19 +34,20 @@ function configs(labels, datasets, cutout = 60) {
           backgroundColors.push(gradients[color].state);
         }
       } else {
-        backgroundColors.push(dark.main);
+        backgroundColors.push(primary.main);
       }
     });
   } else {
-    backgroundColors.push(dark.main);
+    backgroundColors.push(primary.main);
   }
+
 
   return {
     data: {
       labels,
       datasets: [
         {
-          label: datasets.label,
+          label: dataset.label,
           weight: 9,
           cutout,
           tension: 0.9,
@@ -51,7 +55,7 @@ function configs(labels, datasets, cutout = 60) {
           borderWidth: 2,
           backgroundColor: backgroundColors,
           fill: false,
-          data: datasets.data,
+          data: dataset.data,
         },
       ],
     },
