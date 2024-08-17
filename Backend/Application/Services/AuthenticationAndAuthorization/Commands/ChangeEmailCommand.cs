@@ -45,7 +45,7 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
 
 
             // Send the confirmation email
-            var confirmationLink = $"https://localhost:7117/api/Auth/confirm-email?userId={user.Id}&email={request.NewEmail}&token={WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token))}";
+            var confirmationLink = $"https://localhost:3000/account/change-email?userId={user.Id}&email={request.NewEmail}&token={WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token))}";
             await _emailSender.SendEmailAsync(request.NewEmail, "Confirm your email", $"Please confirm your new email by clicking this link: {confirmationLink}");
 
             return new ChangeEmailResponse(true, "Confirmation email sent. Please check your new email to confirm the change.");

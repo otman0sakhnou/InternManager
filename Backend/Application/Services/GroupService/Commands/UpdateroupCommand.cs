@@ -1,8 +1,11 @@
 ﻿using Application.Repositories.Groups;
 using Application.Repositories.Periods;
+using Application.Services.PriodService.Commands;
+using Application.Services.PriodService.Queries;
 using AutoMapper;
 using Domain.Models;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 
 
 namespace Application.Services.GroupService.Commands
@@ -21,13 +24,13 @@ namespace Application.Services.GroupService.Commands
     public class UpdateGroupCommandHandler : IRequestHandler<UpdateGroupCommand, bool>
     {
         private readonly IGroupRepository _repository;
-        private readonly IPeriodRepository _periodRepository;
+        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
-        public UpdateGroupCommandHandler(IGroupRepository repository, IPeriodRepository periodRepository, IMapper mapper)
+        public UpdateGroupCommandHandler(IGroupRepository repository, IMediator mediator, IMapper mapper)
         {
             _repository = repository;
-            _periodRepository = periodRepository;
+            _mediator = mediator;
             _mapper = mapper;
         }
 
@@ -44,7 +47,7 @@ namespace Application.Services.GroupService.Commands
             await _repository.UpdateAsync(group);
 
             // Get current interns in the group
-            var currentInterns = (await _periodRepository.GetByGroupIdAsync(request.Id)).Select(p => p.InternId).ToList();
+            var currentInterns = await _mediator.Send(new GetInternIdsByGroupIdQuery { GroupId = request.Id });
 
             // Interns to remove from the group
             var internsToRemove = currentInterns.Except(request.NewInternIds).ToList();
@@ -55,38 +58,40 @@ namespace Application.Services.GroupService.Commands
             // Remove groupId for interns that are no longer in the group
             foreach (var internId in internsToRemove)
             {
-                var periods = await _periodRepository.GetByInternIdAsync(internId);
+                var periods = await _mediator.Send(new GetPeriodsByInternIdQuery { InternId = internId });
                 foreach (var period in periods.Where(p => p.GroupId == request.Id))
                 {
                     period.GroupId = null;
-                    await _periodRepository.UpdateAsync(period);
+                    var updateCommand = _mapper.Map<UpdatePeriodCommand>(period);
+                    updateCommand.GroupId = period.GroupId; // Preserve the current GroupId
+                    await _mediator.Send(updateCommand);
                 }
             }
 
             // Update or add periods for the new interns
             foreach (var internId in internsToAdd)
             {
-                var periods = await _periodRepository.GetByInternIdAsync(internId);
+                var periods = await _mediator.Send(new GetPeriodsByInternIdQuery { InternId = internId });
                 var latestPeriod = periods.OrderByDescending(p => p.EndDate).FirstOrDefault();
 
                 if (latestPeriod != null)
                 {
                     // Update the latest period with the new groupId
-                    latestPeriod.GroupId = request.Id;
-                    await _periodRepository.UpdateAsync(latestPeriod);
+                    var updateCommand = _mapper.Map<UpdatePeriodCommand>(latestPeriod);
+                    updateCommand.GroupId = request.Id;
+                    await _mediator.Send(updateCommand);
                 }
                 else
                 {
                     // Create a new period if none exists
-                    var newPeriod = new Period
+                    var createCommand = new CreatePeriodCommand
                     {
-                        Id = Guid.NewGuid(),
-                        InternId = internId,
-                        GroupId = request.Id,
                         StartDate = DateTime.UtcNow,
-                        EndDate = request.ExpirationDate
+                        EndDate = request.ExpirationDate,
+                        InternId = internId,
+                        GroupId = request.Id
                     };
-                    await _periodRepository.AddAsync(newPeriod);
+                    await _mediator.Send(createCommand);
                 }
             }
 

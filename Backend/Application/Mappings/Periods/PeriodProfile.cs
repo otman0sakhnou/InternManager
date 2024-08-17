@@ -18,7 +18,7 @@ namespace Application.Mappings.Periods
                   .ReverseMap();
 
             CreateMap<UpdatePeriodCommand, Period>()
-           .ForMember(dest => dest.Id, opt => opt.Ignore());
+           .ForMember(dest => dest.Id, opt => opt.Ignore()).ReverseMap();
 
         }
     }

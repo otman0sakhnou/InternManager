@@ -1,6 +1,7 @@
 ﻿using Domain.DTOs;
 using Domain.Models;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,12 @@ namespace Application.Services.AuthenticationAndAuthorization.Queries
     public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMediator _mediator;
 
-        public GetUserQueryHandler(UserManager<ApplicationUser> userManager)
+        public GetUserQueryHandler(UserManager<ApplicationUser> userManager, IMediator mediator)
         {
             _userManager = userManager;
+            _mediator = mediator;
         }
 
         public async Task<GetUserResponse> Handle(GetUserQuery request, CancellationToken cancellationToken)
@@ -26,10 +29,13 @@ namespace Application.Services.AuthenticationAndAuthorization.Queries
 
             if (user == null)
             {
-                return new GetUserResponse(null, "User not found");
+                return new GetUserResponse(null,null, "User not found");
             }
 
-            return new GetUserResponse(user, string.Empty);
+            var rolesQuery = new GetRolesQuery(request.UserId);
+            var rolesResponse = await _mediator.Send(rolesQuery, cancellationToken);
+
+            return new GetUserResponse(user, rolesResponse.Roles , string.Empty);
         }
     }
 }

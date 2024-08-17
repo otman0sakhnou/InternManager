@@ -38,7 +38,9 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
 
                 var link = $"http://localhost:3000";
                 var emailSubject = "Log In To Your Account";
-                var emailBody = $"<p>You were registred to our application. Please click the link below to log in your account:</p><p><a href=\"{link}\">Log In To Your Account</a></p>";
+                var emailBody = $"<p>Hello,</p>" +
+                    $"<p>You were registred to our application. Please click the link below to log in your account:</p><p><a href=\"{link}\">Log In To Your Account</a></p>" +
+                    $"<p>Best regards,<br/>The Application Team</p>";
 
                 await _emailService.SendEmailAsync(request.Email, emailSubject, emailBody);
                 return new RegisterResponse(true, user.Id, Array.Empty<string>());

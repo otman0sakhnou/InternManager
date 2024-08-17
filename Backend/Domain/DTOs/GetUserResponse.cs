@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Domain.DTOs
 {
-    public record GetUserResponse(ApplicationUser User, string Error);
+    public record GetUserResponse(ApplicationUser User, string[] Roles, string Error);
 }

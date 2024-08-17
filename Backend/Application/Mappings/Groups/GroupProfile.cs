@@ -18,6 +18,7 @@ namespace Application.Mappings.Groups
             CreateMap<CreateGroupCommand, Group>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
             CreateMap<UpdateGroupCommand, Group>();
+            //CreateMap<IEnumerable<Group>, IEnumerable<GroupDto>>().ReverseMap();
         }
     }
 }

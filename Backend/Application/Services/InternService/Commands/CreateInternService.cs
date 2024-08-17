@@ -1,8 +1,10 @@
 ﻿using Application.Repositories;
 using Application.Repositories.Periods;
+using Application.Services.AuthenticationAndAuthorization.Commands;
 using Application.Services.LoggerService.Commands;
 using AutoMapper;
 using Domain.Models;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
@@ -37,7 +39,8 @@ namespace Application.Services.InternService.Commands
         private readonly IPeriodRepository _periodRepository;
 
         // Définir un mot de passe statique
-        private const string DefaultPassword = "SqliIntern123!"; 
+        private const string DefaultPassword = "SqliIntern123!";
+        private const string role = "Intern";
 
         public CreateInternCommandHandler(
             UserManager<ApplicationUser> userManager,
@@ -57,19 +60,35 @@ namespace Application.Services.InternService.Commands
         public async Task<Guid> Handle(CreateInternCommand request, CancellationToken cancellationToken)
         {
             // Créer l'utilisateur avec ASP.NET Identity
-            var user = new ApplicationUser
-            {
-                UserName = request.Email,
-                Email = request.Email
-            };
-            var result = await _userManager.CreateAsync(user, DefaultPassword);
+            //var user = new ApplicationUser
+            //{
+            //    UserName = request.Email,
+            //    Email = request.Email
+            //};
+            //var result = await _userManager.CreateAsync(user, DefaultPassword);
+            //if (!result.Succeeded)
+            //{
+            //    // Gérer les erreurs de création d'utilisateur
+            //    throw new ApplicationException("Could not create user");
+            //}
 
-            if (!result.Succeeded)
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
             {
-                // Gérer les erreurs de création d'utilisateur
-                throw new ApplicationException("Could not create user");
+                var registerCommand = new RegisterCommand(DefaultPassword, request.Email);
+                var registerResult = await _mediator.Send(registerCommand, cancellationToken);
+
+                if (!registerResult.Success)
+                {
+                    throw new ValidationException($"Failed to create user: {string.Join(", ", registerResult.Errors)}");
+                }
+
+                user = await _userManager.FindByIdAsync(registerResult.UserId);
+                if (user == null)
+                {
+                    throw new ValidationException("User creation failed.");
+                }
             }
-           
 
             // Mapper les informations du stagiaire
             var intern = _mapper.Map<Intern>(request);
@@ -96,6 +115,16 @@ namespace Application.Services.InternService.Commands
                 Timestamp = DateTime.UtcNow,
                 Description = $"Intern with ID {intern.Id} was created."
             };
+            if (!string.IsNullOrEmpty(role))
+            {
+                var assignRoleCommand = new AssignRoleCommand(user.Id, role);
+                var assignRoleResult = await _mediator.Send(assignRoleCommand, cancellationToken);
+
+                if (!assignRoleResult.Success)
+                {
+                    throw new ValidationException($"Failed to assign role: {string.Join(", ", assignRoleResult.Errors)}");
+                }
+            }
 
             var createLogCommand = new CreateLogEntryCommand { LogEntry = logEntry };
             await _mediator.Send(createLogCommand); // Envoyer le command de log

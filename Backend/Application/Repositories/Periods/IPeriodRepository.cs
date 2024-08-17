@@ -15,6 +15,6 @@ namespace Application.Repositories.Periods
         Task<Period> GetByIdAsync(Guid id);
         Task<IEnumerable<Period>> GetByInternIdAsync(Guid internId);
         Task<IEnumerable<Period>> GetByGroupIdAsync(Guid groupId);
-        // Ajoutez d'autres méthodes nécessaires pour les mises à jour et suppressions
+       
     }
 }

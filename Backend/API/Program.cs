@@ -29,6 +29,7 @@ using Application.Validators.Periods;
 
 using Infrastructure.Repositories.Groups;
 using Application.Repositories.Groups;
+using Application.Validators.Groups;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +56,9 @@ builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyCont
 builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UpdateInternCommandValidator>());
 builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UpdatePeriodCommandValidator>());
 builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreatePeriodCommandValidator>());
+
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateGroupCommandValidator>());
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UpdateGroupCommandValidator>());
 // Configure CORS
 builder.Services.AddCors(options =>
 {
@@ -163,7 +167,14 @@ builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetInternByIdQueryHandler).Assembly));
 
 
+
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<IStepRepository, StepRepository>();
+
+
+
 var app = builder.Build();
+
 
 
 // Configure the HTTP request pipeline

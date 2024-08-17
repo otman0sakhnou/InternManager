@@ -4,6 +4,7 @@ using AutoMapper;
 using Domain.DTOs.Groups;
 using Domain.DTOs.Periods;
 using Domain.Models;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,15 @@ namespace API.Controllers.Groups
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-
-        public GroupController(IMediator mediator, IMapper mapper)
+        private readonly IValidator<CreateGroupCommand> _createValidator;
+        private readonly IValidator<UpdateGroupCommand> _updateValidator;
+        public GroupController(IMediator mediator, IMapper mapper, IValidator<CreateGroupCommand> createValidator,
+                               IValidator<UpdateGroupCommand> updateValidator)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         [HttpGet("{id}")]
@@ -30,8 +35,8 @@ namespace API.Controllers.Groups
             {
                 return NotFound();
             }
-            var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(group);
-            return Ok(groupDtos);
+            var groupDto = _mapper.Map<GroupDto>(group);
+            return Ok(groupDto);
         }
 
         [HttpGet]
@@ -41,10 +46,32 @@ namespace API.Controllers.Groups
             var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
             return Ok(groupDtos);
         }
+        [HttpDelete("{groupId}/interns/{internId}")]
+        public async Task<ActionResult> RemoveInternFromGroup(Guid groupId, Guid internId)
+        {
+            var result = await _mediator.Send(new RemoveInternFromGroupCommand
+            {
+                GroupId = groupId,
+                InternId = internId
+            });
+
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
 
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CreateGroupCommand command)
         {
+            var validationResult = await _createValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -54,7 +81,13 @@ namespace API.Controllers.Groups
         {
             if (id != command.Id)
             {
-                return BadRequest();
+                return BadRequest("Mismatched Group ID");
+            }
+
+            var validationResult = await _updateValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
             }
 
             var result = await _mediator.Send(command);
