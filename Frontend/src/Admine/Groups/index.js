@@ -79,7 +79,7 @@ const Groups = () => {
 
     return stagiaires.filter(
       (stagiaire) =>
-        stagiaire.internshipInfo.department === department && !activeInterns.includes(stagiaire.id)
+        stagiaire.department === department && !activeInterns.includes(stagiaire.id)
     );
   };
   // Filtrer les stagiaires en fonction du département sélectionné

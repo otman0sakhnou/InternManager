@@ -24,18 +24,15 @@ import ConfirmationModal from "../../../components/ConfirmationModals";
 function ProfessionalInfoCard({ title, info, action, role }) {
   const infoRespectingFormCreation = {
     id: info.id,
-    educationInfo: {
-      institution: info.institution,
-      level: info.level,
-      specialization: info.specialization,
-      yearOfStudy: info.yearOfStudy,
-    },
-    internshipInfo: {
-      title: info.title,
-      department: info.department,
-      startDate: info.startDate,
-      endDate: info.endDate,
-    },
+    institution: info.institution,
+    level: info.level,
+    specialization: info.specialization,
+    yearOfStudy: info.yearOfStudy,
+    title: info.title,
+    department: info.department,
+    startDate: info.startDate,
+    endDate: info.endDate,
+
   };
 
   const [editable, setEditable] = useState(false);
@@ -66,14 +63,14 @@ function ProfessionalInfoCard({ title, info, action, role }) {
   const getActiveSchema = () => {
     if (role === "intern") {
       return {
-        "educationInfo.institution": validationSchemas.institution,
-        "educationInfo.level": validationSchemas.level,
-        "educationInfo.specialization": validationSchemas.specialization,
-        "educationInfo.yearOfStudy": validationSchemas.yearOfStudy,
-        "internshipInfo.title": validationSchemas.title,
-        "internshipInfo.department": validationSchemas.department,
-        "internshipInfo.startDate": validationSchemas.startDate,
-        "internshipInfo.endDate": validationSchemas.endDate,
+        "institution": validationSchemas.institution,
+        "level": validationSchemas.level,
+        "specialization": validationSchemas.specialization,
+        "yearOfStudy": validationSchemas.yearOfStudy,
+        "title": validationSchemas.title,
+        "department": validationSchemas.department,
+        "startDate": validationSchemas.startDate,
+        "endDate": validationSchemas.endDate,
       };
     } else if (role === "collaborator") {
       return {
@@ -353,38 +350,38 @@ function ProfessionalInfoCard({ title, info, action, role }) {
           {editable
             ? renderEditableField(
               "Institution",
-              editableInfo.educationInfo.institution,
-              "educationInfo.institution"
+              editableInfo.institution,
+              "institution"
             )
             : renderField(
               "Institution",
-              editableInfo.educationInfo.institution,
-              "educationInfo.institution"
+              editableInfo.institution,
+              "institution"
             )}
           {editable
-            ? renderEditableField("Level", editableInfo.educationInfo.level, "educationInfo.level")
-            : renderField("Level", editableInfo.educationInfo.level, "educationInfo.level")}
+            ? renderEditableField("Level", editableInfo.level, "level")
+            : renderField("Level", editableInfo.level, "level")}
           {editable
             ? renderEditableField(
               "Specialization",
-              editableInfo.educationInfo.specialization,
-              "educationInfo.specialization"
+              editableInfo.specialization,
+              "specialization"
             )
             : renderField(
               "Specialization",
-              editableInfo.educationInfo.specialization,
-              "educationInfo.specialization"
+              editableInfo.specialization,
+              "specialization"
             )}
           {editable
             ? renderEditableField(
               "Year of Study",
-              editableInfo.educationInfo.yearOfStudy,
-              "educationInfo.yearOfStudy"
+              editableInfo.yearOfStudy,
+              "yearOfStudy"
             )
             : renderField(
               "Year of Study",
-              editableInfo.educationInfo.yearOfStudy,
-              "educationInfo.yearOfStudy"
+              editableInfo.yearOfStudy,
+              "yearOfStudy"
             )}
 
           <SoftTypography
@@ -398,15 +395,15 @@ function ProfessionalInfoCard({ title, info, action, role }) {
           {editable
             ? renderEditableField(
               "Title",
-              editableInfo.internshipInfo.title,
-              "internshipInfo.title"
+              editableInfo.title,
+              "title"
             )
-            : renderField("Title", editableInfo.internshipInfo.title, "internshipInfo.title")}
+            : renderField("Title", editableInfo.title, "title")}
           {editable
             ? renderEditableSelectField(
               "Department",
-              editableInfo.internshipInfo.department,
-              "internshipInfo.department",
+              editableInfo.department,
+              "department",
               [
                 { value: "Microsoft&Data", label: "Microsoft & Data" },
                 { value: "Front&Mobile", label: "Front & Mobile" },
@@ -418,30 +415,30 @@ function ProfessionalInfoCard({ title, info, action, role }) {
             )
             : renderField(
               "Department",
-              editableInfo.internshipInfo.department,
-              "internshipInfo.department"
+              editableInfo.department,
+              "department"
             )}
           {editable
             ? renderEditableDateField(
               "Start Date",
-              editableInfo.internshipInfo.startDate,
-              "internshipInfo.startDate"
+              editableInfo.startDate,
+              "startDate"
             )
             : renderField(
               "Start Date",
-              dayjs(editableInfo.internshipInfo.startDate).format("YYYY-MM-DD"),
-              "internshipInfo.startDate"
+              dayjs(editableInfo.startDate).format("YYYY-MM-DD"),
+              "startDate"
             )}
           {editable
             ? renderEditableDateField(
               "End Date",
-              editableInfo.internshipInfo.endDate,
-              "internshipInfo.endDate"
+              editableInfo.endDate,
+              "endDate"
             )
             : renderField(
               "End Date",
-              dayjs(editableInfo.internshipInfo.endDate).format("YYYY-MM-DD"),
-              "internshipInfo.endDate"
+              dayjs(editableInfo.endDate).format("YYYY-MM-DD"),
+              "endDate"
             )}
         </>
       );

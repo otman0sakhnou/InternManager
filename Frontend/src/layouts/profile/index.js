@@ -6,7 +6,7 @@ import useStagiaireStore from "store/InternStore"; // Ensure you import the corr
 import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
 import SoftBox from "../../components/SoftBox";
 import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
+
 import Header from "./components/Header";
 import ProfessionalInfoCard from "./customComponents/ProfessionalInfoCard";
 import TeamsCard from "./customComponents/TeamsCard";
@@ -30,12 +30,12 @@ function Overview() {
   useEffect(() => {
     const fetchData = async () => {
       if (role === "collaborator") {
-        const collaborator =  getCollaboratorById(Number(id));
+        const collaborator = getCollaboratorById(Number(id));
         console.log("Fetched collaborator:", collaborator);
         setData(collaborator);
       } else {
-        const intern = getStagiaireById(Number(id));
-        console.log("Fetched intern:", intern);
+        const intern = getStagiaireById(id);
+
         setData(intern);
       }
     };
@@ -47,9 +47,12 @@ function Overview() {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger useEffect
   };
 
-  console.log(data)
+  console.log("Data:", data)
 
   if (!data) return <div>Loading...</div>; // Handle loading state
+  const latestPeriod = data.periods?.reduce((latest, current) =>
+    new Date(current.endDate) > new Date(latest.endDate) ? current : latest
+    , data.periods[0]);
 
   const profileAction = {
     route: "/edit-profile",
@@ -59,25 +62,25 @@ function Overview() {
   const info =
     role === "intern"
       ? {
-          id: data.id,
-          institution: data.educationInfo.institution,
-          level: data.educationInfo.level,
-          specialization: data.educationInfo.specialization,
-          yearOfStudy: data.educationInfo.yearOfStudy,
-          title: data.internshipInfo.title,
-          department: data.internshipInfo.department,
-          startDate: data.internshipInfo.startDate,
-          endDate: data.internshipInfo.endDate,
-        }
+        id: data.id,
+        institution: data.institution,
+        level: data.level,
+        specialization: data.specialization,
+        yearOfStudy: data.yearOfStudy,
+        title: data.title,
+        department: data.department,
+        startDate: latestPeriod?.startDate,
+        endDate: latestPeriod?.endDate,
+      }
       : {
-          id: data.id,
-          department: data.department,
-          employmentDate: data.employementDate,
-          job: data.job,
-          organization: data.organization,
-        };
+        id: data.id,
+        department: data.department,
+        employmentDate: data.employementDate,
+        job: data.job,
+        organization: data.organization,
+      };
 
-    
+
 
   return (
     <DashboardLayout>
@@ -91,7 +94,7 @@ function Overview() {
                 id: data.id,
                 name: data.name,
                 phone: data.phone,
-                email: data.email,
+                email: data.user?.email,
                 gender: data.gender,
               }}
               action={profileAction}
@@ -108,7 +111,7 @@ function Overview() {
               />
             </LocalizationProvider>
           </Grid>
-          <TeamsCard  id={data.id}/>
+          <TeamsCard id={data.id} />
           {/* <ProjectsSection /> */}
         </Grid>
       </SoftBox>

@@ -78,7 +78,7 @@ function Header({ name, gender }) {
       navigate(-1); // Navigate back to the previous page
     }
   };
-  
+
   const avatarImage = getAvatarImage(gender)
 
   return (

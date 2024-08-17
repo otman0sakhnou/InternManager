@@ -22,6 +22,7 @@ function Interns() {
   const { addStagiaire, updateStagiaire, deleteAllStagiaires, deleteStagiaire } =
     useStagiaireStore();
   const stagiaires = useStagiaireStore((state) => state.stagiaires);
+  const { loadInterns } = useStagiaireStore();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -32,8 +33,8 @@ function Interns() {
   const navigate = useNavigate();
 
   useEffect(() => {
-
-  }, [stagiaires])
+    loadInterns();
+  }, [loadInterns])
 
   const getPaginatedInterns = () => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -90,17 +91,12 @@ function Interns() {
         const data = JSON.parse(text);
         //console.log("Parsed data:", data);
         data.forEach((intern) => {
-          // Générer l'avatar basé sur le nom complet
-          // if (intern.name) {
-          //   intern.avatar = generateAvatar(intern.name);
-          // } else {
-          //   intern.avatar = "DEFAULT";
-          // }
-          // Ajouter le stagiaire avec l'avatar généré
+          console.log("Intern", intern)
+
           addStagiaire(intern);
         });
       } catch (error) {
-        //console.error("Error reading or parsing file:", error);
+        console.error("Error reading or parsing file:", error);
       }
     };
     reader.readAsText(file);
