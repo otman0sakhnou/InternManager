@@ -135,7 +135,7 @@ export default function CreateProfile() {
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const handleSubmit = () => {
     const updatedIntern = {
       name: internName,
@@ -143,8 +143,16 @@ export default function CreateProfile() {
       phone: internPhone,
       gender: internGender,
       avatar: "",
-      educationInfo: { ...educationInfo },
-      internshipInfo: { ...internshipInfo },
+      // educationInfo: { ...educationInfo },
+      // internshipInfo: { ...internshipInfo },
+      institution: educationInfo.institution,
+      level: educationInfo.level,
+      specialization: educationInfo.specialization,
+      yearOfStudy: parseInt(educationInfo.yearOfStudy, 10),
+      title: internshipInfo.title,
+      department: internshipInfo.department,
+      startDate: internshipInfo.startDate,
+      endDate: internshipInfo.endDate,
     };
     setConfirmationModalTitle("Add Intern");
     setConfirmationModalDescription(
@@ -213,8 +221,8 @@ export default function CreateProfile() {
       activeStep === 0
         ? { internName, internEmail, internPhone, internGender }
         : activeStep === 1
-        ? educationInfo
-        : internshipInfo,
+          ? educationInfo
+          : internshipInfo,
       schema
     );
 
@@ -626,19 +634,19 @@ export default function CreateProfile() {
                                     startAdornment: (
                                       <InputAdornment position="start">
                                         <CalendarTodayIcon />
-                                        </InputAdornment>
-                                      ),
-                                    }}
-                                  />
-                                )}
-                              />
-                              {!!errors.endDate && (
-                                <FormHelperText>{errors.endDate}</FormHelperText>
+                                      </InputAdornment>
+                                    ),
+                                  }}
+                                />
                               )}
-                            </FormControl>
-                          </Box>
-                        </Grid>
+                            />
+                            {!!errors.endDate && (
+                              <FormHelperText>{errors.endDate}</FormHelperText>
+                            )}
+                          </FormControl>
+                        </Box>
                       </Grid>
+                    </Grid>
                     <SoftBox
                       display="flex"
                       justifyContent="space-between"

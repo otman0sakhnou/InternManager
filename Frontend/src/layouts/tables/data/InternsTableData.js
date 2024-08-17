@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useStagiaireStore from "store/InternStore";
+
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import PropTypes from "prop-types";
@@ -40,6 +40,7 @@ const avatarStyles = {
   fontSize: 16,
   fontWeight: "bold",
 };
+
 // Composants pour chaque section
 function PersonalInfos({ name, gender }) {
   const avatarImage = getAvatarImage(gender);
@@ -171,40 +172,83 @@ const InternsTableData = (paginatedInterns, handleDeleteClick, handleViewDetails
     { name: "Contact", align: "left" },
     { name: "Actions", align: "left" },
   ];
+  const getLatestPeriod = (periods) => {
+    if (!periods || periods.length === 0) {
+      return {}; // Retourne un objet vide si aucune période n'est disponible
+    }
+    return periods.reduce((latest, current) => {
+      return dayjs(current.endDate).isAfter(dayjs(latest.endDate)) ? current : latest;
+    }, periods[0]);
+  };
 
   const rows = (handleEditClick) =>
-    paginatedInterns.map((stagiaire) => ({
-      Interns: (
-        <PersonalInfos avatar={stagiaire.avatar} name={stagiaire.name} gender={stagiaire.gender} />
-      ),
-      Department: (
-        <SoftTypography variant="caption" color="secondary">
-          {stagiaire.internshipInfo.department}
-        </SoftTypography>
-      ),
-      "End Date": (
-        <SoftTypography variant="caption" color="secondary">
-          {dayjs(stagiaire.internshipInfo.endDate).format("YYYY-MM-DD")}
-        </SoftTypography>
-      ),
-      Duration: (
-        <SoftTypography variant="caption" color="secondary">
-          {dayjs(stagiaire.internshipInfo.endDate).diff(
-            dayjs(stagiaire.internshipInfo.startDate),
-            "day"
-          )}{" "}
-          days
-        </SoftTypography>
-      ),
-      Contact: <ContactInfos email={stagiaire.email} phone={stagiaire.phone} />,
-      Actions: (
-        <ActionIcons
-          onEdit={() => handleEditClick(stagiaire)}
-          onDelete={() => handleDeleteClick(stagiaire)}
-          onViewDetails={() => handleViewDetails(stagiaire.id)}
-        />
-      ),
-    }));
+    paginatedInterns.map((stagiaire) => {
+      const latestPeriod = getLatestPeriod(stagiaire.periods);
+
+      // Ajoutez une vérification pour afficher un message si latestPeriod est vide
+      if (!latestPeriod || !latestPeriod.endDate) {
+        return {
+          Interns: <PersonalInfos name={stagiaire.name} gender={stagiaire.gender} />,
+          Department: (
+            <SoftTypography variant="caption" color="secondary">
+              {stagiaire.department}
+            </SoftTypography>
+          ),
+          "End Date": (
+            <SoftTypography variant="caption" color="secondary">
+              No End Date Available
+            </SoftTypography>
+          ),
+          Duration: (
+            <SoftTypography variant="caption" color="secondary">
+
+            </SoftTypography>
+          ),
+          Contact: <ContactInfos email={stagiaire.user?.email} phone={stagiaire.phone} />,
+          Actions: (
+            <ActionIcons
+              onEdit={() => handleEditClick(stagiaire)}
+              onDelete={() => handleDeleteClick(stagiaire)}
+              onViewDetails={() => handleViewDetails(stagiaire.id)}
+            />
+          ),
+        };
+      }
+
+      return {
+        Interns: (
+          <PersonalInfos name={stagiaire.name} gender={stagiaire.gender} />
+        ),
+        Department: (
+          <SoftTypography variant="caption" color="secondary">
+            {stagiaire.department}
+          </SoftTypography>
+        ),
+        "End Date": (
+          <SoftTypography variant="caption" color="secondary">
+            {dayjs(latestPeriod.endDate).format("YYYY-MM-DD")}
+          </SoftTypography>
+        ),
+        Duration: (
+          <SoftTypography variant="caption" color="secondary">
+            {dayjs(latestPeriod.endDate).diff(
+              dayjs(latestPeriod.startDate),
+              "day"
+            )}{" "}
+            days
+          </SoftTypography>
+        ),
+        Contact: <ContactInfos email={stagiaire.user?.email} phone={stagiaire.phone} />,
+        Actions: (
+          <ActionIcons
+            onEdit={() => handleEditClick(stagiaire)}
+            onDelete={() => handleDeleteClick(stagiaire)}
+            onViewDetails={() => handleViewDetails(stagiaire.id)}
+          />
+        ),
+      };
+    });
+
 
   return { columns, rows };
 };
