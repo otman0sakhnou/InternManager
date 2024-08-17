@@ -31,7 +31,7 @@ import SoftTypography from "components/SoftTypography";
 // DefaultDoughnutChart configurations
 import configs from "examples/Charts/DoughnutCharts/DefaultDoughnutChart/configs";
 import { Box } from "@mui/material";
-
+//
 function DefaultDoughnutChart({ title = "", description = "", height = "19.125rem", chart }) {
   const { data, options } = configs(chart.labels || [], chart.datasets || {}, chart.cutout);
 

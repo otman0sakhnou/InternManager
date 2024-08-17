@@ -15,6 +15,7 @@ Coded by www.creative-tim.com
 
 /* eslint-disable no-dupe-keys */
 // Soft UI Dashboard React base styles
+//
 import colors from "assets/theme/base/colors";
 
 const { gradients, primary } = colors;
