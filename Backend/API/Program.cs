@@ -170,7 +170,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetIn
 
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<IStepRepository, StepRepository>();
-
+builder.Services.AddScoped<IInternStepRepository, InternStepRepository>();
 
 
 var app = builder.Build();
