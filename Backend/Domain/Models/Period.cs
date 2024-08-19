@@ -19,6 +19,7 @@ namespace Domain.Models
 
         [ForeignKey("groupId")]
         public Guid? GroupId { get; set; }
+        [JsonIgnore]
         public Intern Intern { get; set; } // Navigation property
         [JsonIgnore]
         public Group Group { get; set; } // Navigation property

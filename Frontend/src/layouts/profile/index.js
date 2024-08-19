@@ -6,6 +6,8 @@ import useStagiaireStore from "store/InternStore"; // Ensure you import the corr
 import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
 import SoftBox from "../../components/SoftBox";
 import Grid from "@mui/material/Grid";
+import InternStepsCard from "./customComponents/InternStepsCard"
+
 
 import Header from "./components/Header";
 import ProfessionalInfoCard from "./customComponents/ProfessionalInfoCard";
@@ -74,7 +76,7 @@ function Overview() {
       }
       : {
         id: data.id,
-        department: data.department,
+        department: data.department, 
         employmentDate: data.employementDate,
         job: data.job,
         organization: data.organization,
@@ -110,9 +112,9 @@ function Overview() {
                 role={role}
               />
             </LocalizationProvider>
-          </Grid>
+          </Grid>  
           <TeamsCard id={data.id} />
-          {/* <ProjectsSection /> */}
+          {role=="intern" && <InternStepsCard/>}
         </Grid>
       </SoftBox>
       <Footer />

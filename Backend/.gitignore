@@ -399,4 +399,5 @@ FodyWeavers.xsd
 
 # ignore appsettings and designetimedbcontextfactory
 API/appsettings.json
+Deployment/appsettings.json
 Infrastructure\Data\Context\DesignTimeDbContextFactory.cs
