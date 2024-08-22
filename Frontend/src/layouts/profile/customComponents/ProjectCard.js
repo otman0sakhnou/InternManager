@@ -1,19 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined"; // Outlined icon
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined"; // Outlined view icon
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined"; // Outlined delete icon
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 
-// Styled components for additional customization
 const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
@@ -48,13 +47,13 @@ const ContentContainer = styled(CardContent)(({ theme }) => ({
   },
 }));
 
-// Main component definition
 const ProjectCard = ({ subject, onDelete }) => {
   const navigate = useNavigate();
 
   const subjectDetails = () => {
     navigate(`/Subject/${subject.id}`);
-  }
+  };
+
   return (
     <StyledCard>
       <IconContainer>
@@ -84,10 +83,12 @@ const ProjectCard = ({ subject, onDelete }) => {
   );
 };
 
-// Prop type validation
 ProjectCard.propTypes = {
-  subject: PropTypes.array.isRequired,
-  viewRoute: PropTypes.string.isRequired,
+  subject: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired, // Assuming these properties exist
+    type: PropTypes.string.isRequired,  // Adjust according to your data structure
+  }).isRequired,
   onDelete: PropTypes.func.isRequired,
 };
 

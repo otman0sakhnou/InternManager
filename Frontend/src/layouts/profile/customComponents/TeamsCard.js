@@ -1,17 +1,23 @@
 import React from 'react'
-import PropTypes from "prop-types"; 
+import PropTypes from "prop-types";
 import { Grid } from '@mui/material';
 // import teamsList from '../data/TeamsList';
+import { useState } from 'react';
+import { useEffect } from 'react';
 import CustomTeamsList from './CustomTeamsList';
 import useAuthStore from 'store/AuthStore';
 import useGroupStore from 'store/GroupsStore';
 //this component is to list team members for an internship and to list teams for a collaborator
 
-const TeamsCard = (id) => {
-  const role = useAuthStore((state) => state.role)
-  const getGroupsByCollaboratorId = useGroupStore((state) => state.getGroupsByCollaboratorId)
+const TeamsCard = ({ id }) => {
 
-  const getGroupsByInternId = useGroupStore((state) => state.getGroupsByInternId);
+  const role = useAuthStore((state) => state.role)
+  const getGroupsByCollaboratorId = useGroupStore((state) => state.fetchGroupsByCollaboratorId)
+
+  const getGroupsByInternId = useGroupStore((state) => state.fetchGroupsByInternId);
+  const [groups, setGroups] = useState([]);
+
+
 
   const getTitleByRole = (role) => {
     switch (role) {
@@ -26,18 +32,29 @@ const TeamsCard = (id) => {
 
   const title = getTitleByRole(role);
 
-  const getGroupsByRole = (role, id) => {
+  const getGroupsByRole = async (role, id) => {
     if (role === "intern") {
-      return getGroupsByInternId(id);
+      console.log(id);
+      const groups = await getGroupsByInternId(id);
+      console.log(groups);
+      return groups || [];
     } else if (role === "collaborator") {
-      return getGroupsByCollaboratorId(id);
+      const groups = await getGroupsByCollaboratorId(id);
+      return groups || [];
     } else {
       return [];
     }
   };
 
-  const groups = getGroupsByRole(role, id);
-  console.log(groups);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      const result = await getGroupsByRole(role, id);
+      setGroups(result);
+    };
+
+    fetchGroups();
+  }, [role, id]);
 
   return (
     <Grid item xs={12} xl={4}>
@@ -46,7 +63,7 @@ const TeamsCard = (id) => {
   );
 }
 
-TeamsCard.propTypes={
+TeamsCard.propTypes = {
   id: PropTypes.string.isRequired,
-}  
+}
 export default TeamsCard

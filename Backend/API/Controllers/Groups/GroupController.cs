@@ -46,6 +46,29 @@ namespace API.Controllers.Groups
             var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
             return Ok(groupDtos);
         }
+        [HttpGet("department/{department}")]
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroupsByDepartment(string department)
+        {
+            var groups = await _mediator.Send(new GetGroupsByDepartmentQuery(department));
+            var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
+            return Ok(groupDtos);
+        }
+        [HttpGet("collaborator/{collaboratorId}")]
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroupsByCollaboratorId(Guid collaboratorId)
+        {
+            var groups = await _mediator.Send(new GetGroupsByCollaboratorIdQuery(collaboratorId));
+            var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
+            return Ok(groupDtos);
+        }
+
+        [HttpGet("intern/{internId}")]
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroupsByInternId(Guid internId)
+        {
+            var groups = await _mediator.Send(new GetGroupsByInternIdQuery(internId));
+            var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
+            return Ok(groupDtos);
+        }
+
         [HttpDelete("{groupId}/interns/{internId}")]
         public async Task<ActionResult> RemoveInternFromGroup(Guid groupId, Guid internId)
         {
