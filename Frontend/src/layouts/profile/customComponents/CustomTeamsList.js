@@ -10,14 +10,14 @@ import SoftButton from "components/SoftButton";
 import SoftAvatar from "components/SoftAvatar";
 
 function CustomTeamsList({ title, teams }) {
-  console.log(teams);
+  console.log("teams:", teams);
   const navigate = useNavigate();
   const handleViewDetails = (id) => {
     console.log("view clicked");
     navigate(`/groupdetails/${id}`);
   };
   const renderTeams = () => {
-    if (teams.length === 0) {
+    if (!Array.isArray(teams) || teams.length === 0) {
       return (
         <SoftBox mb={2} textAlign="center" verticalALign="middle">
           <SoftTypography variant="caption" color="text">

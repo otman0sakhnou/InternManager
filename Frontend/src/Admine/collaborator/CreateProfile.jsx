@@ -36,7 +36,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import ConfirmationModal from "components/ConfirmationModals";
-
+import Backdrop from "@mui/material/Backdrop";
+import { DNA } from "react-loader-spinner";
 
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
@@ -106,6 +107,7 @@ const steps = ["Personal Information", "Organization Details", "Account Setup"];
 
 export default function CreateProfile() {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
@@ -117,14 +119,17 @@ export default function CreateProfile() {
     email: "",
     phone: "",
     gender: "",
-    job: "",
+    title: "",
     department: "",
     organization: "",
-    employementDate: null,
+    employmentDate: null,
     password: "",
     confirmPassword: "",
   });
 
+  const { getCollaborators } = useCollaboratorStore((state) => ({
+    getCollaborators: state.getCollaborators
+  }));
   const { errors, setErrors } = useValidationStore();
 
   const navigate = useNavigate();
@@ -142,8 +147,8 @@ export default function CreateProfile() {
       return {
         organization: validationSchemas.organization,
         department: validationSchemas.department,
-        job: validationSchemas.job,
-        employementDate: validationSchemas.employementDate,
+        title: validationSchemas.title,
+        employmentDate: validationSchemas.employmentDate,
       };
     } else if (step === 2) {
       return {
@@ -152,12 +157,20 @@ export default function CreateProfile() {
       };
     }
   };
-  const submit = () => {
-    addCollaborator(formData);
-    toast.success("Collab added successfully!");
-
+  const submit = async () => {
+    setLoading(true);
+    try {
+      await addCollaborator(formData);
+      await getCollaborators();
+      toast.success('Collaborator saved successfully');
+      navigate("/collaborator");
+    } catch (error) {
+      toast.error("Failed to delete collaborator");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
-
   const handleNext = () => {
     const schema = getActiveStepSchema(activeStep);
     const newErrors = validate(formData, schema);
@@ -169,8 +182,6 @@ export default function CreateProfile() {
         setConfirmationModalDescription("Are you sure you want to add this collab ?");
         setOnConfirmAction(() => () => {
           submit();
-          navigate("/collaborator");
-
         })
         setIsConfirmationModalOpen(true);
 
@@ -183,6 +194,7 @@ export default function CreateProfile() {
   };
 
   const handleBack = () => {
+    setErrors({});
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
@@ -192,7 +204,7 @@ export default function CreateProfile() {
   };
 
   const handleDateChange = (date) => {
-    setFormData({ ...formData, employementDate: date ? dayjs(date).format("YYYY-MM-DD") : null });
+    setFormData({ ...formData, employmentDate: date ? dayjs(date).format("YYYY-MM-DD") : null });
   };
   const handleGenderChange = (event) => {
     setFormData({ ...formData, gender: event.target.value });
@@ -390,11 +402,11 @@ export default function CreateProfile() {
                   <Grid item xs={12} md={6}>
                     <TextField
                       placeholder="Title"
-                      name="job"
-                      value={formData.job}
+                      name="title"
+                      value={formData.title}
                       onChange={handleInputChange}
-                      error={!!errors.job}
-                      helperText={errors.job}
+                      error={!!errors.title}
+                      helperText={errors.title}
                       fullWidth
                       variant="outlined"
                       InputProps={{
@@ -407,24 +419,24 @@ export default function CreateProfile() {
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth error={!!errors.employementDate}>
+                    <FormControl fullWidth error={!!errors.employmentDate}>
                       <LocalizationProvider fullWidth dateAdapter={AdapterDayjs}>
                         <DatePicker
                           placeholder="Employment Date"
-                          value={formData.employementDate ? dayjs(formData.employementDate) : null}
+                          value={formData.employmentDate ? dayjs(formData.employmentDate) : null}
                           onChange={handleDateChange}
                           renderInput={(params) => (
                             <TextField
                               {...params}
                               fullWidth
-                              error={!!errors.employementDate}
-                              helperText={errors.employementDate}
+                              error={!!errors.employmentDate}
+                              helperText={errors.employmentDate}
                             />
                           )}
                         />
-                        {errors.employementDate && (
+                        {errors.employmentDate && (
                           <FormHelperText p={2} error>
-                            {errors.employementDate}
+                            {errors.employmentDate}
                           </FormHelperText>
                         )}
                       </LocalizationProvider>
@@ -519,6 +531,19 @@ export default function CreateProfile() {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </DashboardLayout>
   );
 }

@@ -8,7 +8,7 @@ import SoftTypography from "components/SoftTypography";
 import TextField from "@mui/material/TextField";
 import useStagiaireStore from "store/InternStore";
 import useCollaboratorStore from "store/collaboratorStore";
-import { FormControl } from "@mui/material";
+import { Backdrop, FormControl } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { InputAdornment } from "@mui/material";
 import CalendarToday from "@mui/icons-material/CalendarToday";
@@ -20,6 +20,7 @@ import flattenObject from "utils/flattenObject";
 import useValidationStore from "store/useValidationStore";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../../../components/ConfirmationModals";
+import { DNA } from "react-loader-spinner";
 
 function ProfessionalInfoCard({ title, info, action, role }) {
   const infoRespectingFormCreation = {
@@ -46,7 +47,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
   const intern = useStagiaireStore((state) =>
     state.getStagiaireById(infoRespectingFormCreation.id)
   );
-  const collaborator = useCollaboratorStore((state) => state.getCollaboratorById(info.id));
+  const collaborator = useCollaboratorStore((state) => state.getCollaborator(info.id));
 
   const { errors, setErrors } = useValidationStore();
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -54,6 +55,7 @@ function ProfessionalInfoCard({ title, info, action, role }) {
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     setEditableInfo(role === "intern" ? infoRespectingFormCreation : info);
   }, [role]);
@@ -76,8 +78,8 @@ function ProfessionalInfoCard({ title, info, action, role }) {
       return {
         organization: validationSchemas.organization,
         department: validationSchemas.department,
-        job: validationSchemas.job,
-        employmentDate: validationSchemas.employementDate,
+        title: validationSchemas.title,
+        employmentDate: validationSchemas.employmentDate,
       };
     } else {
       return {}
@@ -125,11 +127,20 @@ function ProfessionalInfoCard({ title, info, action, role }) {
 
       setConfirmationModalTitle("Update Collaborator");
       setConfirmationModalDescription("Are you sure you want to update this collab?");
-      setOnConfirmAction(() => () => {
+      setOnConfirmAction(() => async () => {
         const updatedData = { ...originalData, ...editableInfo };
-        updateCollaborator(updatedData);
-        setErrors({});
-        toast.success("Collab updated successfully!");
+        setLoading(true);
+        try {
+          await updateCollaborator(updatedData.id, updatedData);
+          setErrors({});
+          toast.success("Collaborator updated successfully!");
+        } catch (error) {
+          toast.error("Failed to updated collaborator: " + error.message);
+          console.log(error);
+          console.log("updated collaborator : ", updatedData)
+        } finally {
+          setLoading(false);
+        }
       });
       setIsConfirmationModalOpen(true);
 
@@ -193,7 +204,6 @@ function ProfessionalInfoCard({ title, info, action, role }) {
       />
     </SoftBox>
   );
-
   const renderEditableDateField = (label, value, key) => (
     <SoftBox key={key} display="flex" py={1} pr={2}>
       <SoftTypography
@@ -233,7 +243,6 @@ function ProfessionalInfoCard({ title, info, action, role }) {
       </FormControl>
     </SoftBox>
   );
-
   const renderEditableSelectField = (label, value, key, options) => (
     <SoftBox key={key} display="flex" py={1} pr={2}>
       <SoftTypography
@@ -286,10 +295,10 @@ function ProfessionalInfoCard({ title, info, action, role }) {
         textTransform="capitalize"
         sx={{ whiteSpace: "nowrap" }}
       >
-        {label}: &nbsp;
+        {label} : &nbsp;
       </SoftTypography>
       <SoftTypography variant="button" fontWeight="regular" color="text">
-        &nbsp;{value}
+        &nbsp;{value || "Not provided"} {/* Add a fallback value */}
       </SoftTypography>
     </SoftBox>
   );
@@ -302,8 +311,8 @@ function ProfessionalInfoCard({ title, info, action, role }) {
             This section provides information about the collaborator&apos;s professional details.
           </SoftTypography>
           {editable
-            ? renderEditableField("Job", editableInfo.job, "job")
-            : renderField("Job", editableInfo.job, "job")}
+            ? renderEditableField("title", editableInfo.title, "job")
+            : renderField("title", editableInfo.title, "job")}
           {editable
             ? renderEditableSelectField("Department", editableInfo.department, "department", [
               { value: "Microsoft&Data", label: "Microsoft & Data" },
@@ -471,6 +480,19 @@ function ProfessionalInfoCard({ title, info, action, role }) {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </Card>
   );
 }

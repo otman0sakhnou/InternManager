@@ -25,6 +25,9 @@ import routes from "routes";
 import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import { GroupNameProvider } from 'context/GroupeNameContext';
 
+import Backdrop from "@mui/material/Backdrop";
+import { DNA } from "react-loader-spinner";
+
 
 // Images
 import brand from "assets/images/images-removebg-preview.png";
@@ -38,6 +41,7 @@ export default function App() {
   const { miniSidenav, direction, layout, openConfigurator, sidenavColor } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const { pathname } = useLocation();
+  const [loading, setLoading] = useState(true);
 
   // Open sidenav when mouse enter on mini sidenav
   const handleOnMouseEnter = () => {
@@ -54,6 +58,14 @@ export default function App() {
       setOnMouseEnter(false);
     }
   };
+  // Simulate loading process
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 15000); // Adjust the time as needed
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Change the openConfigurator state
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
@@ -147,6 +159,19 @@ export default function App() {
   ) : (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {/* <Backdrop
+        sx={{ color: "#ff4",backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop> */}
       {layout === "dashboard" && (
         <>
           <Sidenav

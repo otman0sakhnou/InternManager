@@ -4,7 +4,7 @@ using AutoMapper;
 using Domain.DTOs;
 using MediatR;
 
-namespace Application.Services.Collaborator.Handlers;public class GetAllCollaboratorsQueryHandler : IRequestHandler<GetAllCollaboratorsQuery, IEnumerable<CollaboratorRes>>
+namespace Application.Services.Collaborator.Handlers; public class GetAllCollaboratorsQueryHandler : IRequestHandler<GetAllCollaboratorsQuery, IEnumerable<CollaboratorRes>>
 {
     private readonly ICollaboratorRepository _repository;
     private readonly IMapper _mapper;
@@ -18,6 +18,7 @@ namespace Application.Services.Collaborator.Handlers;public class GetAllCollabor
     public async Task<IEnumerable<CollaboratorRes>> Handle(GetAllCollaboratorsQuery request, CancellationToken cancellationToken)
     {
         var collaborators = await _repository.GetAllCollaborator();
+
         return _mapper.Map<IEnumerable<CollaboratorRes>>(collaborators);
     }
 }

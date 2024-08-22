@@ -5,30 +5,61 @@ import SoftBox from "components/SoftBox";
 import Card from "@mui/material/Card";
 import SoftTypography from "components/SoftTypography";
 import Table from "examples/Tables/Table";
-import AddCollaborator from './addCollaborator';
 import collaboratorTableData from "layouts/tables/data/collaboratorTableData";
 import useCollaboratorStore from 'store/collaboratorStore';
 import SoftPagination from "components/SoftPagination";
 import SoftButton from "components/SoftButton";
 import Icon from "@mui/material/Icon";
 import { useNavigate } from 'react-router-dom';
-import Grid from '@mui/material/Grid'; // Import Grid component from Material-UI
+import Grid from '@mui/material/Grid';
+import { Backdrop } from '@mui/material';
+import { DNA } from 'react-loader-spinner';
 
 function Index() {
   const [visible, setVisible] = useState(false);
   const [selectedCollaborator, setSelectedCollaborator] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Number of items per page
+  const [loading, setLoading] = useState(true);
+  const itemsPerPage = 5;
   const navigate = useNavigate();
-  const collaborators = useCollaboratorStore((state) => state.collaborators);
+  const { collaborators, getCollaborators } = useCollaboratorStore((state) => ({
+    collaborators: state.collaborators,
+    getCollaborators: state.getCollaborators
+  }));
 
-  const getPaginatedCollaborators = () => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return collaborators.slice(start, end);
+  const totalCollaborators = collaborators.length;
+  const totalPages = Math.ceil(totalCollaborators / itemsPerPage);
+
+  useEffect(() => {
+    getCollaborators();
+    setLoading(false);
+  }, [getCollaborators]);
+
+  const calculatePaginationRange = () => {
+    const totalDisplayedPages = 3;
+    const halfRange = Math.floor(totalDisplayedPages / 2);
+    let startPage = Math.max(1, currentPage - halfRange);
+    let endPage = Math.min(totalPages, currentPage + halfRange);
+
+    if (endPage - startPage < totalDisplayedPages - 1) {
+      startPage = Math.max(1, endPage - totalDisplayedPages + 1);
+    }
+
+    const paginationRange = [];
+    for (let i = startPage; i <= endPage; i++) {
+      paginationRange.push(i);
+    }
+
+    return { startPage, endPage, paginationRange };
   };
 
-  const { columns, rows } = collaboratorTableData(getPaginatedCollaborators(), setVisible, setSelectedCollaborator);
+  const { startPage, endPage, paginationRange } = calculatePaginationRange();
+
+  const { columns, rows } = collaboratorTableData(
+    collaborators.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage),
+    setVisible,
+    setSelectedCollaborator
+  );
 
   useEffect(() => {
     if (selectedCollaborator) {
@@ -36,9 +67,10 @@ function Index() {
     }
   }, [selectedCollaborator]);
 
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
+  const handlePagination = (page) => {
+    setCurrentPage(page);
   };
+
   const handleStepperButtonClick = () => {
     navigate('/Collaborator/Create-Collaborator-Profile');
   };
@@ -54,14 +86,8 @@ function Index() {
                 <SoftTypography variant="h6">Collaborator table</SoftTypography>
                 <SoftButton variant="gradient" color="info" onClick={handleStepperButtonClick}>
                   <Icon sx={{ fontWeight: 'bold' }}>add</Icon>
-                  &nbsp;add collaborator 
+                  &nbsp;add collaborator
                 </SoftButton>
-                {/* <AddCollaborator
-                  visible={visible}
-                  setVisible={setVisible}
-                  selectedCollaborator={selectedCollaborator}
-                  setSelectedCollaborator={setSelectedCollaborator}
-                /> */}
               </SoftBox>
               <SoftBox
                 sx={{
@@ -76,21 +102,37 @@ function Index() {
                 <Table columns={columns} rows={rows} />
               </SoftBox>
               <SoftBox display="flex" justifyContent="center" p={2}>
-                <SoftPagination variant="gradient">
-                  <SoftPagination item onClick={() => handlePageChange(null, currentPage - 1)} disabled={currentPage === 1}>
+                <SoftPagination size='small' variant="gradient">
+                  <SoftPagination item onClick={() => handlePagination(currentPage - 1)} disabled={currentPage === 1}>
                     <Icon>keyboard_arrow_left</Icon>
                   </SoftPagination>
-                  {Array.from({ length: Math.ceil(collaborators.length / itemsPerPage) }).map((_, index) => (
+                  {startPage > 1 && (
+                    <>
+                      <SoftPagination item onClick={() => handlePagination(1)}>
+                        1
+                      </SoftPagination>
+                      {startPage > 2 && <SoftTypography variant="button" fontWeight="medium" color="text">...</SoftTypography>}
+                    </>
+                  )}
+                  {paginationRange.map((page) => (
                     <SoftPagination
-                      key={index + 1}
+                      key={page}
                       item
-                      active={index + 1 === currentPage}
-                      onClick={() => handlePageChange(null, index + 1)}
+                      active={page === currentPage}
+                      onClick={() => handlePagination(page)}
                     >
-                      {index + 1}
+                      {page}
                     </SoftPagination>
                   ))}
-                  <SoftPagination item onClick={() => handlePageChange(null, currentPage + 1)} disabled={currentPage === Math.ceil(collaborators.length / itemsPerPage)}>
+                  {endPage < totalPages && (
+                    <>
+                      {endPage < totalPages - 1 && <SoftTypography variant="button" fontWeight="medium" color="text">...</SoftTypography>}
+                      <SoftPagination item onClick={() => handlePagination(totalPages)}>
+                        {totalPages}
+                      </SoftPagination>
+                    </>
+                  )}
+                  <SoftPagination item onClick={() => handlePagination(currentPage + 1)} disabled={currentPage === totalPages}>
                     <Icon>keyboard_arrow_right</Icon>
                   </SoftPagination>
                 </SoftPagination>
@@ -99,6 +141,19 @@ function Index() {
           </Grid>
         </Grid>
       </SoftBox>
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </DashboardLayout>
   );
 }

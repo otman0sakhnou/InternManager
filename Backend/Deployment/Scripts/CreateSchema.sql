@@ -98,7 +98,7 @@ CREATE TABLE Collaborators (
     Title NVARCHAR(MAX) NULL,
     Department NVARCHAR(MAX) NULL,
     Organization NVARCHAR(MAX) NULL,
-    EmploymentDate DATETIME2 NOT NULL,
+    EmploymentDate DATE NOT NULL,
     Gender NVARCHAR(MAX) NULL,
     UserId NVARCHAR(450) NULL,
     CONSTRAINT FK_Collaborators_AspNetUsers_UserId FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
