@@ -11,6 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { keyframes } from "@mui/system";
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 
+
 // Sample subjects
 const subjects = [
   {
@@ -136,6 +137,7 @@ const InternStepsCard = () => {
                 const startIndex = (current - 1) * stepsPerPage;
                 const endIndex = Math.min(startIndex + stepsPerPage, totalSteps);
                 const currentSteps = subject.steps.slice(startIndex, endIndex);
+
                 const completedSteps = subject.steps.filter((s) => s.status === 'Completed').length;
 
 
@@ -162,6 +164,7 @@ const InternStepsCard = () => {
                           >
                             {step.status === "Completed" ? (
                               <CheckCircleOutlineRoundedIcon fontSize="medium" color="success" sx={{ marginRight: 1, }} />
+
                             ) : step.status === "In Progress" ? (
                               <HourglassBottomRoundedIcon fontSize="medium" color="warning" sx={{ marginRight: 1, ...rotatingIconStyle }} />
                             ) : (

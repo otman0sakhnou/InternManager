@@ -50,5 +50,23 @@ namespace Infrastructure.Repositories
             _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
         }
+        public async Task<Subject> GetSubjectForInternAsync(Guid subjectId, Guid internId)
+        {
+            return await _context.Subjects
+                .Include(s => s.Steps)
+                .ThenInclude(s => s.InternSteps.Where(internStep => internStep.InternId == internId))
+                .FirstOrDefaultAsync(s => s.Id == subjectId);
+        }
+
+        public async Task<Subject> GetSubjectForGroupAsync(Guid subjectId, Guid groupId)
+        {
+            return await _context.Subjects
+                .Include(s => s.Steps)
+                .ThenInclude(s => s.InternSteps)
+                .Include(s => s.Group)
+                .ThenInclude(g => g.Periods)
+                .ThenInclude(p => p.Intern) // Include Interns through Periods
+                .FirstOrDefaultAsync(s => s.Id == subjectId && s.GroupId == groupId);
+        }
     }
 }

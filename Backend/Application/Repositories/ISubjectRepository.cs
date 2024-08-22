@@ -14,5 +14,7 @@ namespace Application.Repositories
         Task AddAsync(Subject subject);
         Task UpdateAsync(Subject subject);
         Task DeleteAsync(Guid id);
+        Task<Subject> GetSubjectForInternAsync(Guid subjectId, Guid internId);
+        Task<Subject> GetSubjectForGroupAsync(Guid subjectId, Guid groupId);
     }
 }
