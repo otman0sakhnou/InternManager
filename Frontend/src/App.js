@@ -28,6 +28,10 @@ import { GroupNameProvider } from 'context/GroupeNameContext';
 
 // Images
 import brand from "assets/images/images-removebg-preview.png";
+import ProtectedRoute from "components/ProtectedRoute";
+import NotFound from "pages/NotFound";
+import ErrorPage from "pages/ErrorPage";
+import Unauthorized from "pages/Unauthorized";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -65,6 +69,7 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
+  
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
       if (route.collapse) {
@@ -72,7 +77,21 @@ export default function App() {
       }
 
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        return (
+          <Route
+            exact
+            path={route.route}
+            element={
+              route.roles ? (
+                <ProtectedRoute element={route.component} roles={route.roles} />
+              ) : (
+                route.component
+              )
+            }
+            key={route.key}
+          />
+        );
+        // return <Route exact path={route.route} element={route.component} key={route.key} />;
       }
 
       return null;
@@ -122,7 +141,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
       </Routes>
     </>
   ) : (
@@ -144,9 +163,18 @@ export default function App() {
       )}
       {layout === "vr" && <Configurator />}
       <GroupNameProvider>
-        <Routes>
+        {/* <Routes>
           {getRoutes(routes)}
           <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes> */}
+        {/* Defining the route paths and the corresponding components */}
+        <Routes>
+          {getRoutes(routes)}
+          {/* <Route path="*" element={<Navigate to="/authentication/sign-in" />} /> */}
+
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
         </Routes>
       </GroupNameProvider>
     </ThemeProvider>

@@ -1,4 +1,5 @@
 ﻿using Application.Services.AuthenticationAndAuthorization.Common;
+using Application.Services.AuthenticationAndAuthorization.Queries;
 using Domain.DTOs;
 using Domain.Models;
 using MediatR;
@@ -49,7 +50,12 @@ namespace Application.Services.AuthenticationAndAuthorization.Commands
             var accessToken = await _tokenService.GenerateAccessTokenAsync(user);
             var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user);
 
-            return new LoginResponse(accessToken, refreshToken);
+            var getUserQuery = new GetUserQuery(user.Id);
+            var getUserResponse = await _mediator.Send(getUserQuery, cancellationToken);
+
+            return new LoginResponse(accessToken, refreshToken,
+            new UserDto(user.Id, user.UserName, user.Email),
+            getUserResponse.Roles);
         }
     }
 }

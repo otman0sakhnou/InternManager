@@ -8,7 +8,7 @@ import {
   updateIntern,
   deleteIntern,
   deleteAllInterns,
-} from '../Actions/InternsActions';
+} from '../actions/InternsActions';
 const useStagiaireStore = create((set, get) => ({
   stagiaires: [],
   //   nextId: 3,
