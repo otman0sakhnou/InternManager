@@ -9,33 +9,34 @@ using MediatR;
 namespace Application.Services.Collaborator.Handlers;
 
 public class UpdateCollaboratorCommandHandler : IRequestHandler<UpdateCollaboratorCommand, bool>
+{
+    private readonly ICollaboratorRepository _repository;
+    private readonly IMapper _mapper;
+
+    public UpdateCollaboratorCommandHandler(ICollaboratorRepository repository, IMapper mapper)
     {
-        private readonly ICollaboratorRepository _repository;
-        private readonly IMapper _mapper;
-        private readonly IValidator<CollaboratorReq> _validator;
-
-        public UpdateCollaboratorCommandHandler(ICollaboratorRepository repository, IMapper mapper, IValidator<CollaboratorReq> validator)
-        {
-            _repository = repository;
-            _mapper = mapper;
-            _validator = validator;
-        }
-
-        public async Task<bool> Handle(UpdateCollaboratorCommand request, CancellationToken cancellationToken)
-        {
-         
-            var validationResult = await _validator.ValidateAsync(request.CollaboratorReq, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
-            var existingCollaborator = await _repository.GetCollaboratorById(request.CollaboratorReq.Id);
-            if (existingCollaborator == null) return false;
-
-            _mapper.Map(request.CollaboratorReq, existingCollaborator);
-            await _repository.UpdateCollaborator(existingCollaborator);
-
-            return true;
-        }
+        _repository = repository;
+        _mapper = mapper;
     }
+
+    public async Task<bool> Handle(UpdateCollaboratorCommand request, CancellationToken cancellationToken)
+    {
+
+        var existingCollaborator = await _repository.GetCollaboratorById(request.CollaboratorReq.Id);
+        if (existingCollaborator == null) return false;
+
+        //update only for the provided values
+        existingCollaborator.Name = request.CollaboratorReq.Name ?? existingCollaborator.Name;
+        existingCollaborator.Phone = request.CollaboratorReq.Phone ?? existingCollaborator.Phone;
+        existingCollaborator.Title = request.CollaboratorReq.Title ?? existingCollaborator.Title;
+        existingCollaborator.Department = request.CollaboratorReq.Department ?? existingCollaborator.Department;
+        existingCollaborator.Organization = request.CollaboratorReq.Organization ?? existingCollaborator.Organization;
+        existingCollaborator.EmploymentDate = request.CollaboratorReq.EmploymentDate ?? existingCollaborator.EmploymentDate;
+        existingCollaborator.Gender = request.CollaboratorReq.Gender ?? existingCollaborator.Gender;
+        existingCollaborator.UserId = request.CollaboratorReq.UserId ?? existingCollaborator.UserId;
+
+        await _repository.UpdateCollaborator(existingCollaborator);
+
+        return true;
+    }
+}

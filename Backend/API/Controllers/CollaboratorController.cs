@@ -50,7 +50,7 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCollaborator(Guid id, [FromBody] CollaboratorReq collaboratorReq)
         {
-            if (collaboratorReq == null || id != collaboratorReq.Id)
+            if (id != collaboratorReq.Id)
             {
                 return BadRequest("Invalid collaborator data.");
             }

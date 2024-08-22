@@ -15,6 +15,8 @@ import useCollaboratorStore from "store/collaboratorStore";
 import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg";
 import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp";
 import toast from "react-hot-toast";
+import { Backdrop } from "@mui/material";
+import { DNA } from "react-loader-spinner";
 const getAvatarImage = (gender) => {
   switch (gender.toLowerCase()) {
     case "male":
@@ -110,6 +112,7 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [loading, setLoading] = useState(false);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -119,7 +122,7 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
     setAnchorEl(null);
   };
   const handleViewDetails = () => {
-    navigate(`/Collaborator/Profile/${collaborator.id}`); // Navigate to the profile page with the user's ID
+    navigate(`/Collaborator/Profile/${collaborator.id}`);
     handleClose();
   };
 
@@ -127,9 +130,16 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
     setActionType("delete");
     setConfirmationModalTitle("Delete Collaborator");
     setConfirmationModalDescription("Are you sure you want to delete this collaborator?");
-    setOnConfirmAction(() => () => {
-      deleteCollaborator(id);
-      toast.success("Collaborator deleted successfully!");
+    setOnConfirmAction(() => async () => {
+      setLoading(true);
+      try {
+        await deleteCollaborator(id);
+        toast.success("Collaborator deleted successfully!");
+      } catch (error) {
+        toast.error(`Error deleting collaborator`);
+      } finally {
+        setLoading(false);
+      }
     });
     setIsConfirmationModalOpen(true);
   };
@@ -159,13 +169,6 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
           </Icon>
           details
         </MenuItem>
-        {/* <MenuItem onClick={handleUpdate}>
-          {" "}
-          <Icon sx={{ cursor: "pointer", color: "blue", mr: 1 }} fontSize="small">
-            edit
-          </Icon>
-          Edit
-        </MenuItem> */}
         <MenuItem onClick={() => {
           handleDelete();
 
@@ -187,15 +190,28 @@ const Action = ({ id, setVisible, setSelectedCollaborator, collaborator }) => {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </>
   );
 };
 
-function Function({ job, department, organization, mentorStatus }) {
+function Function({ title, department, organization, mentorStatus }) {
   return (
     <SoftBox display="flex" flexDirection="column">
       <SoftTypography variant="caption" fontWeight="medium" color="text">
-        {job} - {department}
+        {title} - {department}
       </SoftTypography>
       <SoftTypography variant="caption" color="secondary">
         {organization}
@@ -216,14 +232,14 @@ const collaboratorTableData = (collaborators, setVisible, setSelectedCollaborato
     collaborator: (
       <Author
         name={collaborator.name}
-        email={collaborator.email}
+        email={collaborator.user.email}
         phone={collaborator.phone}
         gender={collaborator.gender}
       />
     ),
     function: (
       <Function
-        job={collaborator.job}
+        title={collaborator.title}
         department={collaborator.department}
         organization={collaborator.organization}
       />
@@ -239,7 +255,7 @@ const collaboratorTableData = (collaborators, setVisible, setSelectedCollaborato
     ),
     employed: (
       <SoftTypography variant="caption" color="secondary" fontWeight="medium">
-        {collaborator.employementDate}
+        {collaborator.employmentDate}
       </SoftTypography>
     ),
     action: (

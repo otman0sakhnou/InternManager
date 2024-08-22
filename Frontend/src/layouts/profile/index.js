@@ -26,24 +26,23 @@ function Overview() {
 
   const [refresh, setRefresh] = useState(false);  //this state is added to trigger the update in this component when the name changed in the CustonInfoCard so the header get the up to date value of name at real time
 
-  const getCollaboratorById = useCollaboratorStore((state) => state.getCollaboratorById);
+  const getCollaborator = useCollaboratorStore((state) => state.getCollaborator);
   const getStagiaireById = useStagiaireStore((state) => state.getStagiaireById);
 
   useEffect(() => {
     const fetchData = async () => {
       if (role === "collaborator") {
-        const collaborator = getCollaboratorById(Number(id));
+        const collaborator = await getCollaborator(id);
         console.log("Fetched collaborator:", collaborator);
         setData(collaborator);
       } else {
         const intern = getStagiaireById(id);
-
         setData(intern);
       }
     };
 
     fetchData();
-  }, [id, role, getCollaboratorById, getStagiaireById, refresh]);
+  }, [id, role, getCollaborator, getStagiaireById, refresh]);
 
   const handleDataUpdate = () => {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger useEffect
@@ -77,8 +76,8 @@ function Overview() {
       : {
         id: data.id,
         department: data.department, 
-        employmentDate: data.employementDate,
-        job: data.job,
+        employmentDate: data.employmentDate,
+        title: data.title,
         organization: data.organization,
       };
 

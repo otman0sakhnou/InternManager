@@ -9,7 +9,7 @@ import SoftTypography from "components/SoftTypography";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { keyframes } from "@mui/system";
-import SoftBox from "components/SoftBox";
+import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 
 // Sample subjects
 const subjects = [
@@ -113,7 +113,6 @@ const InternStepsCard = () => {
   const rotatingIconStyle = {
     animation: `${rotateAndScale} 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite`,
   };
-
   return (
     <Box sx={{ width: "100%", margin: "auto" }} p={2}>
       <Card sx={{ boxShadow: 3 }}>
@@ -137,7 +136,7 @@ const InternStepsCard = () => {
                 const startIndex = (current - 1) * stepsPerPage;
                 const endIndex = Math.min(startIndex + stepsPerPage, totalSteps);
                 const currentSteps = subject.steps.slice(startIndex, endIndex);
-                const completedSteps= subject.steps.filter((s)=>s.status === 'Completed').length;
+                const completedSteps = subject.steps.filter((s) => s.status === 'Completed').length;
 
 
                 return (
@@ -148,12 +147,12 @@ const InternStepsCard = () => {
                           <SoftTypography variant="h5" color="dark" fontWeight="bold" textGradient >
                             {subject.title}
                           </SoftTypography>
-                          </Grid>
-                             
-                          <SoftTypography variant="caption" color="secondary" fontWeight="bold" textGradient mb={1}>
-                            ({totalSteps} Steps| {completedSteps} Completed)
-                          </SoftTypography>
-                     
+                        </Grid>
+
+                        <SoftTypography variant="caption" color="secondary" fontWeight="bold" textGradient mb={1}>
+                          ({totalSteps} Steps| {completedSteps} Completed)
+                        </SoftTypography>
+
                         {currentSteps.map((step, stepIndex) => (
                           <Box
                             key={stepIndex}
@@ -163,8 +162,10 @@ const InternStepsCard = () => {
                           >
                             {step.status === "Completed" ? (
                               <CheckCircleOutlineRoundedIcon fontSize="medium" color="success" sx={{ marginRight: 1, }} />
-                            ) : (
+                            ) : step.status === "In Progress" ? (
                               <HourglassBottomRoundedIcon fontSize="medium" color="warning" sx={{ marginRight: 1, ...rotatingIconStyle }} />
+                            ) : (
+                              <PendingOutlinedIcon fontSize="medium" color="error" sx={{ marginRight: 1 }} />
                             )}
                             <Box>
                               <Box>

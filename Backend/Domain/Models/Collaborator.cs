@@ -10,12 +10,12 @@ namespace Domain.Models
         public string Title { get; set; }
         public string Department { get; set; }
         public string Organization { get; set; }
-        public DateTime EmploymentDate { get; set; }
+        public DateOnly EmploymentDate { get; set; }
         public string Gender { get; set; }
         [ForeignKey("userId")]
         public string UserId { get; set; }
 
-        public ApplicationUser User { get; set; } 
-        public ICollection<Group> Groups { get; set; } 
+        public ApplicationUser User { get; set; }
+        public ICollection<Group> Groups { get; set; }
     }
 }

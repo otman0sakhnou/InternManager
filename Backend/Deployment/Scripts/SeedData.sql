@@ -15,20 +15,20 @@ VALUES
 -- Insert sample data into Collaborators
 INSERT INTO Collaborators (Id, Name, Phone, Title, Department, Organization, EmploymentDate, Gender, UserId)
 VALUES
-(NEWID(), 'John Doe', '1234567890', 'Developer', 'IT', 'TechCorp', '2023-01-01', 'Male', '1'),
-(NEWID(), 'Jane Smith', '0987654321', 'Manager', 'HR', 'BusinessInc', '2022-06-15', 'Female', '2');
+(NEWID(), 'John Doe', '1234567890', 'Developer', 'Microsoft & Data', 'TechCorp', '2023-01-01', 'Male', '1'),
+(NEWID(), 'Jane Smith', '0987654321', 'Manager', 'Java', 'BusinessInc', '2022-06-15', 'Female', '2');
 
 -- Insert sample data into Groups
 INSERT INTO Groups (Id, Name, Description, ExpirationDate, Department, CollaboratorId)
 VALUES
-(NEWID(), 'Group A', 'Description for Group A', '2024-12-31', 'IT', (SELECT Id FROM Collaborators WHERE Name = 'John Doe')),
-(NEWID(), 'Group B', 'Description for Group B', '2024-06-30', 'HR', (SELECT Id FROM Collaborators WHERE Name = 'Jane Smith'));
+(NEWID(), 'Group A', 'Description for Group A', '2024-12-31', 'Microsoft & Data', (SELECT Id FROM Collaborators WHERE Name = 'John Doe')),
+(NEWID(), 'Group B', 'Description for Group B', '2024-06-30', 'Java', (SELECT Id FROM Collaborators WHERE Name = 'Jane Smith'));
 
 -- Insert sample data into Interns
 INSERT INTO Interns (Id, Name, Phone, Institution, Level, Gender, Specialization, YearOfStudy, Title, Department, UserId)
 VALUES
-(NEWID(), 'Alice Johnson', '1234567890', 'University A', 'Undergraduate', 'Female', 'Computer Science', 2, 'Intern', 'IT', '1'),
-(NEWID(), 'Bob Brown', '0987654321', 'University B', 'Postgraduate', 'Male', 'Business Administration', 1, 'Intern', 'HR', '2');
+(NEWID(), 'Alice Johnson', '1234567890', 'University A', 'Undergraduate', 'Female', 'Computer Science', 2, 'Intern', 'Microsoft & Data', '1'),
+(NEWID(), 'Bob Brown', '0987654321', 'University B', 'Postgraduate', 'Male', 'Business Administration', 1, 'Intern', 'Java', '2');
 
 -- Insert sample data into Subjects
 INSERT INTO Subjects (Id, Title, Type, Description, GroupId)
