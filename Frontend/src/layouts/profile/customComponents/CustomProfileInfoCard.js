@@ -24,6 +24,8 @@ import { validate } from "utils/validation";
 import useValidationStore from "store/useValidationStore";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../../../components/ConfirmationModals";
+import { Backdrop } from "@mui/material";
+import { DNA } from "react-loader-spinner";
 
 function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const { role } = useAuthStore(); // Adjust based on how your auth store returns role
@@ -35,7 +37,7 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const intern = useStagiaireStore((state) => state.getStagiaireById(info.id));
 
   const updateCollaborator = useCollaboratorStore((state) => state.updateCollaborator);
-  const collaborator = useCollaboratorStore((state) => state.getCollaboratorById(info.id));
+  const collaborator = useCollaboratorStore((state) => state.getCollaborator(info.id));
 
   const { errors, setErrors } = useValidationStore();
 
@@ -46,6 +48,7 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [loading, setLoading] = useState(false);
 
   const handleEditClick = () => {
     if (isEditMode) {
@@ -84,15 +87,24 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
     } else if (role === "collaborator") {
       setConfirmationModalTitle("Update Collaborator");
       setConfirmationModalDescription("Are you sure you want to update this collab?");
-      setOnConfirmAction(() => () => {
+      setOnConfirmAction(() => async () => {
         const updatedCollaborator = {
           ...data,
           ...editableInfo,
           description: editableDescription,
         };
-        updateCollaborator(updatedCollaborator);
-        setErrors({});
-        toast.success("Collab updated successfully!");
+        setLoading(true)
+        try {
+          await updateCollaborator(info.id, updatedCollaborator);
+          setErrors({});
+          toast.success("Collaborator updated successfully!");
+        } catch (error) {
+          toast.error("Failed to delete collaborator: " + error.message);
+          console.log(error);
+        } finally {
+          setLoading(false);
+          console.log("rrr", updateCollaborator)
+        }
       });
       setIsConfirmationModalOpen(true);
 
@@ -261,6 +273,19 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </Card>
   );
 }

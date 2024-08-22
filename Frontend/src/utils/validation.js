@@ -15,12 +15,16 @@ export const validationSchemas = {
   phone: {
     required: { value: true, message: "Phone number is required" },
     minLength: { value: 10, message: "Phone number must be at least 10 digits long" },
+    pattern: {
+      value: /^(?:(?:(?:\+|00)212[\s]?(?:[\s]?\(0\)[\s]?)?)|0){1}(?:5[\s.-]?[2-3]|6[\s.-]?[13-9]){1}[0-9]{1}(?:[\s.-]?\d{2}){3}$/,
+      message: "Phone is not valid",
+    },
   },
   gender: {
     required: { value: true, message: "Gender is required" },
   },
-  job: {
-    required: { value: true, message: "Job role is required" },
+  title: {
+    required: { value: true, message: "title is required" },
   },
   department: {
     required: { value: true, message: "Department is required" },
@@ -28,7 +32,7 @@ export const validationSchemas = {
   organization: {
     required: { value: true, message: "Organization is required" },
   },
-  employementDate: {
+  employmentDate: {
     required: { value: true, message: "Employment date is required" },
   },
   password: {
