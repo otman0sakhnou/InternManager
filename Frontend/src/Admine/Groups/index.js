@@ -70,6 +70,17 @@ const Groups = () => {
     { value: "Devops", label: "Devops" },
     { value: "Test&Support", label: "Test & Support" },
   ];
+  const { loadCollaborators } = useCollaboratorStore((state) => ({
+
+    loadCollaborators: state.getCollaborators,
+
+  }));
+
+  useEffect(() => {
+    loadCollaborators();
+  }, [loadCollaborators]);
+
+
   useEffect(() => {
     if (selectedDepartment) {
       const fetchData = async () => {
@@ -142,8 +153,8 @@ const Groups = () => {
       expirationDate,
       internIds: selectedInterns.map(intern => intern.id),
       department: selectedDepartment,
-      collaboratorId: "5E7D64CF-C5F3-404C-AEF8-B91420DD3C95",
-      // collaboratorId: selectedCollaborator,
+      // collaboratorId: "5E7D64CF-C5F3-404C-AEF8-B91420DD3C95",
+      collaboratorId: selectedCollaborator,
     };
 
     // Rediriger vers la page de création de sujet si la case est cochée
@@ -885,7 +896,11 @@ const Groups = () => {
                                   </Box>
                                 </Box>
                                 <Typography variant="body2" sx={{ mb: 0.5 }}>
-                                  Expiration Date: {group.expirationDate}
+                                  Expiration Date: {new Date(group.expirationDate).toLocaleDateString('fr-FR', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit'
+                                  })}
                                 </Typography>
                                 <Typography variant="body2">
                                   Members:{stagiairesIds.length}

@@ -79,7 +79,14 @@ const CollaboratorsInternsCard = ({
     loadInterns: state.loadInterns,
     getStagiaireById: state.getStagiaireById,
   }));
+  const { loadCollaborators } = useCollaboratorStore((state) => ({
 
+    loadCollaborators: state.getCollaborators,
+
+  }));
+  useEffect(() => {
+    loadCollaborators();
+  }, [loadCollaborators]);
 
   useEffect(() => {
     if (collaborator) {
@@ -229,8 +236,9 @@ const CollaboratorsInternsCard = ({
         const updatedGroup = {
           ...group,
           collaborator: selectedCollaborator,
-          newInternIds: selectedInternIds,
+
         };
+        console.log(updatedGroup)
         updateGroup(group.id, updatedGroup);
         onEditCollaborator(selectedCollaborator);
         onUpdate();

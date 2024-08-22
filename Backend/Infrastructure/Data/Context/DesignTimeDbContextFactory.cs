@@ -10,7 +10,7 @@ namespace Infrastructure.Data.Context
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             // Utilisez la chaîne de connexion appropriée pour votre environnement de conception
-            optionsBuilder.UseSqlServer("Data Source=DESKTOP-L1KJOGA\\SQLEXPRESS01;Initial Catalog=InternManagerDb;Integrated Security=True;TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Data Source=DESKTOP-L1KJOGA\\SQLEXPRESS01;Initial Catalog=InternManagerDb2;Integrated Security=True;TrustServerCertificate=True");
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }
