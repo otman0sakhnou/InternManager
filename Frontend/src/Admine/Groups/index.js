@@ -19,8 +19,6 @@ import dayjs from "dayjs";
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
-
-
 import {
   IconButton,
   Box,
@@ -37,7 +35,6 @@ import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/Info";
 import useGroupStore from "store/GroupsStore";
 import { useGroupName } from 'context/GroupeNameContext';
-
 const Groups = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
@@ -47,19 +44,24 @@ const Groups = () => {
   const [expirationDate, setExpirationDate] = useState("");
   const [selectedCollaborator, setSelectedCollaborator] = useState("");
   const stagiaires = useInternStore((state) => state.stagiaires);
+  const { loadInterns } = useInternStore((state) => ({
+
+    loadInterns: state.loadInterns,
+
+  }));
+
   const groups = useGroupStore((state) => state.groups);
   const addGroup = useGroupStore((state) => state.addGroup);
   const deleteGroup = useGroupStore((state) => state.deleteGroup);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
   const { setGroupNameC } = useGroupName();
-
-  const getGroupsByDepartment = useGroupStore((state) => state.getGroupsByDepartment)
-
+  const fetchGroupsByDepartment = useGroupStore((state) => state.fetchGroupsByDepartment)
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [departmentGroups, setDepartmentGroups] = useState([]);
   const departments = [
     { value: "Microsoft&Data", label: "Microsoft & Data" },
     { value: "Front&Mobile", label: "Front & Mobile" },
@@ -68,20 +70,50 @@ const Groups = () => {
     { value: "Devops", label: "Devops" },
     { value: "Test&Support", label: "Test & Support" },
   ];
-  const getActiveInterns = (department) => {
-    const today = new Date().toISOString().split("T")[0]; // Date actuelle au format YYYY-MM-DD
-    const activeInterns =
-      getGroupsByDepartment(department)
-        ?.flatMap((group) =>
-          new Date(group.expirationDate) > new Date(today) ? group.stagiaires : []
-        )
-        .map((intern) => intern.id) || [];
+  useEffect(() => {
+    if (selectedDepartment) {
+      const fetchData = async () => {
+        try {
+          const groups = await fetchGroupsByDepartment(selectedDepartment);
+          setDepartmentGroups(groups || []);
+        } catch (error) {
+          console.error("Failed to fetch groups:", error);
+        }
+      };
+      fetchData();
+    }
+  }, [selectedDepartment, fetchGroupsByDepartment, addGroup, deleteGroup]);
+  useEffect(() => {
+    loadInterns();
+  }, [loadInterns]);
 
-    return stagiaires.filter(
-      (stagiaire) =>
-        stagiaire.department === department && !activeInterns.includes(stagiaire.id)
-    );
+  const getActiveInterns = (department) => {
+    const today = new Date().toISOString().split("T")[0];
+    const activeInternIds = [];
+
+    // Trouver les IDs des internes actifs
+    (departmentGroups || []).forEach((group) => {
+      const expirationDate = group?.expirationDate;
+      if (expirationDate && new Date(expirationDate) > new Date(today)) {
+        (group.periods || []).forEach(period => {
+          if (period.internId) {
+            activeInternIds.push(period.internId);
+          }
+        });
+      }
+    });
+
+    const filteredInterns = (stagiaires || []).filter((stagiaire) => {
+      const isInDepartment = stagiaire.department === department;
+      const isActive = !activeInternIds.includes(stagiaire.id);
+      return isInDepartment && isActive;
+    });
+
+    return filteredInterns;
   };
+
+
+
   // Filtrer les stagiaires en fonction du département sélectionné
   const filteredStagiaires = selectedDepartment ? getActiveInterns(selectedDepartment) : [];
   const filteredCollaborators = selectedDepartment
@@ -103,21 +135,22 @@ const Groups = () => {
     );
   };
   const navigate = useNavigate();
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
     const newGroup = {
       name: groupName,
       description,
       expirationDate,
-      stagiaires: selectedInterns || [],
+      internIds: selectedInterns.map(intern => intern.id),
       department: selectedDepartment,
-      collaborator: selectedCollaborator,
+      collaboratorId: "5E7D64CF-C5F3-404C-AEF8-B91420DD3C95",
+      // collaboratorId: selectedCollaborator,
     };
 
     // Rediriger vers la page de création de sujet si la case est cochée
     if (addSubject) {
       addGroup(newGroup);
 
-      const groupId = addGroup(newGroup);
+      const groupId = await addGroup(newGroup);
 
       navigate(`/Add-Subject/${groupId}`);
     } else {
@@ -127,8 +160,10 @@ const Groups = () => {
       setConfirmationModalDescription(
         "Are you sure you don't want to add a subject for this group?"
       );
-      setOnConfirmAction(() => () => {
-        addGroup(newGroup);
+      setOnConfirmAction(() => async () => {
+        await addGroup(newGroup);
+        const groups = await fetchGroupsByDepartment(selectedDepartment);
+        setDepartmentGroups(groups || []);
         setShowCreateGroupForm(false);
         setSelectedInterns([]);
         setGroupName("");
@@ -141,7 +176,6 @@ const Groups = () => {
     setIsConfirmationModalOpen(true);
   };
 
-  const departmentGroups = getGroupsByDepartment(selectedDepartment) || [];
 
   const handleDelete = (id) => {
     setActionType("delete");
@@ -149,8 +183,10 @@ const Groups = () => {
     setConfirmationModalDescription(
       "Are you sure you want to delete this group? This action cannot be undone."
     );
-    setOnConfirmAction(() => () => {
-      deleteGroup(id);
+    setOnConfirmAction(() => async () => {
+      await deleteGroup(id);
+      const groups = await fetchGroupsByDepartment(selectedDepartment);
+      setDepartmentGroups(groups || []);
       toast.success("Group deleted successfully!");
     });
     setIsConfirmationModalOpen(true);
@@ -264,9 +300,11 @@ const Groups = () => {
     setConfirmationModalDescription("Are you sure you want to remove this intern for this group?");
     setOnConfirmAction(() => () => {
       setSelectedInterns(selectedInterns.filter((intern) => intern.id !== internId));
+      toast.success("Intern deleted successfully!");
     });
-    toast.success("Intern deleted successfully!");
+
     setIsConfirmationModalOpen(true);
+
   };
   return (
     <DashboardLayout>
@@ -774,6 +812,7 @@ const Groups = () => {
                         >
                           {currentGroups.map((group) => {
                             const isExpired = new Date(group.expirationDate) < new Date();
+                            const stagiairesIds = group.periods?.map(period => period.internId) || [];
                             return (
                               <Box
                                 key={group.id}
@@ -849,7 +888,7 @@ const Groups = () => {
                                   Expiration Date: {group.expirationDate}
                                 </Typography>
                                 <Typography variant="body2">
-                                  Members: {group.stagiaires.length}
+                                  Members:{stagiairesIds.length}
                                 </Typography>
                               </Box>
                             );

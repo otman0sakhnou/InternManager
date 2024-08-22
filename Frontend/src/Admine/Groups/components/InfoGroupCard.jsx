@@ -41,12 +41,12 @@ const InfoGroupCard = ({
     department: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-   const [actionType, setActionType] = useState("");
-   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
-   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-   const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
-   const updateGroup = useGroupStore((state) => state.updateGroup)
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [actionType, setActionType] = useState("");
+  const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
+  const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const updateGroup = useGroupStore((state) => state.updateGroup)
 
   useEffect(() => {
     setEditableInfo({
@@ -56,7 +56,7 @@ const InfoGroupCard = ({
       department: department,
     });
   }, [groupName, description, expirationDate, department]);
-  
+
 
   // const handleSave = () => {
   //   onSave(editableInfo);
@@ -64,17 +64,20 @@ const InfoGroupCard = ({
   // };
 
   const handleSave = () => {
-    console.log("called")
+
     setConfirmationModalTitle("Confirm Save");
     setConfirmationModalDescription("Are you sure you want to save the changes?");
     setOnConfirmAction(() => () => {
+      const newInternsIds = group.periods.map(period => period.internId).filter(id => id);
       const updatedGroup = {
         ...group,
         name: editableInfo.name,
         description: editableInfo.description,
         expirationDate: editableInfo.expirationDate,
         department: editableInfo.department,
+        newInternIds: newInternsIds,
       };
+      console.log("Updated Group Data:", updatedGroup);
       updateGroup(group.id, updatedGroup);
       onUpdate();
       setGroup(updatedGroup);
@@ -82,9 +85,14 @@ const InfoGroupCard = ({
       // setIsEditingInterns(false);
       // setIsEditingCollaborator(false);
       toast.success("Group updated successfully!");
+
+
     });
+
     setIsConfirmationModalOpen(true);
   };
+
+
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -234,20 +242,20 @@ const InfoGroupCard = ({
             : renderField("Description", editableInfo.description, "description")}
           {isEditing
             ? renderEditableSelectField("Department", editableInfo.department, "department", [
-                { value: "Microsoft&Data", label: "Microsoft & Data" },
-                { value: "Front&Mobile", label: "Front & Mobile" },
-                { value: "Java", label: "Java" },
-                { value: "PHP", label: "PHP" },
-                { value: "Devops", label: "Devops" },
-                { value: "Test&Support", label: "Test & Support" },
-              ])
+              { value: "Microsoft&Data", label: "Microsoft & Data" },
+              { value: "Front&Mobile", label: "Front & Mobile" },
+              { value: "Java", label: "Java" },
+              { value: "PHP", label: "PHP" },
+              { value: "Devops", label: "Devops" },
+              { value: "Test&Support", label: "Test & Support" },
+            ])
             : renderField("Department", editableInfo.department, "department")}
           {isEditing
             ? renderEditableDateField(
-                "Expiration Date",
-                editableInfo.expirationDate,
-                "expirationDate"
-              )
+              "Expiration Date",
+              editableInfo.expirationDate,
+              "expirationDate"
+            )
             : renderField("Expiration Date", editableInfo.expirationDate, "expirationDate")}
         </SoftBox>
       </>
@@ -273,7 +281,7 @@ const InfoGroupCard = ({
           <SoftBox mt={2}>{renderItems()}</SoftBox>
         </SoftBox>
       </Card>
-      <ConfirmationModal 
+      <ConfirmationModal
         open={isConfirmationModalOpen}
         handleClose={() => setIsConfirmationModalOpen(false)}
         title={confirmationModalTitle}

@@ -33,7 +33,7 @@ import ConfirmationModal from "components/ConfirmationModals";
 import toast from "react-hot-toast";
 import useCollaboratorStore from "store/collaboratorStore";
 import useInternStore from "store/InternStore";
-import { useParams } from "react-router-dom";
+
 
 const CircleIcon = styled("div")(({ theme }) => ({
   display: "flex",
@@ -49,23 +49,20 @@ const CollaboratorsInternsCard = ({
   group,
   department,
   selectedInterns,
-  onAddInterns,
   collaborator,
   onEditCollaborator,
   onUpdate,
 }) => {
-  console.log(collaborator)
+
+
   const [currentCollaborator, setCurrentCollaborator] = useState(collaborator);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
-  // const [selectedInterns, setSelectedInterns] = useState([]);
-  // const [selectedCollaborator, setSelectedCollaborator] = useState("");
-  const stagiaires = useInternStore((state) => state.stagiaires);
-  
-
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingInterns, setIsEditingInterns] = useState(false);
   const [isEditingCollaborator, setIsEditingCollaborator] = useState(false);
+
+  const [internsMap, setInternsMap] = useState({});
 
   const [selectedInternIds, setSelectedInternIds] = useState([]);
   const [selectedCollaboratorId, setSelectedCollaboratorId] = useState(collaborator?.id || "");
@@ -73,42 +70,87 @@ const CollaboratorsInternsCard = ({
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const updateGroup = useGroupStore((state) => state.updateGroup);
-  const getGroupsByDepartment = useGroupStore((state) => state.getGroupsByDepartment);
+  const fetchGroupsByDepartment = useGroupStore((state) => state.fetchGroupsByDepartment);
+  const [departmentGroups, setDepartmentGroups] = useState([]);
+  const { stagiaires, loadInterns, getStagiaireById } = useInternStore((state) => ({
+    stagiaires: state.stagiaires,
+    loadInterns: state.loadInterns,
+    getStagiaireById: state.getStagiaireById,
+  }));
 
-  const getCollaboratorNameById = (id) => {
-    const collaborator = collaborators.find((collaborator) => collaborator.id === id);
-    return collaborator ? collaborator.name : "Unknown Collaborator";
-  };
 
   useEffect(() => {
     if (collaborator) {
-      setCurrentCollaborator({id: collaborator, name: getCollaboratorNameById(collaborator)})
-      console.log(currentCollaborator)
+      setCurrentCollaborator({ id: collaborator.id, name: collaborator.name, })
+
       setSelectedCollaboratorId(collaborator.id);
     }
   }, [collaborator]);
+  useEffect(() => {
+    loadInterns();
+  }, [loadInterns]);
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const groups = await fetchGroupsByDepartment(department);
+        setDepartmentGroups(groups || []);
+      } catch (error) {
+        console.error("Failed to fetch groups:", error);
+      }
+    };
+    if (department) fetchGroups();
+  }, [department, fetchGroupsByDepartment]);
+
+  useEffect(() => {
+    const loadInternNames = async () => {
+      try {
+        const internNames = await Promise.all(
+          selectedInterns.map(async (internId) => {
+            const intern = await getStagiaireById(internId);
+
+            return {
+              id: internId,
+              name: intern?.name || "Unknown Intern"
+            };
+          })
+        );
+
+        const internsObject = internNames.reduce((acc, intern) => {
+          acc[intern.id] = intern.name;
+          return acc;
+        }, {});
+        setInternsMap(internsObject);
+      } catch (error) {
+        console.error("Failed to fetch intern names:", error);
+      }
+    };
+    loadInternNames();
+  }, [selectedInterns, getStagiaireById]);
 
   const getActiveInterns = (department) => {
     const today = new Date().toISOString().split("T")[0];
-    const activeInterns =
-      getGroupsByDepartment(department)
-        ?.flatMap((group) =>
-          new Date(group.expirationDate) > new Date(today) ? group.stagiaires : []
-        )
-        .map((intern) => intern.id) || [];
+    const activeInternIds = new Set();
 
-    return stagiaires.filter(
-      (stagiaire) =>
-        stagiaire.internshipInfo.department === department && !activeInterns.includes(stagiaire.id)
+    departmentGroups.forEach((group) => {
+      const expirationDate = group?.expirationDate;
+      if (expirationDate && new Date(expirationDate) > new Date(today)) {
+        group.periods.forEach(period => {
+          if (period.internId) {
+            activeInternIds.add(period.internId);
+          }
+        });
+      }
+    });
+
+    return stagiaires.filter((stagiaire) =>
+      stagiaire.department === department && !activeInternIds.has(stagiaire.id)
     );
   };
-  // const handleEditCollaborator = (collaborator) => {
-  //   setSelectedCollaborator(collaborator);
-  // };
 
   const remainingInterns = department ? getActiveInterns(department) : [];
+
   const remainingCollaborators = department
     ? collaborators.filter((collab) => collab.department === department)
     : [];
@@ -124,29 +166,43 @@ const CollaboratorsInternsCard = ({
   };
 
   const handleToggle = (internId) => {
-    setSelectedInternIds((prevSelectedInternIds) =>
-      prevSelectedInternIds.includes(internId)
-        ? prevSelectedInternIds.filter((id) => id !== internId)
-        : [...prevSelectedInternIds, internId]
-    );
-  };
+    setSelectedInternIds((prevSelectedInternIds) => {
 
+      const isSelected = prevSelectedInternIds.includes(internId);
+
+
+      if (isSelected) {
+        return prevSelectedInternIds.filter((id) => id !== internId);
+      }
+
+
+      return [...prevSelectedInternIds, internId];
+    });
+  };
   const handleSubmit = () => {
+
     const selectedInternsToAdd = remainingInterns.filter((intern) =>
       selectedInternIds.includes(intern.id)
     );
-    const updatedSelectedInterns = [
-      ...selectedInterns.filter((intern) => !selectedInternIds.includes(intern.id)),
-      ...selectedInternsToAdd,
+
+
+    const selectedInternIdsToAdd = selectedInternsToAdd.map((intern) => intern.id);
+
+
+    const updatedSelectedInternIds = [
+      ...selectedInterns.filter((internId) => !selectedInternIds.includes(internId)),
+      ...selectedInternIdsToAdd,
     ];
+
 
     setConfirmationModalTitle("Confirm Save");
     setConfirmationModalDescription("Are you sure you want to save the changes?");
     setOnConfirmAction(() => () => {
       const updatedGroup = {
         ...group,
-        stagiaires: updatedSelectedInterns,
+        newInternIds: updatedSelectedInternIds,
       };
+      console.log(updatedGroup);
       updateGroup(group.id, updatedGroup);
       onUpdate();
       setIsEditing(false);
@@ -158,6 +214,7 @@ const CollaboratorsInternsCard = ({
     setSelectedInternIds([]);
     handleClose();
   };
+
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -171,7 +228,8 @@ const CollaboratorsInternsCard = ({
       setOnConfirmAction(() => () => {
         const updatedGroup = {
           ...group,
-          collaborator: selectedCollaborator, // Ensure this is correct
+          collaborator: selectedCollaborator,
+          newInternIds: selectedInternIds,
         };
         updateGroup(group.id, updatedGroup);
         onEditCollaborator(selectedCollaborator);
@@ -257,49 +315,49 @@ const CollaboratorsInternsCard = ({
         </Box>
         <Box px={2} pb={2}>
           {selectedInterns.length === 0 ? (
-          <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 1 }}>
-            No interns available. Please add interns.
-          </Typography>
+            <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 1 }}>
+              No interns available. Please add interns.
+            </Typography>
           ) : (
-          <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: 2, py: 2 }}>
-            {selectedInterns.map((intern) => (
-              <Card key={intern.id} sx={{ borderRadius: 2, width: "200px", px: 2, py: 1 }}>
-                <ListItem
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "no-wrap",
-                  }}
-                >
-                  <CircleIcon>
-                    <StyledIcon>
-                      <Person />
-                    </StyledIcon>
-                  </CircleIcon>
+            <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: 2, py: 2 }}>
+              {selectedInterns.map((internId) => (
+                <Card key={internId} sx={{ borderRadius: 2, width: "200px", px: 2, py: 1 }}>
+                  <ListItem
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "no-wrap",
+                    }}
+                  >
+                    <CircleIcon>
+                      <StyledIcon>
+                        <Person />
+                      </StyledIcon>
+                    </CircleIcon>
 
-                  <ListItemText
-                    primary={intern.name}
-                    primaryTypographyProps={{ fontSize: "0.75rem", color: "#3a416f" }}
-                    sx={{ pl: "12px" }}
-                  />
-                  <ListItemSecondaryAction>
-                    <Tooltip title="Remove Intern">
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => handleRemoveIntern(group.id, intern.id)}
-                      >
-                        <StyledIcon>
-                          <ClearOutlined />
-                        </StyledIcon>
-                      </IconButton>
-                    </Tooltip>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              </Card>
-            ))}
-          </List>
+                    <ListItemText
+                      primary={internsMap[internId] || "Unknown Intern"}
+                      primaryTypographyProps={{ fontSize: "0.75rem", color: "#3a416f" }}
+                      sx={{ pl: "12px" }}
+                    />
+                    <ListItemSecondaryAction>
+                      <Tooltip title="Remove Intern">
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleRemoveIntern(group.id, internId)}
+                        >
+                          <StyledIcon>
+                            <ClearOutlined />
+                          </StyledIcon>
+                        </IconButton>
+                      </Tooltip>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </Card>
+              ))}
+            </List>
           )}
         </Box>
       </Box>

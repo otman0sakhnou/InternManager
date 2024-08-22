@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useGroupStore from "store/GroupsStore";
 import useCollaboratorStore from "store/collaboratorStore";
-import useInternStore from "store/InternStore";
-import { Grid, Card, Box, Typography, Avatar } from "@mui/material";
+
+import { Grid, Card, Box, } from "@mui/material";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "examples/Footer";
 import ConfirmationModal from "components/ConfirmationModals";
@@ -12,16 +12,13 @@ import ProjectsSection from "layouts/profile/customComponents/ProjectsSection";
 import InfoGroupCard from "./components/InfoGroupCard";
 import CollaboratorsInternsCard from "./components/CollaboratorsInternsCard";
 import DetailsHeader from "./components/DetailsHeader";
-
-
 const GroupDetails = () => {
   const { id } = useParams();
-  const getGroupById = useGroupStore((state) => state.getGroupById);
+  const fetchGroupById = useGroupStore((state) => state.fetchGroupById);
   const collaborators = useCollaboratorStore((state) => state.collaborators);
   const [group, setGroup] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isEditingInterns, setIsEditingInterns] = useState(false);
-  const [isEditingCollaborator, setIsEditingCollaborator] = useState(false);
+
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
@@ -34,8 +31,7 @@ const GroupDetails = () => {
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
-  const groups = useGroupStore((state) => state.groups);
-  const stagiaires = useInternStore((state) => state.stagiaires);
+
 
   const [refresh, setRefresh] = useState(false); //this state is added to trigger the update in this component when the name changed in the CustonInfoCard so the header get the up to date value of name at real time
 
@@ -44,21 +40,40 @@ const GroupDetails = () => {
   };
 
   useEffect(() => {
-    const fetchedGroup = getGroupById(id);
-    if (fetchedGroup) {
-      setGroup(fetchedGroup);
-      setGroupName(fetchedGroup.name);
-      setDescription(fetchedGroup.description);
-      setExpirationDate(fetchedGroup.expirationDate);
-      setSelectedInterns(fetchedGroup.stagiaires);
-      setSelectedDepartment(fetchedGroup.department);
-      setSelectedCollaborator(fetchedGroup.collaborator);
-      setSubjects([
-        { name: "Project A", type: "Project" },
-        { name: "Training B", type: "Training" },
-      ]);
-    }
-  }, [id, getGroupById, refresh]);
+
+    const extractInterns = (periods) => {
+
+      const internIds = new Set(periods.map(period => period.internId));
+
+      return Array.from(internIds);
+    };
+
+    const fetchGroupData = async () => {
+      try {
+        const fetchedGroup = await fetchGroupById(id);
+        if (fetchedGroup) {
+          setGroup(fetchedGroup);
+          setGroupName(fetchedGroup.name);
+          setDescription(fetchedGroup.description);
+          setExpirationDate(fetchedGroup.expirationDate);
+          setSubjects(fetchedGroup.subjects || []);
+
+
+          const internIds = extractInterns(fetchedGroup.periods || []);
+          setSelectedInterns(internIds);
+
+          setSelectedDepartment(fetchedGroup.department);
+          setSelectedCollaborator(fetchedGroup.collaborator);
+        }
+      } catch (error) {
+        console.error('Error fetching group data:', error);
+      }
+    };
+
+    fetchGroupData();
+  }, [id, fetchGroupById, refresh]);
+
+
 
   const handleSave = () => {
     setConfirmationModalTitle("Confirm Save");
@@ -69,9 +84,9 @@ const GroupDetails = () => {
         name: groupName,
         description,
         expirationDate,
-        stagiaires: selectedInterns,
+        newInternIds: selectedInterns,
         department: selectedDepartment,
-        collaborator: selectedCollaborator,
+        collaboratorId: selectedCollaborator.id,
         subjects,
       };
       useGroupStore.getState().updateGroup(id, updatedGroup);
@@ -126,19 +141,20 @@ const GroupDetails = () => {
               onUpdate={handleDataUpdate}
               onEditToggle={handleEditToggle}
               setGroup={setGroup}
+              newInternIds={selectedInterns}
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <ProjectsSection />
+            <ProjectsSection subjects={subjects} />
           </Grid>
         </Grid>
-
         <Grid item xs={12} md={6} spacing={3} mt={3}>
           <CollaboratorsInternsCard
             group={group}
             department={selectedDepartment}
             selectedInterns={selectedInterns}
+
             // remainingInterns={filteredStagiaires}
             collaborator={selectedCollaborator}
             // remainingCollaborators={filteredCollaborators}
