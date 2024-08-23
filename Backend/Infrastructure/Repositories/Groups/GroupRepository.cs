@@ -60,5 +60,35 @@ namespace Infrastructure.Repositories.Groups
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<Group>> GetGroupsByDepartmentAsync(string department)
+        {
+            return await _context.Groups
+                                 .Where(g => g.Department == department)
+                                 .Include(g => g.Collaborator)
+                                 .Include(g => g.Subjects)
+                                 .Include(g => g.Periods)
+                                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Group>> GetGroupsByCollaboratorIdAsync(Guid collaboratorId)
+        {
+            return await _context.Groups
+                                 .Where(g => g.CollaboratorId == collaboratorId)
+                                 .Include(g => g.Collaborator)
+                                 .Include(g => g.Subjects)
+                                 .Include(g => g.Periods)
+                                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Group>> GetGroupsByInternIdAsync(Guid internId)
+        {
+            return await _context.Groups
+                         .Include(g => g.Periods)
+                         .ThenInclude(p => p.Intern)
+                         .Where(g => g.Periods.Any(p => p.InternId == internId))
+                         .Include(g => g.Collaborator)
+                         .Include(g => g.Subjects)
+                         .ToListAsync();
+        }
     }
 }

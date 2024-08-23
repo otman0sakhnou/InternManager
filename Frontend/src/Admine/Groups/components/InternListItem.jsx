@@ -10,8 +10,9 @@ import {
 import { Person as PersonIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 const InternListItem = ({ intern, id, handleRemove }) => {
+
   return (
-    <ListItem key={id} sx={{ pl: 0 , backgroundColor: "red"}}>
+    <ListItem key={id} sx={{ pl: 0, backgroundColor: "red" }}>
       <PersonIcon className="h-8 w-8" />
       <ListItemText primary={intern.name} />
       <ListItemSecondaryAction>
