@@ -15,6 +15,7 @@ import {
   FormHelperText,
   FormControl,
   Grid,
+  IconButton,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -38,6 +39,8 @@ import toast from "react-hot-toast";
 import ConfirmationModal from "components/ConfirmationModals";
 import Backdrop from "@mui/material/Backdrop";
 import { DNA } from "react-loader-spinner";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
@@ -114,6 +117,8 @@ export default function CreateProfile() {
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const [activeStep, setActiveStep] = React.useState(0);
   const addCollaborator = useCollaboratorStore((state) => state.addCollaborator);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -126,7 +131,8 @@ export default function CreateProfile() {
     password: "",
     confirmPassword: "",
   });
-
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
   const { getCollaborators } = useCollaboratorStore((state) => ({
     getCollaborators: state.getCollaborators
   }));
@@ -209,6 +215,7 @@ export default function CreateProfile() {
   const handleGenderChange = (event) => {
     setFormData({ ...formData, gender: event.target.value });
   };
+  const roles = ["Admin", "Manager", "Collaborator"]
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -460,45 +467,98 @@ export default function CreateProfile() {
               )}
               {activeStep === 2 && (
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <TextField
-                      placeholder="Password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      error={!!errors.password}
-                      helperText={errors.password}
-                      fullWidth
-                      variant="outlined"
-                      type="password"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>lock</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      placeholder="Confirm Password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      error={!!errors.confirmPassword}
-                      helperText={errors.confirmPassword}
-                      fullWidth
-                      variant="outlined"
-                      type="password"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <StyledIcon>lock</StyledIcon>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
+                  <Grid container spacing={2}>
+                    <Grid item lg={12} md={12} xs={12} >
+                      <FormControl fullWidth error={!!errors.role}>
+                        <Select
+                          value={formData.role}
+                          onChange={handleInputChange}
+                          displayEmpty
+                          variant="outlined"
+                          renderValue={(selected) => {
+                            if (!selected) {
+                              return <span style={{ color: "#CCCCCC" }}>Select role</span>;
+                            }
+                            return selected;
+                          }}
+                          startAdornment={
+                            <InputAdornment
+                              style={{ fontSize: 16, color: "#344767" }}
+                              position="start"
+                            >
+                              <StyledIcon>person</StyledIcon>
+                            </InputAdornment>
+                          }
+                        >
+                          <MenuItem value="" disabled>
+                            Select role
+                          </MenuItem>
+                          {roles.map((role, index) => (
+                            <MenuItem key={index} value={role}>
+                              {role}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {!!errors.role && (
+                          <FormHelperText>{errors.role}</FormHelperText>
+                        )}
+                      </FormControl>
+
+                    </Grid>
+                    <Grid item md={12} xs={12}>
+                      <TextField
+                        placeholder="Password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        error={!!errors.password}
+                        helperText={errors.password}
+                        fullWidth
+                        variant="outlined"
+                        type={showPassword ? "text" : "password"}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <StyledIcon>lock</StyledIcon>
+                            </InputAdornment>
+                          ),
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={togglePasswordVisibility} sx={{ color: "#344767" }}>
+                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item md={12} xs={12}>
+                      <TextField
+                        placeholder="Confirm Password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        error={!!errors.confirmPassword}
+                        helperText={errors.confirmPassword}
+                        fullWidth
+                        variant="outlined"
+                        type={showConfirmPassword ? "text" : "password"}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <StyledIcon>lock</StyledIcon>
+                            </InputAdornment>
+                          ),
+                          endAdornment: (
+                            <InputAdornment position="end" onClick={toggleConfirmPasswordVisibility}>
+                              <IconButton sx={{ color: "#344767" }}>
+                                {showConfirmPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
                   </Grid>
                   <Grid
                     container
@@ -506,6 +566,7 @@ export default function CreateProfile() {
                     justifyContent="space-between"
                     alignItems="center"
                     margin={2}
+                    xs={12}
                   >
                     <SoftButton variant="gradient" color="dark" onClick={handleBack}>
                       Previous
