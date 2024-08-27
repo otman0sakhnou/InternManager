@@ -29,7 +29,7 @@ const InfoGroupCard = ({
   description,
   expirationDate,
   department,
-  // isEditing,
+
   onUpdate,
   onEditToggle,
   setGroup,
@@ -58,10 +58,6 @@ const InfoGroupCard = ({
   }, [groupName, description, expirationDate, department]);
 
 
-  // const handleSave = () => {
-  //   onSave(editableInfo);
-  //   onUpdate
-  // };
 
   const handleSave = () => {
 
@@ -82,8 +78,7 @@ const InfoGroupCard = ({
       onUpdate();
       setGroup(updatedGroup);
       setIsEditing(false);
-      // setIsEditingInterns(false);
-      // setIsEditingCollaborator(false);
+
       toast.success("Group updated successfully!");
 
 

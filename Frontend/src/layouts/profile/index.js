@@ -8,6 +8,10 @@ import SoftBox from "../../components/SoftBox";
 import Grid from "@mui/material/Grid";
 import InternStepsCard from "./customComponents/InternStepsCard";
 
+import InternStepsCard from "./customComponents/InternStepsCard"
+import { Grid, Backdrop } from "@mui/material";
+import { DNA } from 'react-loader-spinner';
+
 import Header from "./components/Header";
 import ProfessionalInfoCard from "./customComponents/ProfessionalInfoCard";
 import TeamsCard from "./customComponents/TeamsCard";
@@ -127,6 +131,7 @@ function Overview() {
         console.log(err);
         setError("Failed to fetch data. Please try again later.");
       }
+      setLoading(false);
     };
     fetchData();
   }, [selectedUserId, getCollaborator, getStagiaireById, refresh, roles, user, selectedUserRole]);
@@ -153,11 +158,38 @@ function Overview() {
   if (error){
     return <div>{error}</div>;
   } 
-  if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
-  const latestPeriod = data.periods?.reduce(
-    (latest, current) => (new Date(current.endDate) > new Date(latest.endDate) ? current : latest),
-    data.periods[0]
-  );
+  // if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
+  // const latestPeriod = data.periods?.reduce(
+  //   (latest, current) => (new Date(current.endDate) > new Date(latest.endDate) ? current : latest),
+  //   data.periods[0]
+  // );
+  // if (roleLoading) return <div>Loading...</div>;
+  if (loading || roleLoading) {
+    return (
+      <Backdrop
+        sx={{
+          color: "#ff4",
+          backgroundImage: "linear-gradient(135deg, #ced4da 0%, #ebeff4 100%)",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
+    );
+  }
+
+  if (!data) return <div>No data found</div>; // Handle loading state
+  const latestPeriod = data.periods?.reduce((latest, current) =>
+    new Date(current.endDate) > new Date(latest.endDate) ? current : latest
+    , data.periods[0]);
 
   const profileAction = {
     route: "/edit-profile",
@@ -231,6 +263,7 @@ function Overview() {
         </Grid>
       </SoftBox>
       <Footer />
+
     </DashboardLayout>
   );
 }

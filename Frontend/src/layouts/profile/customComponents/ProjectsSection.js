@@ -22,7 +22,7 @@ const ProjectsSection = ({ subjects = [] }) => {
 
 
   return (
-    <Card>
+    <Card sx={{ height: "100%", display: 'flex', flexDirection: 'column' }}>
       <SoftBox pt={2} px={2}>
         <SoftBox mb={0.5} display="flex" alignItems="center" justifyContent="space-between">
           <SoftTypography variant="h6" fontWeight="medium">
@@ -31,8 +31,8 @@ const ProjectsSection = ({ subjects = [] }) => {
         </SoftBox>
       </SoftBox>
 
-      <SoftBox p={2}>
-        <Grid container spacing={3}>
+      <SoftBox p={2} flex="1">
+        <Grid container spacing={3} sx={{ flexGrow: 1 }}>
           {subjects.map((subject) => (
             <Grid
               key={subject.id}
@@ -48,6 +48,8 @@ const ProjectsSection = ({ subjects = [] }) => {
             item
             xs={12}
             sx={{
+
+              marginTop: '4%',
               cursor: 'pointer',
               '&:hover': {
                 cursor: 'pointer',
