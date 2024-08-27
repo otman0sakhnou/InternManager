@@ -35,6 +35,9 @@ import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/Info";
 import useGroupStore from "store/GroupsStore";
 import { useGroupName } from 'context/GroupeNameContext';
+import { Grid, Backdrop } from "@mui/material";
+import { DNA } from 'react-loader-spinner';
+
 const Groups = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
@@ -49,7 +52,7 @@ const Groups = () => {
     loadInterns: state.loadInterns,
 
   }));
-
+  const [loading, setLoading] = useState(false);
   const groups = useGroupStore((state) => state.groups);
   const addGroup = useGroupStore((state) => state.addGroup);
   const deleteGroup = useGroupStore((state) => state.deleteGroup);
@@ -85,17 +88,21 @@ const Groups = () => {
     if (selectedDepartment) {
       const fetchData = async () => {
         try {
+          setLoading(true);
           const groups = await fetchGroupsByDepartment(selectedDepartment);
           setDepartmentGroups(groups || []);
+          setLoading(false);
         } catch (error) {
           console.error("Failed to fetch groups:", error);
+          setLoading(false);
         }
       };
       fetchData();
     }
   }, [selectedDepartment, fetchGroupsByDepartment, addGroup, deleteGroup]);
   useEffect(() => {
-    loadInterns();
+    setLoading(true);
+    loadInterns().finally(() => setLoading(false));
   }, [loadInterns]);
 
   const getActiveInterns = (department) => {
@@ -147,6 +154,7 @@ const Groups = () => {
   };
   const navigate = useNavigate();
   const handleCreateGroup = async () => {
+
     const newGroup = {
       name: groupName,
       description,
@@ -157,34 +165,45 @@ const Groups = () => {
       collaboratorId: selectedCollaborator,
     };
 
-    // Rediriger vers la page de création de sujet si la case est cochée
-    if (addSubject) {
-      addGroup(newGroup);
+    try {
+      if (addSubject) {
+        setLoading(true);
+        addGroup(newGroup);
 
-      const groupId = await addGroup(newGroup);
+        const groupId = await addGroup(newGroup);
 
-      navigate(`/Add-Subject/${groupId}`);
-    } else {
-      // Afficher la confirmation
-      setActionType("success");
-      setConfirmationModalTitle("Add Subject");
-      setConfirmationModalDescription(
-        "Are you sure you don't want to add a subject for this group?"
-      );
-      setOnConfirmAction(() => async () => {
-        await addGroup(newGroup);
-        const groups = await fetchGroupsByDepartment(selectedDepartment);
-        setDepartmentGroups(groups || []);
-        setShowCreateGroupForm(false);
-        setSelectedInterns([]);
-        setGroupName("");
-        setDescription("");
-        setExpirationDate("");
-        setSelectedCollaborator("");
-      });
+        navigate(`/Add-Subject/${groupId}`);
+      } else {
+        // Afficher la confirmation
+        setActionType("success");
+        setConfirmationModalTitle("Add Subject");
+        setConfirmationModalDescription(
+          "Are you sure you don't want to add a subject for this group?"
+        );
+        setOnConfirmAction(() => async () => {
+          setLoading(true);
+          await addGroup(newGroup);
+          const groups = await fetchGroupsByDepartment(selectedDepartment);
+          setDepartmentGroups(groups || []);
+          setShowCreateGroupForm(false);
+          setSelectedInterns([]);
+          setGroupName("");
+          setDescription("");
+          setExpirationDate("");
+          setSelectedCollaborator("");
+          setLoading(false);
+        });
+
+
+        setIsConfirmationModalOpen(true);
+      }
     }
-
-    setIsConfirmationModalOpen(true);
+    catch (error) {
+      console.error("Error creating group:", error);
+      setLoading(false); // Stop loading if there's an error
+    } finally {
+      setLoading(false); // Ensure loading is stopped in case of any early returns
+    }
   };
 
 
@@ -195,10 +214,12 @@ const Groups = () => {
       "Are you sure you want to delete this group? This action cannot be undone."
     );
     setOnConfirmAction(() => async () => {
+      setLoading(true);
       await deleteGroup(id);
       const groups = await fetchGroupsByDepartment(selectedDepartment);
       setDepartmentGroups(groups || []);
       toast.success("Group deleted successfully!");
+      setLoading(false);
     });
     setIsConfirmationModalOpen(true);
   };
@@ -989,6 +1010,19 @@ const Groups = () => {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </DashboardLayout>
   );
 };

@@ -12,6 +12,8 @@ import ProjectsSection from "layouts/profile/customComponents/ProjectsSection";
 import InfoGroupCard from "./components/InfoGroupCard";
 import CollaboratorsInternsCard from "./components/CollaboratorsInternsCard";
 import DetailsHeader from "./components/DetailsHeader";
+import { Backdrop } from "@mui/material";
+import { DNA } from 'react-loader-spinner';
 const GroupDetails = () => {
   const { id } = useParams();
   const fetchGroupById = useGroupStore((state) => state.fetchGroupById);
@@ -31,6 +33,7 @@ const GroupDetails = () => {
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [loading, setLoading] = useState(false);
 
 
   const [refresh, setRefresh] = useState(false); //this state is added to trigger the update in this component when the name changed in the CustonInfoCard so the header get the up to date value of name at real time
@@ -49,6 +52,7 @@ const GroupDetails = () => {
     };
 
     const fetchGroupData = async () => {
+      setLoading(true);
       try {
         const fetchedGroup = await fetchGroupById(id);
         if (fetchedGroup) {
@@ -67,6 +71,9 @@ const GroupDetails = () => {
         }
       } catch (error) {
         console.error('Error fetching group data:', error);
+      }
+      finally {
+        setLoading(false); // Stop loading once data is fetched
       }
     };
 
@@ -176,6 +183,19 @@ const GroupDetails = () => {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </DashboardLayout>
   );
 };

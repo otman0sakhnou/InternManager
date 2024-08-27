@@ -15,7 +15,8 @@ import ConfirmationModal from "components/ConfirmationModals";
 import CustomDropzone from "components/Dropzone";
 import toast from "react-hot-toast";
 import useStagiaireStore from "store/InternStore";
-import { Grid } from "@mui/material";
+import { Grid, Backdrop } from "@mui/material";
+import { DNA } from 'react-loader-spinner';
 
 function Interns() {
   const [selectedIntern, setSelectedIntern] = useState(null);
@@ -31,10 +32,21 @@ function Interns() {
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadInterns();
-  }, [loadInterns])
+    const fetchInterns = async () => {
+      try {
+        await loadInterns();
+        setLoading(false);
+      } catch (error) {
+        console.error("Erreur lors du chargement des stagiaires:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchInterns();
+  }, [loadInterns]);
 
   const getPaginatedInterns = () => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -44,6 +56,7 @@ function Interns() {
   };
 
   const handleAddIntern = (newIntern) => {
+
     if (selectedIntern) {
       setConfirmationModalDescription("Are you sure you want to edit this intern's information?");
       updateStagiaire(newIntern);
@@ -63,9 +76,16 @@ function Interns() {
     setConfirmationModalDescription(
       "Are you sure you want to delete this intern? This action cannot be undone."
     );
-    setOnConfirmAction(() => () => {
-      deleteStagiaire(intern.id);
-      toast.success("Intern deleted successfully!");
+    setOnConfirmAction(() => async () => {
+      setLoading(true);
+      try {
+        await deleteStagiaire(intern.id);
+        toast.success("Intern deleted successfully!");
+      } catch (error) {
+        toast.error("Failed to delete intern.");
+      } finally {
+        setLoading(false);
+      }
     });
     setIsConfirmationModalOpen(true);
   };
@@ -76,27 +96,36 @@ function Interns() {
     setConfirmationModalDescription(
       "Are you sure you want to delete all interns? This action cannot be undone."
     );
-    setOnConfirmAction(() => () => {
-      deleteAllStagiaires();
-      toast.success("All interns deleted successfully!");
+    setOnConfirmAction(() => async () => {
+      setLoading(true);
+      try {
+        await deleteAllStagiaires();
+        toast.success("All interns deleted successfully!");
+      } catch (error) {
+        toast.error("Failed to delete all interns.");
+      } finally {
+        setLoading(false);
+      }
     });
     setIsConfirmationModalOpen(true);
   };
 
+
   const handleFileAdded = (file) => {
+    setLoading(true);
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const text = e.target.result;
         const data = JSON.parse(text);
-        //console.log("Parsed data:", data);
-        data.forEach((intern) => {
-          console.log("Intern", intern)
-
-          addStagiaire(intern);
-        });
+        for (const intern of data) {
+          await addStagiaire(intern);
+        }
+        toast.success("Interns added successfully!");
       } catch (error) {
-        console.error("Error reading or parsing file:", error);
+        toast.error("Error reading or parsing file.");
+      } finally {
+        setLoading(false);
       }
     };
     reader.readAsText(file);
@@ -203,6 +232,19 @@ function Interns() {
         }}
         actionType={actionType}
       />
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </DashboardLayout>
   );
 }

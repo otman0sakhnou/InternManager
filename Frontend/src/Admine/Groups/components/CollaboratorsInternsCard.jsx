@@ -35,6 +35,7 @@ import useCollaboratorStore from "store/collaboratorStore";
 import useInternStore from "store/InternStore";
 
 
+
 const CircleIcon = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -74,11 +75,8 @@ const CollaboratorsInternsCard = ({
   const updateGroup = useGroupStore((state) => state.updateGroup);
   const fetchGroupsByDepartment = useGroupStore((state) => state.fetchGroupsByDepartment);
   const [departmentGroups, setDepartmentGroups] = useState([]);
-  const { stagiaires, loadInterns, getStagiaireById } = useInternStore((state) => ({
-    stagiaires: state.stagiaires,
-    loadInterns: state.loadInterns,
-    getStagiaireById: state.getStagiaireById,
-  }));
+  const [remainingInterns, setRemainingInterns] = useState([]);
+  const { stagiaires, loadInterns, getStagiaireById } = useInternStore();
   const { loadCollaborators } = useCollaboratorStore((state) => ({
 
     loadCollaborators: state.getCollaborators,
@@ -86,7 +84,7 @@ const CollaboratorsInternsCard = ({
   }));
   useEffect(() => {
     loadCollaborators();
-  }, [loadCollaborators]);
+  }, [loadCollaborators, isEditingCollaborator]);
 
   useEffect(() => {
     if (collaborator) {
@@ -95,9 +93,10 @@ const CollaboratorsInternsCard = ({
       setSelectedCollaboratorId(collaborator.id);
     }
   }, [collaborator]);
+
   useEffect(() => {
-    loadInterns();
-  }, [loadInterns]);
+    loadInterns()
+  }, [loadInterns, isEditingInterns]);
   useEffect(() => {
     const fetchGroups = async () => {
       try {
@@ -107,9 +106,16 @@ const CollaboratorsInternsCard = ({
         console.error("Failed to fetch groups:", error);
       }
     };
-    if (department) fetchGroups();
-  }, [department, fetchGroupsByDepartment]);
 
+
+    if (department) {
+      fetchGroups()
+    };
+  }, [department, fetchGroupsByDepartment, stagiaires]);
+  useEffect(() => {
+    if (departmentGroups)
+      setRemainingInterns(getActiveInterns(department))
+  }, [departmentGroups, stagiaires])
   useEffect(() => {
     const loadInternNames = async () => {
       try {
@@ -150,13 +156,13 @@ const CollaboratorsInternsCard = ({
         });
       }
     });
-
+    console.log(activeInternIds, stagiaires)
     return stagiaires.filter((stagiaire) =>
       stagiaire.department === department && !activeInternIds.has(stagiaire.id)
     );
   };
 
-  const remainingInterns = department ? getActiveInterns(department) : [];
+
 
   const remainingCollaborators = department
     ? collaborators.filter((collab) => collab.department === department)
@@ -200,16 +206,16 @@ const CollaboratorsInternsCard = ({
       ...selectedInterns.filter((internId) => !selectedInternIds.includes(internId)),
       ...selectedInternIdsToAdd,
     ];
-
+    setIsEditingInterns(true);
 
     setConfirmationModalTitle("Confirm Save");
     setConfirmationModalDescription("Are you sure you want to save the changes?");
     setOnConfirmAction(() => () => {
       const updatedGroup = {
         ...group,
-        newInternIds: updatedSelectedInternIds,
+        newInternIds: updatedSelectedInternIds.length > 0 ? updatedSelectedInternIds : selectedInterns
       };
-      console.log(updatedGroup);
+
       updateGroup(group.id, updatedGroup);
       onUpdate();
       setIsEditing(false);
@@ -235,7 +241,8 @@ const CollaboratorsInternsCard = ({
       setOnConfirmAction(() => () => {
         const updatedGroup = {
           ...group,
-          collaborator: selectedCollaborator,
+          collaboratorId: selectedCollaboratorId,
+          newInternIds: selectedInterns,
 
         };
         console.log(updatedGroup)
@@ -295,15 +302,20 @@ const CollaboratorsInternsCard = ({
   );
 
   const handleRemoveIntern = (groupId, internId) => {
-    setActionType("delete")
+    setActionType("delete");
     setConfirmationModalTitle("Confirm Delete");
     setConfirmationModalDescription("Are you sure you want to delete this intern?");
-    setOnConfirmAction(() => () => {
-      removeInternFromGroup(groupId, internId);
-      onUpdate(); // Call to trigger a re-render or additional logic
+    setOnConfirmAction(() => async () => {
+      setIsEditingInterns(true);
+      await removeInternFromGroup(groupId, internId);
+
+      onUpdate();
       toast.success("Intern deleted successfully!");
+      setIsEditingInterns(false);
     });
     setIsConfirmationModalOpen(true);
+
+
   };
 
 
@@ -396,7 +408,7 @@ const CollaboratorsInternsCard = ({
                 {remainingCollaborators.length > 0 ? (
                   renderEditableSelectField(
                     "Collaborator",
-                    collaborator.name,
+                    selectedCollaboratorId,
                     "collaborator",
                     remainingCollaborators
                   )
