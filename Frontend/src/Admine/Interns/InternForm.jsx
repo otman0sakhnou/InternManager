@@ -34,12 +34,14 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import useValidationStore from "store/useValidationStore";
 import dayjs from "dayjs";
 import SoftBox from "components/SoftBox";
-import { Grid } from "@mui/material";
+
 import { validate, validationSchemas } from "../../utils/validation";
 import useStagiaireStore from "store/InternStore";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 // Import the icon you want to use
 import { useNavigate } from "react-router-dom";
+import { Grid, Backdrop } from "@mui/material";
+import { DNA } from 'react-loader-spinner';
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -136,6 +138,7 @@ export default function CreateProfile() {
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
   const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [loading, setLoading] = useState(false);
   const handleSubmit = () => {
     const updatedIntern = {
       name: internName,
@@ -158,15 +161,21 @@ export default function CreateProfile() {
     setConfirmationModalDescription(
       "Are you sure you want to Add This intern? This action cannot be undone."
     );
-    setOnConfirmAction(() => () => {
-      addStagiaire(updatedIntern);
-      toast.success("Intern added successfully!");
-      navigate("/interns");
-      resetForm();
+    setOnConfirmAction(() => async () => {
+      setLoading(true); // Show loading indicator
+      try {
+        await addStagiaire(updatedIntern); // Assuming addStagiaire is async
+        toast.success("Intern added successfully!");
+        navigate("/interns");
+        resetForm();
+      } catch (error) {
+        toast.error("Failed to add intern.");
+      } finally {
+        setLoading(false); // Hide loading indicator
+      }
     });
     setIsConfirmationModalOpen(true);
   };
-
   const resetForm = () => {
     setInternName("");
     setInternEmail("");
@@ -677,6 +686,19 @@ export default function CreateProfile() {
           }}
           actionType={actionType}
         />
+        <Backdrop
+          sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}
+        >
+          <DNA
+            visible={true}
+            height="100"
+            width="100"
+            ariaLabel="dna-loading"
+            wrapperStyle={{}}
+            wrapperClass="dna-wrapper"
+          />
+        </Backdrop>
       </DashboardLayout>
     </LocalizationProvider>
   );

@@ -5,9 +5,10 @@ import useCollaboratorStore from "store/collaboratorStore"; // Ensure you import
 import useStagiaireStore from "store/InternStore"; // Ensure you import the correct store
 import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
 import SoftBox from "../../components/SoftBox";
-import Grid from "@mui/material/Grid";
-import InternStepsCard from "./customComponents/InternStepsCard"
 
+import InternStepsCard from "./customComponents/InternStepsCard"
+import { Grid, Backdrop } from "@mui/material";
+import { DNA } from 'react-loader-spinner';
 
 import Header from "./components/Header";
 import ProfessionalInfoCard from "./customComponents/ProfessionalInfoCard";
@@ -28,9 +29,11 @@ function Overview() {
 
   const getCollaborator = useCollaboratorStore((state) => state.getCollaborator);
   const getStagiaireById = useStagiaireStore((state) => state.getStagiaireById);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       if (role === "collaborator") {
         const collaborator = await getCollaborator(id);
         console.log("Fetched collaborator:", collaborator);
@@ -39,6 +42,7 @@ function Overview() {
         const intern = getStagiaireById(id);
         setData(intern);
       }
+      setLoading(false);
     };
 
     fetchData();
@@ -48,9 +52,29 @@ function Overview() {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger useEffect
   };
 
-  console.log("Data:", data)
+  if (loading) {
+    return (
+      <Backdrop
+        sx={{
+          color: "#ff4",
+          backgroundImage: "linear-gradient(135deg, #ced4da 0%, #ebeff4 100%)",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
+    );
+  }
 
-  if (!data) return <div>Loading...</div>; // Handle loading state
+  if (!data) return <div>No data found</div>; // Handle loading state
   const latestPeriod = data.periods?.reduce((latest, current) =>
     new Date(current.endDate) > new Date(latest.endDate) ? current : latest
     , data.periods[0]);
@@ -75,7 +99,7 @@ function Overview() {
       }
       : {
         id: data.id,
-        department: data.department, 
+        department: data.department,
         employmentDate: data.employmentDate,
         title: data.title,
         organization: data.organization,
@@ -111,12 +135,13 @@ function Overview() {
                 role={role}
               />
             </LocalizationProvider>
-          </Grid>  
+          </Grid>
           <TeamsCard id={data.id} />
-          {role=="intern" && <InternStepsCard/>}
+          {role == "intern" && <InternStepsCard />}
         </Grid>
       </SoftBox>
       <Footer />
+
     </DashboardLayout>
   );
 }
