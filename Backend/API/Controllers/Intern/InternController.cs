@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 using MediatR;
+using Application.Services.AuthenticationAndAuthorization.Queries;
 
 
 namespace Presentation.Controllers
@@ -89,6 +90,26 @@ namespace Presentation.Controllers
             var interns = await _mediator.Send(query);
             var internDtos = _mapper.Map<IEnumerable<InternDto>>(interns);
             return Ok(internDtos);
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetInternIdByUserId(Guid userId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetInternIdByUserIdQuery(userId));
+
+                if (result == null)
+                {
+                    return NotFound("No intern found for the given user ID.");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -4,8 +4,7 @@ import Billing from "layouts/billing";
 import VirtualReality from "layouts/virtual-reality";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-// import CollabProfile from "Admine/collaborator/CollabProfile";
-import CreateProfile from './Admine/collaborator/CreateProfile';
+import CreateProfile from "./Admine/collaborator/CreateProfile";
 import Collaborator from "./Admine/collaborator";
 import Interns from "./Admine/Interns";
 import InternForm from "Admine/Interns/InternForm";
@@ -25,6 +24,10 @@ import GroupIcon from "@mui/icons-material/Group";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import GroupDetails from "Admine/Groups/GroupDetails";
 import Profile from "layouts/profile";
+import Document from "examples/Icons/Document";
+import SpaceShip from "examples/Icons/SpaceShip";
+import { LogoutOutlined } from "@mui/icons-material";
+import Logout from "components/Logout";
 
 const routes = [
   {
@@ -35,6 +38,7 @@ const routes = [
     icon: <Shop size="12px" />,
     component: <Dashboard />,
     noCollapse: true,
+    roles: ["admin", "manager", "collaborator", "intern"],
   },
   {
     type: "collapse",
@@ -44,24 +48,28 @@ const routes = [
     icon: <PersonIcon size="12px" />,
     component: <Collaborator />,
     noCollapse: true,
+    roles: ["admin", "manager"],
   },
   {
     name: "CreateIntern",
     key: "c",
     route: "/createintern",
     component: <InternForm />,
+    roles: ["admin", "manager", "collaborator"],
   },
   {
     name: "AddSubject",
     key: "c",
     route: "/Add-Subject/:id",
     component: <AddSubjectComponent />,
+    roles: ["admin", "manager", "collaborator"],
   },
   {
     name: "subjects",
     key: "subjects",
     route: "/Subject/:id",
     component: <SubjectPage />,
+    roles: ["admin", "manager", "collaborator", "intern"],
   },
   {
     type: "collapse",
@@ -71,6 +79,7 @@ const routes = [
     icon: <GroupIcon size="12px" />,
     component: <Interns />,
     noCollapse: true,
+    roles: ["admin", "manager", "collaborator"],
   },
   // {
   //   type: "collapse",
@@ -90,6 +99,7 @@ const routes = [
     icon: <PeopleAltIcon size="12px" />,
     component: <Groups />,
     noCollapse: true,
+    roles: ["admin", "manager", "collaborator"],
   },
   {
     name: "Groups Details ",
@@ -97,6 +107,7 @@ const routes = [
     route: "/groupdetails/:id",
 
     component: <GroupDetails />,
+    roles: ["admin", "manager", "collaborator", "intern"],
   },
 
   // {
@@ -126,16 +137,17 @@ const routes = [
     icon: <CustomerSupport size="12px" />,
     component: <Profile />,
     noCollapse: true,
+    roles: ["admin", "manager", "collaborator", "intern"],
   },
-  // {
-  //   type: "collapse",
-  //   name: "Sign In",
-  //   key: "sign-in",
-  //   route: "/authentication/sign-in",
-  //   icon: <Document size="12px" />,
-  //   component: <SignIn />,
-  //   noCollapse: true,
-  // },
+  {
+    //type: "collapse",
+    name: "Sign In",
+    key: "sign-in",
+    route: "/authentication/sign-in",
+    icon: <Document size="12px" />,
+    component: <SignIn />,
+    noCollapse: true,
+  },
   // {
   //   type: "collapse",
   //   name: "Sign Up",
@@ -150,12 +162,14 @@ const routes = [
     key: "c",
     route: "/createintern",
     component: <InternForm />,
+    roles: ["admin", "manager", "collaborator"],
   },
   {
     name: "InternProfile",
     key: "InternProfile",
     route: "/Intern/Profile/:id",
     component: <Profile />,
+    roles: ["admin", "manager", "collaborator"],
   },
   {
     type: "collapse",
@@ -165,16 +179,27 @@ const routes = [
     noCollapse: false,
   },
   {
+    type: "collapse",
+    name: "Logout",
+    key: "logout",
+    route: "/authentication/logout",
+    component: <Logout />,
+    icon: <LogoutOutlined size="12px" />,
+    noCollapse: false,
+  },
+  {
     name: "CreateCollaboratorProfile",
     key: "CreateCollaboratorProfile",
     route: "/Collaborator/Create-Collaborator-Profile",
     component: <CreateProfile />,
+    roles: ["admin", "manager"],
   },
   {
     name: "CollaboratorProfile",
     key: "CollaboratorProfile",
     route: "/Collaborator/Profile/:id",
     component: <Profile />,
+    roles: ["admin", "manager"],
   },
 ];
 

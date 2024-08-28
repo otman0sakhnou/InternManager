@@ -31,7 +31,7 @@ function Footer() {
   return (
     <SoftBox component="footer" py={6}>
       <Grid container justifyContent="center">
-        <Grid item xs={10} lg={8}>
+        {/* <Grid item xs={10} lg={8}>
           <SoftBox display="flex" justifyContent="center" flexWrap="wrap" mb={3}>
             <SoftBox mr={{ xs: 2, lg: 3, xl: 6 }}>
               <SoftTypography component="a" href="#" variant="body2" color="secondary">
@@ -64,8 +64,8 @@ function Footer() {
               </SoftTypography>
             </SoftBox>
           </SoftBox>
-        </Grid>
-        <Grid item xs={12} lg={8}>
+        </Grid> */}
+        {/* <Grid item xs={12} lg={8}>
           <SoftBox display="flex" justifyContent="center" mt={1} mb={3}>
             <SoftBox mr={3} color="secondary">
               <FacebookIcon fontSize="small" />
@@ -83,10 +83,10 @@ function Footer() {
               <LinkedInIcon fontSize="small" />
             </SoftBox>
           </SoftBox>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} lg={8} sx={{ textAlign: "center" }}>
           <SoftTypography variant="body2" color="secondary">
-            Copyright &copy; 2021 Soft by Creative Tim.
+            Copyright &copy; 2024 Intern Manager.
           </SoftTypography>
         </Grid>
       </Grid>

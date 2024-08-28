@@ -32,3 +32,8 @@ export const DeleteCollaborator = async (id) => {
   await axios.delete(`${API_BASE_URL}/Collaborator/${id}`);
   return true;
 }
+
+export const getCollaboratorIdByUserId = async (userId) => {
+  const res = await axios.get(`${API_BASE_URL}/Collaborator/user/${userId}`);
+  return res.data;
+};

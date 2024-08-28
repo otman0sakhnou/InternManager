@@ -53,7 +53,7 @@ const avatarStyles = {
   fontWeight: "bold",
 };
 
-function Header({ name, gender }) {
+function Header({ name, gender , isViewingOwnProfile}) {
   const navigate = useNavigate(); // Initialize navigate function
 
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
@@ -79,7 +79,7 @@ function Header({ name, gender }) {
     }
   };
 
-  const avatarImage = getAvatarImage(gender)
+  const avatarImage = gender && getAvatarImage(gender)
 
   return (
     <SoftBox position="relative">
@@ -115,14 +115,16 @@ function Header({ name, gender }) {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            <SoftAvatar
-              variant="rounded"
-              size="xl"
-              shadow="sm"
-              src={avatarImage}
-              alt={name}
-              sx={{ bgcolor: "primary" }}
-            />
+            {gender && (
+              <SoftAvatar
+                variant="rounded"
+                size="xl"
+                shadow="sm"
+                src={avatarImage}
+                alt={name}
+                sx={{ bgcolor: "primary" }}
+              />
+            )}
           </Grid>
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
@@ -142,11 +144,13 @@ function Header({ name, gender }) {
                 onChange={handleTabChange}
                 sx={{ background: "transparent" }}
               >
-                <Tab
-                  label="Go Back"
-                  icon={<ArrowBack />}
-                  onClick={() => navigate(-1)} // Handle click directly
-                />
+                {!isViewingOwnProfile && (
+                  <Tab
+                    label="Go Back"
+                    icon={<ArrowBack />}
+                    onClick={() => navigate(-1)} // Handle click directly
+                  />
+                )}
                 <Tab label="Message" icon={<Document />} />
                 <Tab label="Settings" icon={<Settings />} />
               </Tabs>
@@ -160,7 +164,8 @@ function Header({ name, gender }) {
 
 Header.propTypes = {
   name: PropTypes.string.isRequired,
-  gender: PropTypes.string.isRequired,
+  gender: PropTypes.string,
+  isViewingOwnProfile: PropTypes.bool.isRequired,
 };
 
 export default Header;

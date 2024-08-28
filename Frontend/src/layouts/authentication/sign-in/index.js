@@ -14,6 +14,8 @@ Coded by www.creative-tim.com
 */
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuthStore from "store/useAuthStore";
 
 // react-router-dom components
 import { Link } from "react-router-dom";
@@ -33,25 +35,56 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 // Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 
+import sqliLogo from "../../../assets/images/sqliLogo.jpg";
+import { Icon, IconButton, InputAdornment } from "@mui/material";
+
 function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const { login, loading, error } = useAuthStore((state) => ({
+    login: state.login,
+    loading: state.loading,
+    error: state.error,
+  }));
+
+  const navigate = useNavigate();
+
+   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try{
+      await login({email, password});
+      navigate("/dashboard");
+    } catch (err) {
+       console.error("Login error:", err);
+    }
+  }
+
   return (
     <CoverLayout
-      title="Welcome back"
+      title="Welcome To Intern Manager"
       description="Enter your email and password to sign in"
-      image={curved9}
+      image={sqliLogo}
     >
-      <SoftBox component="form" role="form">
+      <SoftBox component="form" role="form" onSubmit={handleSubmit}>
         <SoftBox mb={2}>
           <SoftBox mb={1} ml={0.5}>
             <SoftTypography component="label" variant="caption" fontWeight="bold">
               Email
             </SoftTypography>
           </SoftBox>
-          <SoftInput type="email" placeholder="Email" />
+          <SoftInput
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </SoftBox>
         <SoftBox mb={2}>
           <SoftBox mb={1} ml={0.5}>
@@ -59,9 +92,25 @@ function SignIn() {
               Password
             </SoftTypography>
           </SoftBox>
-          <SoftInput type="password" placeholder="Password" />
+          <SoftInput
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            // endAdornment={
+            //   <InputAdornment sx={{ display: "flex", alignItems: "center", justifyContent:"flex-end" }}>
+            //     <IconButton
+            //       aria-label="toggle password visibility"
+            //       onClick={handleClickShowPassword}
+            //     >
+            //       <Icon>{showPassword ? "visibility" : "visibility_off"}</Icon>
+            //     </IconButton>
+            //   </InputAdornment>
+            // }
+          />
         </SoftBox>
-        <SoftBox display="flex" alignItems="center">
+        {/* <SoftBox display="flex" alignItems="center">
           <Switch checked={rememberMe} onChange={handleSetRememberMe} />
           <SoftTypography
             variant="button"
@@ -71,13 +120,18 @@ function SignIn() {
           >
             &nbsp;&nbsp;Remember me
           </SoftTypography>
-        </SoftBox>
+        </SoftBox> */}
         <SoftBox mt={4} mb={1}>
-          <SoftButton variant="gradient" color="info" fullWidth>
-            sign in
+          <SoftButton variant="gradient" color="info" fullWidth type="submit" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
           </SoftButton>
         </SoftBox>
-        <SoftBox mt={3} textAlign="center">
+        {error && (
+          <SoftBox mt={2}>
+            <SoftTypography color="error">{error}</SoftTypography>
+          </SoftBox>
+        )}
+        {/* <SoftBox mt={3} textAlign="center">
           <SoftTypography variant="button" color="text" fontWeight="regular">
             Don&apos;t have an account?{" "}
             <SoftTypography
@@ -91,7 +145,7 @@ function SignIn() {
               Sign up
             </SoftTypography>
           </SoftTypography>
-        </SoftBox>
+        </SoftBox> */}
       </SoftBox>
     </CoverLayout>
   );
