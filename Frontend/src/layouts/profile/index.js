@@ -6,10 +6,9 @@ import useStagiaireStore from "store/InternStore"; // Ensure you import the corr
 import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
 import SoftBox from "../../components/SoftBox";
 import Grid from "@mui/material/Grid";
-import InternStepsCard from "./customComponents/InternStepsCard";
 
 import InternStepsCard from "./customComponents/InternStepsCard"
-import { Grid, Backdrop } from "@mui/material";
+import { Backdrop } from "@mui/material";
 import { DNA } from 'react-loader-spinner';
 
 import Header from "./components/Header";
