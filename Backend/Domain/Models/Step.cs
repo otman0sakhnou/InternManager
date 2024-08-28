@@ -12,6 +12,7 @@ namespace Domain.Models
     {
         public Guid Id { get; set; }
         public string Description { get; set; }
+        public int OrderStep { get; set; }
 
         [ForeignKey("subjectId")]
         public Guid SubjectId { get; set; }

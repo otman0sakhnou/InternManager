@@ -1,7 +1,7 @@
-//tracking progress
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded';
-import { Grid, Box, Typography, Paper, Icon, Tooltip, Button } from '@mui/material';
+import { Grid, Box, Typography, Paper, Icon, Tooltip, Button, Backdrop } from '@mui/material';
 import SoftTypography from 'components/SoftTypography';
 import SoftProgress from 'components/SoftProgress';
 import StyledIcon from 'components/StyledIcon';
@@ -9,51 +9,95 @@ import DefaultDoughnutChart from 'examples/Charts/DoughnutCharts/DefaultDoughnut
 import SoftPagination from 'components/SoftPagination';
 import SoftBox from 'components/SoftBox';
 import chroma from 'chroma-js';
-import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
+import teamProgressStore from 'store/teamProgressStore';
+import SoftAvatar from 'components/SoftAvatar';
+import femaleAvatar from "assets/avatars/1e599ceb-ce32-4588-b931-f1dd33c99b37.jpg";
+import maleAvatar from "assets/avatars/male-avatar-maker-2a7919.webp";
+import { DNA } from 'react-loader-spinner';
 
-function TrackingteamComponent() {
+function TrackingteamComponent({ subjectId, groupId }) {
   const [colors, setColors] = useState([]);
-
-  const steps = [
-    { name: 'HTML Basics', progress: 100, internsCompleted: 30, interns: ["jhon doe", "intern1", "intern2", "intern3", "intern4", "intern5", "intern6"] },
-    { name: 'CSS Fundamentals', progress: 80, internsCompleted: 24, interns: ["jhon doe"] },
-    { name: 'JavaScript Intro', progress: 50, internsCompleted: 15, interns: ["jhon doe", "intern1"] },
-    { name: 'DOM Manipulation', progress: 60, internsCompleted: 18, interns: ["jhon doe", "intern1", "intern2"] },
-    { name: 'Responsive Design', progress: 40, internsCompleted: 12, interns: ["jhon doe", "intern1", "intern2"] },
-    { name: 'Advanced CSS', progress: 30, internsCompleted: 10, interns: ["jhon doe"] },
-    { name: 'React Basics', progress: 20, internsCompleted: 5, interns: ["jhon doe", "intern1"] },
-    { name: 'React Basics', progress: 20, internsCompleted: 5, interns: ["jhon doe"] },
-    { name: 'React Basics', progress: 20, internsCompleted: 5, interns: ["jhon doe", "intern1", "intern2"] },
-    { name: 'React Basics', progress: 20, internsCompleted: 5, interns: ["jhon doe", "intern4", "intern5", "intern6", "intern4", "intern5", "intern6"] }
-  ];
-
-  const stepsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalSteps = steps.length;
-  const totalPages = Math.ceil(totalSteps / stepsPerPage);
   const [visibleInterns, setVisibleInterns] = useState({});
 
+  const { teamProgress, loading, error, fetchTeamProgress } = teamProgressStore(state => ({
+    teamProgress: state.teamProgress,
+    loading: state.loading,
+    error: state.error,
+    fetchTeamProgress: state.fetchTeamProgress,
+  }));
+
   useEffect(() => {
-    const generateColors = (numColors) => {
-      const colorsArray = [];
-      for (let i = 0; i < numColors; i++) {
-        const color = chroma.random().hex();
-        colorsArray.push(color);
-      }
-      return colorsArray;
-    };
-    const generatedColors = generateColors(steps.length);
-    setColors(generatedColors);
-  }, [steps.length]);
-  
-  // Chart configuration with custom colors
+    fetchTeamProgress(subjectId, groupId);
+  }, [fetchTeamProgress, subjectId, groupId]);
+
+  useEffect(() => {
+    if (teamProgress && teamProgress.subjects) {
+      const steps = teamProgress.subjects[0]?.steps || [];
+      const generateColors = (numColors) => {
+        const colorsArray = [];
+        for (let i = 0; i < numColors; i++) {
+          const color = chroma.random().hex();
+          colorsArray.push(color);
+        }
+        return colorsArray;
+      };
+      const generatedColors = generateColors(steps.length);
+      setColors(generatedColors);
+    }
+  }, [teamProgress]);
+
+  const getAvatarImage = (gender) => {
+    switch (gender.toLowerCase()) {
+      case "male":
+        return maleAvatar;
+      case "female":
+        return femaleAvatar;
+      default:
+        return null;
+    }
+  };
+  if (loading) {
+    return <Backdrop
+      sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={loading}
+    >
+      <DNA
+        visible={true}
+        height="100"
+        width="100"
+        ariaLabel="dna-loading"
+        wrapperStyle={{}}
+        wrapperClass="dna-wrapper"
+      />
+    </Backdrop>;
+  }
+
+  if (error || !teamProgress || !teamProgress.subjects || teamProgress.subjects.length === 0) {
+    return <Typography>Error loading data or no subjects available.</Typography>;
+  }
+
+  const subject = teamProgress.subjects[0];
+  const steps = subject?.steps || [];
+
+  const stepsPerPage = 5;
+  const totalSteps = steps.length;
+  const totalPages = Math.ceil(totalSteps / stepsPerPage);
+
+  const progressColor=(progressValue)=>{
+    let color;
+    progressValue <= 30 ? color= "error" : progressValue <= 70 ? color ="warning" : color ="success"
+    console.log("color :",color)
+    return color;  
+  };
+
   const chartConfig = {
-    labels: steps.map(step => step.name),
+    labels: steps.map(step => step.description),
     datasets: [
       {
         label: 'Interns Completed',
         customColors: colors,
-        data: steps.map(step => step.internsCompleted),
+        data: steps.map(step => step.completedByInterns.length),
       },
     ],
   };
@@ -97,10 +141,10 @@ function TrackingteamComponent() {
 
           <Box ml={2}>
             <SoftTypography variant="h4" color="dark" fontWeight="bold" textGradient>
-              Intro to Web Development
+              {subject?.title || "No Title Available"}
             </SoftTypography>
             <Typography variant="body2" color="textSecondary">
-              {totalSteps} steps | {((steps.reduce((acc, step) => acc + step.internsCompleted, 0) / (totalSteps * 30)) * 100).toFixed(2)}% complete
+              {totalSteps} steps | {subject?.subjectProgress || 0}% complete
             </Typography>
           </Box>
         </Box>
@@ -109,7 +153,7 @@ function TrackingteamComponent() {
       <Grid item xs={12} sm={8}>
         <Grid container spacing={2}>
           {steps.slice((currentPage - 1) * stepsPerPage, currentPage * stepsPerPage).map((step, index) => (
-            <Grid item xs={12} key={index}>
+            <Grid item xs={12} key={step.stepId}>
               <Paper
                 elevation={3}
                 sx={{
@@ -120,9 +164,9 @@ function TrackingteamComponent() {
               >
                 <Box mb={2}>
                   <SoftTypography variant="body1" color="dark" fontWeight="bold" mb={1} textGradient sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
-                    {step.name}
+                    {step.description}
                   </SoftTypography>
-                  <SoftProgress value={step.progress} alignItems='end' color="warning" variant="gradient" label={true} sx={{ width: '100%' }} />
+                  <SoftProgress value={step.stepProgress} alignItems='end' color={progressColor(step.stepProgress)} variant="gradient" label={true} sx={{ width: '100%' }} />
                   <SoftBox display="flex"
                     alignItems="center"
                     flexWrap="wrap"
@@ -132,16 +176,31 @@ function TrackingteamComponent() {
                       textOverflow: 'ellipsis',
                     }} mt={0.5}>
                     <SoftTypography variant="caption" color="dark" textGradient sx={{ marginRight: '8px' }} >Completed by :</SoftTypography>
-                    {step.interns.slice(0, visibleInterns[index] ? step.interns.length : 3).map((intern, internIndex) => (
-                      <Tooltip key={internIndex} title={intern}>
-                        <StyledIcon sx={{ fontSize: 'small', marginRight: '4px', cursor: 'pointer' }}>
-                          <HowToRegOutlinedIcon />
-                        </StyledIcon>
+                    {step.completedByInterns.slice(0, visibleInterns[index] ? step.completedByInterns.length : 3).map((intern, internIndex) => (
+                      <Tooltip key={internIndex} title={intern.internName} placeholder="bottom">
+                        <SoftAvatar
+                          src={getAvatarImage(intern.gender)}
+                          alt="name"
+                          size="xs"
+                          sx={{
+                            border: ({ borders: { borderWidth }, palette: { white } }) =>
+                              `${borderWidth[2]} solid ${white.main}`,
+                            cursor: "pointer",
+                            position: "relative",
+
+                            "&:not(:first-of-type)": {
+                              ml: -1.25,
+                            },
+                            "&:hover, &:focus": {
+                              zIndex: "10",
+                            },
+                          }}
+                        />
                       </Tooltip>
                     ))}
-                    {step.interns.length > 5 && (
+                    {step.completedByInterns.length > 3 && (
                       <Button size="small" onClick={() => handleToggleInterns(index)}>
-                        {visibleInterns[index] ? 'Show less' : `+${step.interns.length - 3} more`}
+                        {visibleInterns[index] ? 'Show less' : `+${step.completedByInterns.length - 3} more`}
                       </Button>
                     )}
                   </SoftBox>
@@ -151,7 +210,7 @@ function TrackingteamComponent() {
           ))}
         </Grid>
         <SoftBox display="flex" justifyContent="center" p={2}>
-          <SoftPagination variant="gradient">
+          <SoftPagination variant="gradient" size="small" color="primary">
             <SoftPagination item onClick={() => handlePagination(currentPage - 1)} disabled={currentPage === 1}>
               <Icon>keyboard_arrow_left</Icon>
             </SoftPagination>
@@ -187,8 +246,8 @@ function TrackingteamComponent() {
           </SoftPagination>
         </SoftBox>
       </Grid>
-
       <Grid item xs={12} sm={4}>
+
         <DefaultDoughnutChart
           title="Interns' Step Completion Overview"
           description="This chart visualizes the number of interns who have successfully completed each step."
@@ -197,20 +256,20 @@ function TrackingteamComponent() {
         />
       </Grid>
 
-      <Grid item xs={12} mt={4}>
+
+      <Grid item xs={12}>
         <Paper
-          elevation={3}
           sx={{
             p: 2,
             borderRadius: 2,
             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
           }}
         >
-          <Box>
+        <Box>
             <SoftTypography variant="h6" fontWeight="bold" textGradient>
               Overall Progress
             </SoftTypography>
-            <SoftProgress value={(steps.reduce((acc, step) => acc + step.progress, 0) / totalSteps).toFixed(2)} color="success" variant="gradient" />
+            <SoftProgress value={subject?.subjectProgress || 0} color={progressColor(subject.subjectProgress)} variant="gradient" label />
           </Box>
         </Paper>
       </Grid>

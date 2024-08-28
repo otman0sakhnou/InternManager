@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Application.Services.InternSteps.Queries
 {
-    public record GetSubjectForInternQuery(Guid SubjectId, Guid InternId) : IRequest<SubjectDetailsForInternDto>;
+    public record GetSubjectForInternQuery(Guid InternId) : IRequest<List<SubjectDetailsForInternDto>>;
 
-    public class GetSubjectForInternQueryHandler : IRequestHandler<GetSubjectForInternQuery, SubjectDetailsForInternDto>
+    public class GetSubjectForInternQueryHandler : IRequestHandler<GetSubjectForInternQuery, List<SubjectDetailsForInternDto>>
     {
         private readonly ISubjectRepository _subjectRepository;
 
@@ -20,35 +20,38 @@ namespace Application.Services.InternSteps.Queries
             _subjectRepository = subjectRepository;
         }
 
-        public async Task<SubjectDetailsForInternDto> Handle(GetSubjectForInternQuery request, CancellationToken cancellationToken)
+        public async Task<List<SubjectDetailsForInternDto>> Handle(GetSubjectForInternQuery request, CancellationToken cancellationToken)
         {
-            var subject = await _subjectRepository.GetSubjectForInternAsync(request.SubjectId, request.InternId);
+            var subjects = await _subjectRepository.GetSubjectsForInternAsync(request.InternId);
 
-            if (subject == null)
+            if (subjects == null)
             {
                 throw new InvalidOperationException("Subject not found");
             }
 
-            var steps = subject.Steps.Select(step =>
-                new StepStatusDto(
-                    step.Id,
-                    step.Description,
-                    step.InternSteps.FirstOrDefault()?.Status ?? "Not Started"
-                )
-            ).ToList();
+            var subjectDetails = subjects.Select(subject =>
+            {
+                var steps = subject.Steps.Select(step =>
+                    new StepStatusDto(
+                        step.Id,
+                        step.Description,
+                        step.InternSteps.FirstOrDefault(internStep => internStep.InternId == request.InternId)?.Status ?? "Not Started"
+                    )
+                ).ToList();
 
-            double completedSteps = steps.Count(step => step.Status == "Completed");
-            double totalSteps = steps.Count;
-            double progressPercentage = (totalSteps > 0) ? (completedSteps / totalSteps) * 100 : 0;
+                double completedSteps = steps.Count(step => step.Status == "Completed");
+                double totalSteps = steps.Count;
+                double progressPercentage = (totalSteps > 0) ? (completedSteps / totalSteps) * 100 : 0;
 
-            return new SubjectDetailsForInternDto(
-                subject.Id,
-                subject.Title,
-                subject.Type,
-                subject.Description,
-                steps,
-                progressPercentage
-            );
+                return new SubjectDetailsForInternDto(
+                    subject.Id,
+                    subject.Title,
+                    steps,
+                    progressPercentage
+                );
+            }).ToList();
+
+            return subjectDetails;
         }
     }
 

@@ -11,8 +11,6 @@ namespace Domain.DTOs.Subjects
     public record SubjectDetailsForInternDto(
         Guid SubjectId,
         string Title,
-        string Type,
-        string Description,
         List<StepStatusDto> Steps,
         double ProgressPercentage
     );

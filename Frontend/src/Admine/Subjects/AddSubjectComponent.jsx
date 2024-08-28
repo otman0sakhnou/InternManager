@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import {
   Box,
   Grid,
@@ -12,19 +13,25 @@ import {
   InputAdornment,
   Paper,
   Icon,
-  useMediaQuery,
+  Backdrop,
 } from '@mui/material';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import FroalaEditor from 'react-froala-wysiwyg';
 import useSubjectStore from 'store/useSubjectStore';
-import 'froala-editor/css/froala_style.min.css';
-import 'froala-editor/css/froala_editor.pkgd.min.css';
-import 'froala-editor/js/plugins/image.min.js';
-import 'froala-editor/js/plugins/char_counter.min.js';
 import 'froala-editor/js/plugins.pkgd.min.js';
+import 'froala-editor/css/froala_editor.pkgd.min.css';
+import 'froala-editor/js/languages/de.js'
+import 'froala-editor/css/froala_style.min.css';
+import 'froala-editor/js/third_party/image_tui.min.js';
+import 'froala-editor/js/third_party/embedly.min.js';
+import 'froala-editor/js/third_party/spell_checker.min.js';
+import 'froala-editor/js/plugins/char_counter.min.js';
 import 'froala-editor/js/plugins/align.min.js';
+import 'froala-editor/js/plugins/image.min.js';
+import 'froala-editor/js/plugins/video.min.js';
+import 'froala-editor/js/plugins/file.min.js';
 import 'froala-editor/js/languages/de.js';
 import 'froala-editor/js/third_party/image_tui.min.js';
 import 'froala-editor/js/third_party/embedly.min.js';
@@ -35,25 +42,42 @@ import StyledIcon from 'components/StyledIcon';
 import SoftTypography from 'components/SoftTypography';
 import SoftBox from 'components/SoftBox';
 import SoftButton from 'components/SoftButton';
+import { DNA } from 'react-loader-spinner';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 
 const AddSubjectComponent = () => {
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const { addSubject } = useSubjectStore();
   const { id } = useParams();
+  const GroupId = uuidValidate(id) && id;;
   const [title, setTitle] = useState('');
   const [type, setType] = useState('');
   const [description, setDescription] = useState('');
   const [steps, setSteps] = useState([]);
   const [stepInput, setStepInput] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
 
   const handleAddStep = () => {
     if (stepInput.trim() !== '') {
-      setSteps([...steps, { description: stepInput }]);
+      const newStep = {
+        description: stepInput,
+        order: steps.length + 1,  // Ensure correct order when adding new steps
+      };
+      setSteps([...steps, newStep]);
       setStepInput('');
     }
   };
+
   const handleRemoveStep = (index) => {
-    const newSteps = steps.filter((_, i) => i !== index);
+    const newSteps = steps.filter((_, i) => i !== index).map((step, i) => ({
+      ...step,
+      order: i + 1,  // Reorder steps after removal
+    }));
     setSteps(newSteps);
   };
 
@@ -64,37 +88,141 @@ const AddSubjectComponent = () => {
     const [reorderedItem] = newSteps.splice(result.source.index, 1);
     newSteps.splice(result.destination.index, 0, reorderedItem);
 
-    setSteps(newSteps);
+    // Update the order based on new positions
+    const reorderedSteps = newSteps.map((step, index) => ({
+      ...step,
+      order: index + 1,
+    }));
+
+    setSteps(reorderedSteps);
   };
 
-  const handleSubmit = () => {
+  const handleMediaInsert = (mediaType, $media) => {
+    let blobUrl;
+    if (mediaType === 'video') {
+      const $video = $media.find('video');
+      blobUrl = $video.attr('src');
+
+    } else {
+      blobUrl = $media.attr('src') || $media.attr('href');
+    }
+    console.log(`Inserted : ${mediaType} :${blobUrl}`)
+
+  };
+
+  const extractMediaUrls = (html) => {
+    const imgRegex = /<img\s+[^>]*src="(blob:[^"]*)"[^>]*>/g;
+    const videoRegex = /<video\s+[^>]*src="(blob:[^"]*)"[^>]*>/g;
+    const fileRegex = /<a\s+[^>]*href="(blob:[^"]*)"[^>]*>/g;
+
+    const mediaUrls = [];
+    let match;
+
+    while ((match = imgRegex.exec(html)) !== null) {
+      console.log(`Extracted image URL: ${match[1]}`);
+      mediaUrls.push({ url: match[1], type: 'image' });
+    }
+    while ((match = videoRegex.exec(html)) !== null) {
+      console.log(`Extracted video URL: ${match[1]}`);
+      mediaUrls.push({ url: match[1], type: 'video' });
+    }
+    while ((match = fileRegex.exec(html)) !== null) {
+      console.log(`Extracted file URL: ${match[1]}`);
+      mediaUrls.push({ url: match[1], type: 'file' });
+    }
+
+    return mediaUrls;
+  };
+
+  const uploadMedia = async (blobUrl, mediaType) => {
+    const response = await fetch(blobUrl);
+    const blob = await response.blob();
+    console.log("blob : ", blob);
+    const extension = blob.type.split("/")[1];
+    const formData = new FormData();
+    const filename = `${mediaType}-${Date.now()}.${extension}`;
+
+    formData.append('file', blob, filename);
+    console.log("Form Data :", formData);
+    console.log("media type :", mediaType);
+    console.log("file name :", filename);
+
+    try {
+      const res = await axios.post(`${API_BASE_URL}/upload/${mediaType}`, formData, {
+        headers: {
+          'Content-type': 'multipart/form-data'
+        }
+      });
+
+      if (res.status === 200) {
+        console.log("link :", res.data.link);
+        return res.data.link;
+      } else {
+        console.log(res);
+        throw new Error(res.data.message || "Upload failed");
+      }
+    } catch (error) {
+      console.error(`Error uploading ${mediaType}:`, error.message);
+      return null;
+    }
+  };
+
+
+  const handleUploadMedia = async () => {
+    const mediaUrls = extractMediaUrls(description);
+    const uploadPromises = mediaUrls.map((media) =>
+      uploadMedia(media.url, media.type)
+    );
+
+    const uploadedUrls = await Promise.all(uploadPromises);
+
+    let updatedDescription = description;
+    mediaUrls.forEach((media, index) => {
+      const uploadedUrl = uploadedUrls[index];
+      if (uploadedUrl) {
+        updatedDescription = updatedDescription.replace(media.url, uploadedUrl);
+      }
+    });
+
+    return updatedDescription;
+  };
+  const handleSubmit = async () => {
+    setLoading(true);
+    const updateDescription = await handleUploadMedia();
     const newSubject = {
-      id: Date.now().toString(),
-      groupeId: id,
+      GroupId,
       title,
       type,
-      description,
+      description: updateDescription,
       steps,
     };
-    addSubject(newSubject);
-    navigate(`/groupdetails/${newSubject.groupeId}`);
-    console.log("new subject :", newSubject);
-    setTitle('');
-    setType('');
-    setDescription('');
-    setSteps([]);
+    try {
+      await addSubject(newSubject);
+      toast.success("Subject added successfully")
+      console.log("new subject :", newSubject);
+      navigate(`/groupdetails/${newSubject.GroupId}`);
+    } catch (error) {
+      toast.error("Error adding subject :", error.message);
+      console.log("error adding subject :", error.message);
+    } finally {
+      setLoading(false);
+      setTitle('');
+      setType('');
+      setDescription('');
+      setSteps([]);
+    }
   };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Box sx={{ py: { xs: 1, sm: 2 }, px: { xs: 1, sm: 20 } }}>
+      <Box sx={{ py: { xs: 1, sm: 2 }, px: { xs: 1, sm: 2, md: 5 } }}>
         <SoftBox p={3} textAlign="center">
           <SoftTypography variant="h3" fontWeight="bold" color="info" textGradient>
             Add New Subject
           </SoftTypography>
         </SoftBox>
-        <Paper elevation={5} sx={{ px: { xs: 2, sm: 5, md: 10 }, py: 3, mx: { xs: 1, sm: 5, md: 10 }, borderRadius: 2 }}>
+        <Paper elevation={5} sx={{ px: { xs: 2, sm: 3, md: 5 }, py: 3, mx: { xs: 1, sm: 2, md: 5 }, borderRadius: 2 }}>
           <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
             <Grid item xs={12} md={6}>
               <SoftTypography variant="h6" color="dark" textGradient gutterBottom>
@@ -154,9 +282,22 @@ const AddSubjectComponent = () => {
                   charCounterCount: true,
                   attribution: false,
                   events: {
-                    'contentChanged': function () {
-                      setDescription(this.html.get());
+                    'media.inserted': handleMediaInsert,
+                    'image.inserted': ($img) => handleMediaInsert('image', $img),
+                    'image.error': function (error) {
+                      console.error('Image upload error', error);
                     },
+                    'video.inserted': ($video) => handleMediaInsert('video', $video),
+                    'video.error': function (error) {
+                      console.error('video upload error', error);
+                    },
+                    'file.inserted': ($file) => handleMediaInsert('file', $file),
+                    fileMaxSize: 200 * 1024 * 1024,
+                    fileAllowedTypes: ['*'],
+                    'file.error': function (error) {
+                      console.error('file upload error', error);
+                    },
+                    'blur': (e) => setDescription(e.target.innerHTML),
                   },
                 }}
                 model={description}
@@ -174,6 +315,15 @@ const AddSubjectComponent = () => {
                   value={stepInput}
                   onChange={(e) => setStepInput(e.target.value)}
                   sx={{ mr: { sm: 2 }, mb: { xs: 2, sm: 0 } }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <StyledIcon>
+                          <FastForwardRoundedIcon />
+                        </StyledIcon>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <SoftButton variant="gradient" color="info" onClick={handleAddStep}>
                   <Icon>add</Icon>
@@ -182,40 +332,49 @@ const AddSubjectComponent = () => {
               <DragDropContext onDragEnd={handleOnDragEnd}>
                 <Droppable droppableId="steps" direction="horizontal">
                   {(provided) => (
-                    <Grid container {...provided.droppableProps} ref={provided.innerRef} justifyContent="center">
+                    <Grid
+                      container
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      justifyContent="center"
+                      sx={{
+                        overflowX: 'auto',
+                        px: 1,
+                      }}
+                    >
                       {steps.map((step, index) => (
                         <Draggable key={index} draggableId={index.toString()} index={index}>
                           {(provided) => (
                             <Grid
                               item
                               xs={12}
-                              md={3}
+                              sm={6}
+                              md={4}
+                              lg={3}
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               sx={{
-                                mb: 2,
-                                mx: 2,
-                                p: 2,
-                                border: '1px solid #d1d9ff',
-                                boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
-                                borderRadius: 2,
-                                backgroundColor: '#f0f4ff',
-                                '&:hover': {
-                                  backgroundColor: '#e1eaff',
-                                },
-                                display: 'flex',
-                                alignItems: 'center',
-                                textAlign: 'left',
-                                boxShadow: 1,
-                                position: 'relative',
+                                background: 'linear-gradient(90deg, #4a6cff, #4ad0fd)',
+                                borderRadius: 20,
+                                px: 2,
+                                py: 1,
+                                mx: 1,
+                                my: 0.5,
+                                textTransform: "none",
+                                width: "auto",
+                                flexShrink: 0,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                position: "relative",
+                                minWidth: 150,
                               }}
                             >
                               <Typography
                                 variant="subtitle2"
                                 sx={{
                                   position: 'absolute',
-                                  top: -12,
+                                  top: -5,
                                   left: 10,
                                   fontSize: '0.75rem',
                                   fontWeight: 'bold',
@@ -234,7 +393,7 @@ const AddSubjectComponent = () => {
                                   flexGrow: 1,
                                   overflowWrap: 'break-word',
                                   ml: 3,
-                                  color: '#333',
+                                  color: '#fff',
                                 }}
                               >
                                 {step.description}
@@ -242,13 +401,10 @@ const AddSubjectComponent = () => {
                               <IconButton
                                 onClick={() => handleRemoveStep(index)}
                                 sx={{
-                                  color: '#ff5252',
-                                  '&:hover': {
-                                    color: '#ff1744',
-                                  },
+                                  color: '#fff',
                                 }}
                               >
-                                <StyledIcon>close_rounded_icon</StyledIcon>
+                                <Icon>close_rounded_icon</Icon>
                               </IconButton>
                             </Grid>
                           )}
@@ -261,13 +417,26 @@ const AddSubjectComponent = () => {
               </DragDropContext>
             </Grid>
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <SoftButton variant="gradient" color="primary" onClick={handleSubmit}>
+              <SoftButton variant="gradient" color="primary" onClick={handleSubmit} textGradient>
                 Save Subject
               </SoftButton>
             </Grid>
           </Grid>
         </Paper>
       </Box>
+      <Backdrop
+        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
     </DashboardLayout>
   );
 };

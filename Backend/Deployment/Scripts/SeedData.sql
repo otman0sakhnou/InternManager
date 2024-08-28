@@ -37,10 +37,10 @@ VALUES
 (NEWID(), 'Subject 2', 'Type B', 'Description for Subject 2', (SELECT Id FROM Groups WHERE Name = 'Group B'));
 
 -- Insert sample data into Steps
-INSERT INTO Steps (Id, Description, SubjectId)
+INSERT INTO Steps (Id, Description, SubjectId,OrderStep)
 VALUES
-(NEWID(), 'Step 1 Description', (SELECT Id FROM Subjects WHERE Title = 'Subject 1')),
-(NEWID(), 'Step 2 Description', (SELECT Id FROM Subjects WHERE Title = 'Subject 2'));
+(NEWID(), 'Step 1 Description', (SELECT Id FROM Subjects WHERE Title = 'Subject 1'),1),
+(NEWID(), 'Step 2 Description', (SELECT Id FROM Subjects WHERE Title = 'Subject 2'),2);
 
 -- Insert sample data into Periods
 INSERT INTO Periods (Id, StartDate, EndDate, InternId, GroupId)

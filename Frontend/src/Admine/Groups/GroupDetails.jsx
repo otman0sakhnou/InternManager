@@ -153,7 +153,7 @@ const GroupDetails = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <ProjectsSection subjects={subjects} />
+            <ProjectsSection subjects={subjects} onRefresh={handleDataUpdate} />
           </Grid>
         </Grid>
         <Grid item xs={12} md={6} spacing={3} mt={3}>
