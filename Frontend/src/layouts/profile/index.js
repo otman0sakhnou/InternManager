@@ -33,6 +33,7 @@ function Overview() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [refresh, setRefresh] = useState(false); //this state is added to trigger the update in this component when the name changed in the CustonInfoCard so the header get the up to date value of name at real time
+  const [loading, setLoading] = useState(true);
 
   const {
     fetchSelectedUserRole,
@@ -83,6 +84,7 @@ function Overview() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       setError(null); //Reset error state when fetching new data
       try {
         if (isViewingOwnProfile) {
