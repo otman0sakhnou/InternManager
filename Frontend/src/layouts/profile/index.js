@@ -8,11 +8,11 @@ import SoftBox from "../../components/SoftBox";
 import Grid from "@mui/material/Grid";
 import InternStepsCard from "./customComponents/InternStepsCard";
 
+
 import InternStepsCard from "./customComponents/InternStepsCard"
 import { Grid, Backdrop } from "@mui/material";
 import { DNA } from 'react-loader-spinner';
-import Grid from "@mui/material/Grid";
-import InternStepsCard from "./customComponents/InternStepsCard";
+
 
 import Header from "./components/Header";
 import ProfessionalInfoCard from "./customComponents/ProfessionalInfoCard";
@@ -48,6 +48,7 @@ function Overview() {
   const { getCollaborator, getCollaboratorByUserId } = useCollaboratorStore();
   const { getStagiaireById, getInternByUserId } = useStagiaireStore();
 
+
   //to determine if the current user is viewing their own profile or someone's else
   const isViewingOwnProfile = !selectedUserId;
 
@@ -64,6 +65,7 @@ function Overview() {
       } catch (err) {
         setError("An error occured while fetching the roles.");
       }
+      setLoading(false);
     };
     if (
       selectedUserId ||
@@ -127,6 +129,7 @@ function Overview() {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger useEffect
   };
 
+
   if (isViewingOwnProfile && roles[0] === "Admin") {
     return (
       <DashboardLayout>
@@ -167,11 +170,35 @@ function Overview() {
   if (error){
     return <div>{error}</div>;
   } 
-  if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
+  //if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
   const latestPeriod = data.periods?.reduce(
     (latest, current) => (new Date(current.endDate) > new Date(latest.endDate) ? current : latest),
     data.periods[0]
   );
+
+  if (loading) {
+    return (
+      <Backdrop
+        sx={{
+          color: "#ff4",
+          backgroundImage: "linear-gradient(135deg, #ced4da 0%, #ebeff4 100%)",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={loading}
+      >
+        <DNA
+          visible={true}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
+      </Backdrop>
+    );
+  }
+
+  if (!data) return <div>No data found</div>; // Handle loading state
 
   const profileAction = {
     route: "/edit-profile",
@@ -242,6 +269,7 @@ function Overview() {
             isViewingOwnProfile={isViewingOwnProfile}
           />
           {/* {selectedUserRole=="Intern" && <InternStepsCard/>} */}
+
         </Grid>
       </SoftBox>
       <Footer />
