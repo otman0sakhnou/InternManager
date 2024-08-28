@@ -26,6 +26,8 @@ import GroupDetails from "Admine/Groups/GroupDetails";
 import Profile from "layouts/profile";
 import Document from "examples/Icons/Document";
 import SpaceShip from "examples/Icons/SpaceShip";
+import { LogoutOutlined } from "@mui/icons-material";
+import Logout from "components/Logout";
 
 const routes = [
   {
@@ -46,7 +48,7 @@ const routes = [
     icon: <PersonIcon size="12px" />,
     component: <Collaborator />,
     noCollapse: true,
-    roles: ["admin", "manager", "collaborator"],
+    roles: ["admin", "manager"],
   },
   {
     name: "CreateIntern",
@@ -177,18 +179,27 @@ const routes = [
     noCollapse: false,
   },
   {
+    type: "collapse",
+    name: "Logout",
+    key: "logout",
+    route: "/authentication/logout",
+    component: <Logout />,
+    icon: <LogoutOutlined size="12px" />,
+    noCollapse: false,
+  },
+  {
     name: "CreateCollaboratorProfile",
     key: "CreateCollaboratorProfile",
     route: "/Collaborator/Create-Collaborator-Profile",
     component: <CreateProfile />,
-    roles: ["admin", "manager", "collaborator"],
+    roles: ["admin", "manager"],
   },
   {
     name: "CollaboratorProfile",
     key: "CollaboratorProfile",
     route: "/Collaborator/Profile/:id",
     component: <Profile />,
-    roles: ["admin", "manager", "collaborator"],
+    roles: ["admin", "manager"],
   },
 ];
 

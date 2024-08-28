@@ -13,8 +13,7 @@ namespace Application.Services.AuthenticationAndAuthorization.Validators
         public LogoutCommandValidator()
         {
             RuleFor(x => x.RefreshToken)
-                .NotEmpty().WithMessage("Refresh token is required.")
-                .Length(36).WithMessage("Refresh token must be 36 characters long."); // Assuming UUID format for refresh tokens
+                .NotEmpty().WithMessage("Refresh token is required."); // Assuming UUID format for refresh tokens
         }
     }
 }

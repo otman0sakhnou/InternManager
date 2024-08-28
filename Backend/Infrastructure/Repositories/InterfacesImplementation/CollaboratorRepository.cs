@@ -45,5 +45,24 @@ namespace Infrastructure.Repositories
                 await _dbContext.SaveChangesAsync();
             }
         }
+
+        public async Task<string?> GetUserIdByCollaboratorId(Guid collaboratorId)
+        {
+            return await _dbContext.Collaborators
+                .Where(c => c.Id == collaboratorId)
+                .Select(c => c.UserId)
+                .FirstOrDefaultAsync();
+
+            
+        }
+
+        public async Task<Guid?> GetCollaboratorIdByUserId(Guid userId)
+        {
+            return await _dbContext.Collaborators
+            .Where(c => c.UserId == userId.ToString())
+            .Select(c => c.Id)
+            .FirstOrDefaultAsync();
+ 
+        }
     }
 }

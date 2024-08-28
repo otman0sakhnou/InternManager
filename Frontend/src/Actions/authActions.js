@@ -2,11 +2,11 @@ import api from "services/axiosInstance";
 
 export const login = async (loginData) => {
   const response = await api.post("/auth/login", loginData);
-  console.log(response.data);
   return response.data;
 };
 
 export const logout = async (refreshToken) => {
+  console.log(refreshToken)
   await api.post("/auth/logout", { refreshToken });
 };
 

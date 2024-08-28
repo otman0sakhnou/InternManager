@@ -10,4 +10,6 @@ public interface ICollaboratorRepository
   Task AddCollaborator(Collaborator collaborator);
   Task UpdateCollaborator(Collaborator collaborator);
   Task DeleteCollaborator(Guid id);
+  Task<string?> GetUserIdByCollaboratorId(Guid collaboratorId);
+  Task<Guid?> GetCollaboratorIdByUserId(Guid userId);
 }

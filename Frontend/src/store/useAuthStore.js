@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import * as authActions from "actions/authActions";
+import * as authActions from "Actions/authActions";
 
 const useAuthStore = create((set, get) => ({
   user: null,
@@ -10,6 +10,8 @@ const useAuthStore = create((set, get) => ({
   error: null,
   loading: false,
 
+  setUser: (user) => set({ user, roles: user.roles, isAuthenticated: true }),
+
   setAccessToken: (newAccessToken) => {
     localStorage.setItem("accessToken", newAccessToken);
     set({ accessToken: newAccessToken, isAuthenticated: true });
@@ -18,16 +20,16 @@ const useAuthStore = create((set, get) => ({
   login: async (loginData) => {
     set({ loading: true, error: null });
     try {
-      const { accessToken, refreshToken, user, roles } = await authActions.login(loginData);
+      const { accessToken: accessTokenLogged, refreshToken: refreshTokenLogged, user: userLogged, roles: rolesLogged } = await authActions.login(loginData);
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("accessToken", accessTokenLogged);
+      localStorage.setItem("refreshToken", refreshTokenLogged);
 
       set({
-        user,
-        accessToken,
-        refreshToken,
-        roles, // Store roles in state
+        user: userLogged,
+        accessToken: accessTokenLogged,
+        refreshToken: refreshTokenLogged,
+        roles: rolesLogged, // Store roles in state
         isAuthenticated: true,
         error: null,
         loading: false,
@@ -44,7 +46,13 @@ const useAuthStore = create((set, get) => ({
   logout: async () => {
     set({ loading: true, error: null });
     try {
+      console.log("*******Loggging out")
+      
+      console.log(get().refreshToken);
+      
+      console.log(get().accessToken);
       await authActions.logout(get().refreshToken);
+      console.log(get().refreshToken);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
@@ -150,6 +158,11 @@ const useAuthStore = create((set, get) => ({
         loading: false,
       });
     }
+  },
+
+  getRole: () => {
+    const { roles } = get();
+    return roles.length > 0 ? roles[0] : null; 
   },
 }));
 

@@ -26,28 +26,38 @@ import toast from "react-hot-toast";
 import ConfirmationModal from "../../../components/ConfirmationModals";
 import { Backdrop } from "@mui/material";
 import { DNA } from "react-loader-spinner";
+import { getInternIdByUserId } from "Actions/InternsActions";
 
-function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
-  const { role } = useAuthStore(); // Adjust based on how your auth store returns role
+function CustomProfileInfoCard({
+  title,
+  description,
+  info,
+  role,
+  isViewingOwnProfile,
+  action,
+  onUpdate,
+}) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableInfo, setEditableInfo] = useState(info);
   const [editableDescription, setEditableDescription] = useState(description);
 
   const updateStagiaire = useStagiaireStore((state) => state.updateStagiaire);
-  const intern = useStagiaireStore((state) => state.getStagiaireById(info.id));
+  const intern = role === "Intern" && useStagiaireStore((state) => state.getStagiaireById(info.id));
 
   const updateCollaborator = useCollaboratorStore((state) => state.updateCollaborator);
-  const collaborator = useCollaboratorStore((state) => state.getCollaborator(info.id));
+  const collaborator =
+    (role === "Collaborator" || role === "Manager") &&
+    useCollaboratorStore((state) => state.getCollaborator(info.id));
 
   const { errors, setErrors } = useValidationStore();
 
-  const data = role === "intern" ? intern : collaborator;
+  const data = role === "Intern" ? intern : collaborator;
 
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [actionType, setActionType] = useState("");
   const [confirmationModalTitle, setConfirmationModalTitle] = useState("");
   const [confirmationModalDescription, setConfirmationModalDescription] = useState("");
-  const [onConfirmAction, setOnConfirmAction] = useState(() => () => { });
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
   const [loading, setLoading] = useState(false);
 
   const handleEditClick = () => {
@@ -68,8 +78,7 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
   };
 
   const handleSave = () => {
-    if (role === "intern") {
-
+    if (role === "Intern") {
       setConfirmationModalTitle("Update Intern");
       setConfirmationModalDescription("Are you sure you want to update this intern?");
       setOnConfirmAction(() => () => {
@@ -83,7 +92,6 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
         toast.success("Intern updated successfully!");
       });
       setIsConfirmationModalOpen(true);
-
     } else if (role === "collaborator") {
       setConfirmationModalTitle("Update Collaborator");
       setConfirmationModalDescription("Are you sure you want to update this collab?");
@@ -93,21 +101,18 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
           ...editableInfo,
           description: editableDescription,
         };
-        setLoading(true)
+        setLoading(true);
         try {
           await updateCollaborator(info.id, updatedCollaborator);
           setErrors({});
           toast.success("Collaborator updated successfully!");
         } catch (error) {
           toast.error("Failed to delete collaborator: " + error.message);
-          console.log(error);
         } finally {
           setLoading(false);
-          console.log("rrr", updateCollaborator)
         }
       });
       setIsConfirmationModalOpen(true);
-
     }
     if (onUpdate) {
       onUpdate(); // Call callback to update parent state
@@ -132,27 +137,27 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
       phone: validationSchemas.phone,
       email: validationSchemas.email,
       gender: validationSchemas.gender,
-    }
-  }
+    };
+  };
 
   const filteredInfo =
-    role === "intern"
+    role === "Intern"
       ? {
-        name: editableInfo.name,
-        phone: editableInfo.phone,
-        email: editableInfo.email,
-        gender: editableInfo.gender,
-      }
+          name: editableInfo.name,
+          phone: editableInfo.phone,
+          email: editableInfo.email,
+          gender: editableInfo.gender,
+        }
       : {
-        name: editableInfo.name,
-        phone: editableInfo.phone,
-        email: editableInfo.email,
-        gender: editableInfo.gender,
-        // job: editableInfo.job,
-        // department: editableInfo.department,
-        // organization: editableInfo.organization,
-        // employmentDate: editableInfo.employmentDate,
-      };
+          name: editableInfo.name,
+          phone: editableInfo.phone,
+          email: editableInfo.email,
+          gender: editableInfo.gender,
+          // job: editableInfo.job,
+          // department: editableInfo.department,
+          // organization: editableInfo.organization,
+          // employmentDate: editableInfo.employmentDate,
+        };
 
   const labels = Object.keys(filteredInfo).map((el) => {
     if (el.match(/[A-Z\s]+/)) {
@@ -214,7 +219,6 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
     </SoftBox>
   ));
 
-
   return (
     <Card sx={{ height: "100%" }}>
       <SoftBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
@@ -274,7 +278,11 @@ function CustomProfileInfoCard({ title, description, info, action, onUpdate }) {
         actionType={actionType}
       />
       <Backdrop
-        sx={{ color: "#ff4", backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{
+          color: "#ff4",
+          backgroundImage: "linear-gradient(135deg, #ced4da  0%, #ebeff4 100%)",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
         open={loading}
       >
         <DNA
@@ -294,6 +302,8 @@ CustomProfileInfoCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   info: PropTypes.objectOf(PropTypes.string).isRequired,
+  role: PropTypes.oneOf(["Collaborator", "Intern", "Manager"]).isRequired,
+  isViewingOwnProfile: PropTypes.bool.isRequired,
   action: PropTypes.shape({
     route: PropTypes.string.isRequired,
     tooltip: PropTypes.string.isRequired,

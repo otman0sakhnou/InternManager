@@ -45,5 +45,47 @@ namespace API.Controllers
             }
             return NotFound(result.Errors);
         }
+
+        // GET: api/roles/collaborators/{collaboratorId}
+        [HttpGet("collaborators/{collaboratorId}")]
+        public async Task<IActionResult> GetRolesByCollaboratorId(Guid collaboratorId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetRoleByCollaboratorIdQuery(collaboratorId));
+
+                if (result == null)
+                {
+                    return NotFound("No roles found for the given collaborator ID.");
+                }
+
+                return Ok(result.Roles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: api/roles/interns/{internId}
+        [HttpGet("interns/{internId}")]
+        public async Task<IActionResult> GetRolesByInternId(Guid internId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetRoleByInernIdQuery(internId));
+
+                if (result == null)
+                {
+                    return NotFound("No roles found for the given intern ID.");
+                }
+
+                return Ok(result.Roles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -62,5 +62,23 @@ namespace Infrastructure.Repositories
             _context.Interns.RemoveRange(_context.Interns);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Guid?> GetUserIdByInternId(Guid internId)
+        {
+            var userId = await _context.Interns
+                .Where(i => i.Id == internId)
+                .Select(i => i.UserId)
+                .FirstOrDefaultAsync();
+
+            return Guid.TryParse(userId, out var guidUserId) ? guidUserId : (Guid?)null;
+        }
+
+        public async Task<Guid?> GetInternIdByUserId(Guid userId)
+        {
+            return await _context.Interns
+                .Where(i => i.UserId == userId.ToString())
+                .Select(i => i.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

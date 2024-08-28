@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 
 import {
@@ -8,7 +7,8 @@ import {
   updateIntern,
   deleteIntern,
   deleteAllInterns,
-} from '../actions/InternsActions';
+  getInternIdByUserId,
+} from "../Actions/InternsActions";
 const useStagiaireStore = create((set, get) => ({
   stagiaires: [],
   //   nextId: 3,
@@ -76,6 +76,22 @@ const useStagiaireStore = create((set, get) => ({
       return fetchInternById(id);
     }
     return intern;
+  },
+  getInternByUserId: async (userId) => {
+    try {
+      console.log(userId);
+      const internId = await getInternIdByUserId(userId);
+      console.log(internId);
+      if (internId) {
+        const intern = await get().getStagiaireById(internId);
+        console.log(intern);
+        return intern;
+      }
+      throw new Error("Intern not found for the given user ID.");
+    } catch (error) {
+      console.error("Error fetching Intern by userId:", error);
+      throw error;
+    }
   },
 }));
 

@@ -13,5 +13,7 @@ namespace Application.Repositories
         Task UpdateAsync(Intern intern);
         Task DeleteAsync(Guid id);
         Task DeleteAllAsync();
+        Task<Guid?> GetUserIdByInternId(Guid internId);
+        Task<Guid?> GetInternIdByUserId(Guid userId);
     }
 }

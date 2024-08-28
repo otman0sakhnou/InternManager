@@ -1,3 +1,4 @@
+using Application.Services.AuthenticationAndAuthorization.Queries;
 using Application.Services.Collaborator.Commands;
 using Application.Services.Collaborator.Queries;
 using Domain.DTOs;
@@ -79,6 +80,26 @@ namespace API.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetCollaboratorIdByUserId(Guid userId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetCollaboratorIdByUserIdQuery(userId));
+
+                if (result == null)
+                {
+                    return NotFound("No collaborator found for the given user ID.");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
