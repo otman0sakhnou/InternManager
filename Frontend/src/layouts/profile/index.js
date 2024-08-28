@@ -11,6 +11,8 @@ import InternStepsCard from "./customComponents/InternStepsCard";
 import InternStepsCard from "./customComponents/InternStepsCard"
 import { Grid, Backdrop } from "@mui/material";
 import { DNA } from 'react-loader-spinner';
+import Grid from "@mui/material/Grid";
+import InternStepsCard from "./customComponents/InternStepsCard";
 
 import Header from "./components/Header";
 import ProfessionalInfoCard from "./customComponents/ProfessionalInfoCard";
@@ -25,17 +27,14 @@ import useAuthStore from "store/useAuthStore";
 
 function Overview() {
   const { id: selectedUserId } = useParams(); // Extract ID from route parameters
-  console.log(selectedUserId)
+
   // const role = useAuthStore((state) => state.role);
   const location = useLocation(); //to get the current route
-  console.log(location.pathname)
 
   const { user, isAuthenticated, roles } = useAuthStore();
 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  console.log("**************************")
-  console.log(error)
   const [refresh, setRefresh] = useState(false); //this state is added to trigger the update in this component when the name changed in the CustonInfoCard so the header get the up to date value of name at real time
 
   const {
@@ -45,23 +44,19 @@ function Overview() {
     selectedUserRole,
     isLoading: roleLoading,
   } = useSelectedUserRoleStore();
-  console.log(selectedUserRole);
 
   const { getCollaborator, getCollaboratorByUserId } = useCollaboratorStore();
   const { getStagiaireById, getInternByUserId } = useStagiaireStore();
 
   //to determine if the current user is viewing their own profile or someone's else
   const isViewingOwnProfile = !selectedUserId;
-  console.log(isViewingOwnProfile)
 
   useEffect(() => {
-    console.log("the useEffect will run again")
     const fetchRoles = async () => {
       try {
         if (location.pathname.includes("/profile")) {
           await fetchSelectedUserRole(user.userId);
         } else if (location.pathname.includes("/Collaborator/Profile")) {
-          console.log("this is the right function")
           await fetchRolesByCollaboratorId(selectedUserId);
         } else if (location.pathname.includes("/Intern/Profile")) {
           await fetchRolesByInternId(selectedUserId);
@@ -77,7 +72,6 @@ function Overview() {
       roles.includes("Collaborator")
     ) {
       fetchRoles();
-      console.log(selectedUserRole);
     }
   }, [
     selectedUserId,
@@ -89,12 +83,10 @@ function Overview() {
     user.userId,
   ]);
 
-  console.log(selectedUserRole)
 
   useEffect(() => {
     const fetchData = async () => {
       setError(null); //Reset error state when fetching new data
-      console.log("fetching data");
       try {
         if (isViewingOwnProfile) {
           if (roles.includes("Collaborator") || roles.includes("Manager")) {
@@ -107,7 +99,6 @@ function Overview() {
             return;
           }
         } else {
-          console.log("hello");
           if (selectedUserId) {
             if (
               roles.includes("Admin") ||
@@ -115,12 +106,9 @@ function Overview() {
               roles.includes("Manager")
             ) {
               if (selectedUserRole === "Collaborator" || selectedUserRole === "Manager") {
-                console.log("annyeong");
                 const collaborator = await getCollaborator(selectedUserId);
                 setData(collaborator);
-                console.log("after setting the data");
               } else if (selectedUserRole === "Intern") {
-                console.log("annyeong for intern");
                 const intern = await getStagiaireById(selectedUserId);
                 setData(intern);
               }
@@ -128,14 +116,12 @@ function Overview() {
           }
         }
       } catch (err) {
-        console.log(err);
         setError("Failed to fetch data. Please try again later.");
       }
       setLoading(false);
     };
     fetchData();
   }, [selectedUserId, getCollaborator, getStagiaireById, refresh, roles, user, selectedUserRole]);
-  console.log(data);
 
   const handleDataUpdate = () => {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger useEffect
@@ -166,30 +152,26 @@ function Overview() {
   // if (roleLoading) return <div>Loading...</div>;
   if (loading || roleLoading) {
     return (
-      <Backdrop
-        sx={{
-          color: "#ff4",
-          backgroundImage: "linear-gradient(135deg, #ced4da 0%, #ebeff4 100%)",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-        open={loading}
-      >
-        <DNA
-          visible={true}
-          height="100"
-          width="100"
-          ariaLabel="dna-loading"
-          wrapperStyle={{}}
-          wrapperClass="dna-wrapper"
+      <DashboardLayout>
+        <Header
+          key={user.userId}
+          isViewingOwnProfile={isViewingOwnProfile}
+          name={user.userName}
+          gender={user.gender}
         />
-      </Backdrop>
+        <Footer />
+      </DashboardLayout>
     );
   }
 
-  if (!data) return <div>No data found</div>; // Handle loading state
-  const latestPeriod = data.periods?.reduce((latest, current) =>
-    new Date(current.endDate) > new Date(latest.endDate) ? current : latest
-    , data.periods[0]);
+  if (error){
+    return <div>{error}</div>;
+  } 
+  if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
+  const latestPeriod = data.periods?.reduce(
+    (latest, current) => (new Date(current.endDate) > new Date(latest.endDate) ? current : latest),
+    data.periods[0]
+  );
 
   const profileAction = {
     route: "/edit-profile",
