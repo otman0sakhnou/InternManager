@@ -6,13 +6,13 @@ import curved6 from "assets/images/curved-images/curved14.jpg";
 import SubjectsCover from 'components/SubjectsCover';
 import SoftTypography from 'components/SoftTypography';
 import { useGroupName } from 'context/GroupeNameContext';
+import TrackingteamComponent from './TrackingteamComponent';
 
 
 const SubjectList = ({ subjects }) => {
   const { groupNameC } = useGroupName();
-  console.log("groupe name :", groupNameC);
   if (subjects.length === 0) {
-    return <Typography>No subjects available.</Typography>;
+    return <SoftTypography variant="h4" color="dark" fontWeight="bold" textGradient>No subjects available.</SoftTypography>;
   }
 
   return (
@@ -38,13 +38,14 @@ const SubjectList = ({ subjects }) => {
               sx={{
                 border: '1px solid #ddd',
                 borderRadius: 1,
-                p: 2,
+                py: 2,
+                px:5,
                 mb: 2,
                 maxWidth: '100%',
                 overflow: 'auto',
               }}
             >
-              <div dangerouslySetInnerHTML={{ __html: subject.description }} />
+              <div  dangerouslySetInnerHTML={{ __html: subject.description }} />
             </Box>
             <SoftTypography variant="body1" textGradient color='dark' mb={2}>
               <strong>Steps:</strong>
@@ -68,7 +69,7 @@ const SubjectList = ({ subjects }) => {
                       border: '1px solid #d1d9ff',
                       boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
                       borderRadius: 2,
-                      background: 'linear-gradient(135deg, #2152ff 0%, #6e7eff 50%, #21d4fd 100%)',
+                      background: 'linear-gradient(90deg, #4a6cff, #4ad0fd)',
                       '&:hover': {
                         backgroundColor: '#e1eaff',
                       },
@@ -109,6 +110,7 @@ const SubjectList = ({ subjects }) => {
               </Grid>
             )}
           </Box>
+          <TrackingteamComponent subjectId={subject.id} groupId={subject.groupId}/>
         </SubjectsCover>
       ))}
     </>

@@ -1,5 +1,6 @@
 ﻿using Application.Services.InternSteps.Commands;
 using Application.Services.InternSteps.Queries;
+using Application.Services.ProgressTracking.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +19,9 @@ namespace API.Controllers
         }
 
         [HttpGet("intern/{subjectId}")]
-        public async Task<IActionResult> GetSubjectForIntern(Guid subjectId, [FromQuery] Guid internId)
+        public async Task<IActionResult> GetSubjectForIntern([FromQuery] Guid internId)
         {
-            var query = new GetSubjectForInternQuery(subjectId, internId);
+            var query = new GetSubjectForInternQuery(internId);
             var result = await _mediator.Send(query);
 
             return Ok(result);
@@ -29,7 +30,7 @@ namespace API.Controllers
         [HttpGet("group/{subjectId}")]
         public async Task<IActionResult> GetSubjectForGroup(Guid subjectId, [FromQuery] Guid groupId)
         {
-            var query = new GetSubjectForGroupQuery(subjectId, groupId);
+            var query = new GetGroupsProgressQuery(groupId, subjectId);
             var result = await _mediator.Send(query);
 
             return Ok(result);

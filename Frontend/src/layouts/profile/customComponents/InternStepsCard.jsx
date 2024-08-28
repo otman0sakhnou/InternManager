@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unescaped-entities */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import { Card, CardContent, Box, Pagination, Grid } from "@mui/material";
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
@@ -10,53 +10,22 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { keyframes } from "@mui/system";
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
-
-// Sample subjects
-const subjects = [
-  {
-    title: "React.js Formation",
-    steps: [
-      { title: "JSX and Components", status: "Completed" },
-      { title: "State Management with Redux", status: "Completed" },
-      { title: "React Hooks Deep Dive", status: "In Progress" },
-    ],
-  },
-  {
-    title: "Node.js & Express.js Formation",
-    steps: [
-      { title: "Building RESTful APIs with Express", status: "Completed" },
-      { title: "Middleware and Error Handling", status: "In Progress" },
-      { title: "MongoDB Integration", status: "Completed" },
-    ],
-  },
-  {
-    title: "MERN Stack Project",
-    steps: [
-      { title: "Set Up MERN Stack Environment", status: "Completed" },
-      { title: "User Authentication with JWT", status: "In Progress" },
-      { title: "React & Redux Integration", status: "Pending" },
-    ],
-  },
-  {
-    title: "Docker & Kubernetes Formation",
-    steps: [
-      { title: "Containerization with Docker", status: "Completed" },
-      { title: "Kubernetes Basics", status: "In Progress" },
-      { title: "Deploying Apps on Kubernetes", status: "Pending" },
-    ],
-  },
-  {
-    title: "CI/CD Pipeline with Jenkins Project",
-    steps: [
-      { title: "Setup Jenkins Server", status: "Completed" },
-      { title: "Automated Testing with Jenkins", status: "In Progress" },
-      { title: "Continuous Deployment", status: "Pending" },
-    ],
-  },
-];
+import { getSubjectsHisotryByintern } from "Actions/SubjectActions";
+import { useParams } from "react-router-dom";
 
 
 const InternStepsCard = () => {
+  const [data, setData] = useState([])
+  const { id } = useParams()
+
+  useEffect(() => {
+    const loadData = async () => {
+      const res = await getSubjectsHisotryByintern(id);
+      setData(res);
+    };
+    loadData();
+  }, [id]);
+
   const settings = {
     dots: true,
     infinite: true,
@@ -124,12 +93,12 @@ const InternStepsCard = () => {
           </Box>
           <Box>
             <SoftTypography variant="subtitle2" color="secondary" textGradient>
-              Track the progress across different subjects .
+              Track the progress across different subjects.
             </SoftTypography>
           </Box>
           <Box className="slider-container" p={2}>
             <Slider {...settings}>
-              {subjects.map((subject, index) => {
+              {data.map((subject, index) => {
                 const totalSteps = subject.steps.length;
                 const totalPages = Math.ceil(totalSteps / stepsPerPage);
                 const current = currentPage[index] || 1;
@@ -138,19 +107,18 @@ const InternStepsCard = () => {
                 const currentSteps = subject.steps.slice(startIndex, endIndex);
                 const completedSteps = subject.steps.filter((s) => s.status === 'Completed').length;
 
-
                 return (
                   <Box key={index} p={1}>
                     <Card sx={{ boxShadow: 1 }}>
                       <CardContent>
                         <Grid display="flex">
-                          <SoftTypography variant="h5" color="dark" fontWeight="bold" textGradient >
+                          <SoftTypography variant="h5" color="dark" fontWeight="bold" textGradient>
                             {subject.title}
                           </SoftTypography>
                         </Grid>
 
                         <SoftTypography variant="caption" color="secondary" fontWeight="bold" textGradient mb={1}>
-                          ({totalSteps} Steps| {completedSteps} Completed)
+                          ({totalSteps} Steps | {completedSteps} Completed)
                         </SoftTypography>
 
                         {currentSteps.map((step, stepIndex) => (
@@ -161,16 +129,15 @@ const InternStepsCard = () => {
                             mb={1}
                           >
                             {step.status === "Completed" ? (
-                              <CheckCircleOutlineRoundedIcon fontSize="medium" color="success" sx={{ marginRight: 1, }} />
-                            ) : step.status === "In Progress" ? (
+                              <CheckCircleOutlineRoundedIcon fontSize="medium" color="success" sx={{ marginRight: 1 }} />
+                            ) : step.status === "Pending" ? (
                               <HourglassBottomRoundedIcon fontSize="medium" color="warning" sx={{ marginRight: 1, ...rotatingIconStyle }} />
                             ) : (
                               <PendingOutlinedIcon fontSize="medium" color="error" sx={{ marginRight: 1 }} />
                             )}
                             <Box>
                               <Box>
-                                <SoftTypography variant="body2" color="primary" fontWeight="bold" textGradient>{step.title}</SoftTypography>
-
+                                <SoftTypography variant="body2" color="primary" fontWeight="bold" textGradient>{step.description}</SoftTypography>
                               </Box>
                               <Box>
                                 <SoftTypography variant="body2" color="secondary" textGradient>

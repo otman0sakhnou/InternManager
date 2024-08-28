@@ -146,12 +146,12 @@ function SubjectsCover({ team, title = "", description = "", type, image, childr
         <Grid container spacing={3}>
           <Grid item xs={12} lg={12}>
             <Card sx={{ p: 3 }}>
-              {children}
+              {children[0]}
             </Card>
           </Grid>
           <Grid item xs={12} lg={12}>
             <Card sx={{ p: 5 }}>
-              <TrackingteamComponent/>
+              {children[1]}
             </Card>
           </Grid>
         </Grid>

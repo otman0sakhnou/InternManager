@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services.Subjects.Commands
 {
-    public record StepDto(Guid Id, string Description);
+    public record StepDto(Guid Id, string Description, int order);
     public record UpdateSubjectCommand(
         Guid Id,
         string Title,
@@ -68,7 +68,8 @@ namespace Application.Services.Subjects.Commands
                     {
                         Id = Guid.NewGuid(),
                         Description = stepDto.Description,
-                        SubjectId = subject.Id
+                        SubjectId = subject.Id,
+                        OrderStep = stepDto.order
                     };
 
                     await _stepRepository.AddAsync(newStep);
