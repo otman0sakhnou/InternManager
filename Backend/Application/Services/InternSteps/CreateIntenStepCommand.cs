@@ -29,7 +29,7 @@ namespace Application.Services.InternSteps
                 {
                     InternId = internStepDto.InternId,
                     StepId = internStepDto.StepId,
-                    Status = internStepDto.Status ? "Completed" : "Pending",
+                    Status = internStepDto.Status ? "Completed" : "In Progress",
                 };
                 await _internStepRepository.AddAsync(internStep);
             }

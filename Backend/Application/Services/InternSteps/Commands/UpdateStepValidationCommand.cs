@@ -45,13 +45,13 @@ namespace Application.Services.InternSteps.Commands
                 {
                     StepId = request.StepId,
                     InternId = request.InternId,
-                    Status = request.Status ? "Completed" : "Pending"
+                    Status = request.Status ? "Completed" : "In Progress"
                 });
             }
             else
             {
                 // Update the status of the existing InternStep
-                internStep.Status = request.Status ? "Completed" : "Pending";
+                internStep.Status = request.Status ? "Completed" : "In Progress";
             }
 
             await _internStepRepository.SaveChangesAsync();

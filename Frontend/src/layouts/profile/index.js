@@ -268,7 +268,7 @@ function Overview() {
             role={selectedUserId ? selectedUserRole : roles[0]}
             isViewingOwnProfile={isViewingOwnProfile}
           />
-          {/* {selectedUserRole=="Intern" && <InternStepsCard/>} */}
+          {selectedUserRole=="Intern" && <InternStepsCard/>}
         </Grid>
       </SoftBox>
       <Footer />
