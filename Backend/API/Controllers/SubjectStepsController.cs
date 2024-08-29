@@ -18,8 +18,8 @@ namespace API.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("intern/{subjectId}")]
-        public async Task<IActionResult> GetSubjectForIntern([FromQuery] Guid internId)
+        [HttpGet("intern/{internId}")]
+        public async Task<IActionResult> GetSubjectForIntern(Guid internId)
         {
             var query = new GetSubjectForInternQuery(internId);
             var result = await _mediator.Send(query);
