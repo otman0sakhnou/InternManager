@@ -90,6 +90,7 @@ function Overview() {
         if (isViewingOwnProfile) {
           if (roles.includes("Collaborator") || roles.includes("Manager")) {
             const collaborator = await getCollaboratorByUserId(user.userId);
+
             setData(collaborator);
           } else if (roles.includes("Intern")) {
             const intern = await getInternByUserId(user.userId);
@@ -140,9 +141,9 @@ function Overview() {
     );
   }
 
-  if (error){
+  if (error) {
     return <div>{error}</div>;
-  } 
+  }
   // if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
   // const latestPeriod = data.periods?.reduce(
   //   (latest, current) => (new Date(current.endDate) > new Date(latest.endDate) ? current : latest),
@@ -163,9 +164,9 @@ function Overview() {
     );
   }
 
-  if (error){
+  if (error) {
     return <div>{error}</div>;
-  } 
+  }
   // if (!data || roleLoading) return <div>Loading...</div>; // Handle loading state
   // const latestPeriod = data.periods?.reduce(
   //   (latest, current) => (new Date(current.endDate) > new Date(latest.endDate) ? current : latest),
@@ -206,16 +207,16 @@ function Overview() {
   const info =
     selectedUserRole === "Intern" || roles[0] === "Intern"
       ? {
-          id: data.id,
-          institution: data.institution,
-          level: data.level,
-          specialization: data.specialization,
-          yearOfStudy: data.yearOfStudy,
-          title: data.title,
-          department: data.department,
-          startDate: latestPeriod?.startDate,
-          endDate: latestPeriod?.endDate,
-        }
+        id: data.id,
+        institution: data.institution,
+        level: data.level,
+        specialization: data.specialization,
+        yearOfStudy: data.yearOfStudy,
+        title: data.title,
+        department: data.department,
+        startDate: latestPeriod?.startDate,
+        endDate: latestPeriod?.endDate,
+      }
       : {
         id: data.id,
         department: data.department,
@@ -268,7 +269,7 @@ function Overview() {
             role={selectedUserId ? selectedUserRole : roles[0]}
             isViewingOwnProfile={isViewingOwnProfile}
           />
-          {selectedUserRole=="Intern" && <InternStepsCard/>}
+          {selectedUserRole == "Intern" && <InternStepsCard />}
         </Grid>
       </SoftBox>
       <Footer />

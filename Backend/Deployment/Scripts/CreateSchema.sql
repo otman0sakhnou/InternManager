@@ -1,5 +1,5 @@
 ﻿--db schema
-USE InternManagerDb
+USE InternManagerDb3
 
 Go
 IF NOT EXISTS (SELECT * 

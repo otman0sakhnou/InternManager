@@ -14,9 +14,9 @@ namespace Deployment.Migrations
             var connectionString = conf.GetConnectionString("DefaultConnection");
 
             var createDatabaseQuery = $@"
-            IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'InternManagerDb')
+            IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'InternManagerDb3')
             BEGIN
-                CREATE DATABASE [InternManagerDb];
+                CREATE DATABASE [InternManagerDb3];
             END";
 
             using (var connection = new SqlConnection(connectionString))

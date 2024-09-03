@@ -166,12 +166,12 @@ const Groups = () => {
     };
 
     try {
+
+      setLoading(true);
+
+
+      const groupId = await addGroup(newGroup);
       if (addSubject) {
-        setLoading(true);
-        addGroup(newGroup);
-
-        const groupId = await addGroup(newGroup);
-
         navigate(`/Add-Subject/${groupId}`);
       } else {
         // Afficher la confirmation
